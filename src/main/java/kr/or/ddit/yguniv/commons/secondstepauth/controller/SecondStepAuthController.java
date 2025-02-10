@@ -135,8 +135,8 @@ public class SecondStepAuthController {
 	
 	//sms인증인경우
 	public void smsMethod(String phoneNumber,HttpSession session) {
-		final String API_KEY = "NCSFMBZFCLMHWXX1";
-		final String API_SECRET = "LLUC1U6VITX6DZGX5TALMHMF4TC98MJN";
+		final String API_KEY = "APIKEY";
+		final String API_SECRET = "APISECRET";
 		final String API_URL = "https://api.coolsms.co.kr"; 
 		
 		// MessageService 객체 초기화
