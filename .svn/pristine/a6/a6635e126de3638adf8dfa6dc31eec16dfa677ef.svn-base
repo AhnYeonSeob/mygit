@@ -1,0 +1,34 @@
+/**
+ * 
+ */
+document.querySelector("form").addEventListener("submit", function (e) {
+    const password = document.getElementById("pswd").value;
+    const confirmPassword = document.getElementById("confirmPswd").value;
+
+   if (password !== confirmPassword) {
+        alert('비밀번호가 일치하지 않습니다.');
+        e.preventDefault(); // 폼 제출 중단
+    }
+    return true; // 폼 제출 진행
+});
+
+
+
+function previewProfileImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('profilePreview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+
+function removeProfileImage() {
+    document.getElementById('profilePreview').src = `${contextPath}/resources/NiceAdmin/assets/img/user.png?${new Date().getTime()}`;
+    document.getElementById('profileImage').value = ""; // 파일 선택 초기화
+}
+
+      

@@ -1,0 +1,32 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const statusSelect = document.getElementById("statusSelect");
+    const approvalDateInput = document.getElementById("approvalDateInput");
+  
+    const form = document.getElementById("updateStatusForm");
+
+    if (!statusSelect || !approvalDateInput || !form) {
+        console.error("Required elements not found in the DOM.");
+        return;
+    }
+
+    // 상태 변경 시 이벤트 핸들러
+    statusSelect.addEventListener("change", function () {
+        const selectedStatus = statusSelect.value;
+
+        console.log("Selected status:", selectedStatus);
+
+        if (!selectedStatus) {
+            alert("상태를 선택하세요.");
+            return;
+        }
+
+       
+      
+    });
+
+    // 폼 제출 함수
+    function submitForm() {
+        console.log("Form submitted.");
+        form.submit(); // 폼 제출
+    }
+});

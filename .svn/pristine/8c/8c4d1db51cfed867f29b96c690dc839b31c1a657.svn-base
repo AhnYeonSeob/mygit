@@ -1,0 +1,477 @@
+/**
+ *
+	 제출과제 js 
+	1. 리스트 출력 (권한에 따라 해당강의 교수의경우 전체출력/ 학생의 경우 부분출력)
+ 	2. 리스트 출력시 (권한에 따라 제출/삭제 || 채점/삭제 )
+	3. 현재 로그인한 사용자의 아이디를 가져와 비교
+
+ */
+
+var contextPath = document.getElementById('parentTable').dataset['path'];
+const lectNo = document.getElementById('lectNo').value;
+var Url = `${contextPath}/lecture/${lectNo}/assignmentSubmission`;
+var userId = document.getElementById('parentTable').dataset['auth'];
+
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+	//const targetTable = document.getElementById('parentTable');
+	const $targetTable = $('#parentTable');
+	
+	const getListURL = `${Url}/get`;
+	
+	await fndataTable(getListURL, $targetTable);
+	
+	const submitForm = document.querySelector('#assignSubmitForm');
+	
+	//과제제출처리
+	submitForm.addEventListener("submit",async (e)=>{
+		e.preventDefault();
+		
+		const formData = new FormData(submitForm);
+		
+	    try {
+	        const resp = await fetch(`${submitForm.action}`, {
+	            method: "POST",
+	            body: formData // JSON 데이터 전송
+	        });
+	        if (!resp.ok) {
+	            const result = await resp.json();
+	            swal({
+	            title: "제출실패!",
+	            text: result.message,
+	            icon: "error",
+	            button: "확인"
+        		});
+	        } 
+			else{
+			swal({
+	            title: "제출성공!",
+	            text: "과제가 정상적으로 제출되었습니다",
+	            icon: "success",
+	            button: "확인"
+        	}).then(function(){
+				location.reload();
+			});
+			
+			}
+	    } catch (error) {
+	        console.error("Fetch error:", error);
+			swal({
+	            title: "제출실패!",
+	            text: "서버와의 연결에 실패했습니다. 다시 시도해주세요.",
+	            icon: "error",
+	            button: "확인"
+       		 });
+   		 }
+	});//과제제출처리이벤트리스너 끝
+	
+	//과제제출취소처리
+	const cancelBtn = document.querySelector('#cancelBtn');
+	
+	cancelBtn.addEventListener("click", async()=>{
+		swal({
+	            title: "제출회수하시겠습니까?",
+	            text: "제출회수한 과제는 복구할 수 없습니다.",
+	            icon: "warning",
+	            buttons: ["확인","취소"]
+		}).then(async (willDelete)=>{
+			if(!willDelete){
+				const assigNo =document.querySelector('.assignmentSubmission-assigNo').innerText;
+				const changeStatusUrl = `${Url}/${assigNo}`;
+				try{
+					let resp = await fetch(changeStatusUrl,{
+						method: 'PUT'
+						,headers: {
+							'content-type' : 'application/json'
+						}
+						,body: JSON.stringify({
+							assubYn: "Y"
+						})
+						
+					});
+					if(resp.ok){
+						swal("제출취소되었습니다.","과제가 정상적으로 제출 취소되었습니다.","success")
+						.then(()=>{
+							location.reload();
+						})
+					}else{
+						let jsonData = await resp.json();
+						swal("실패",jsonData.message,"error");
+					}
+				}catch(e){
+					console.log("에러:",e);
+					swal("서버 오류", "과제 제출 취소 중 오류가 발생했습니다.", "error");
+				}					
+				
+			}
+			else{
+				swal("취소했습니다.","제출회수취소","info")
+				.then(()=>{
+					location.reload();
+				})
+				
+			}
+		})
+	})
+	
+	const gradeForm = document.querySelector('#gradeForm');
+	gradeForm.addEventListener("submit",async (e)=>{
+		e.preventDefault();
+		
+		const assubScore = e.target.assubScore.value;
+		const assigScore = document.querySelector('.assigScore').innerText;
+		const assigNo = e.target.assigNo.value;
+		const stuId = e.target.stuId.value;
+		
+		const url = e.target.action;
+		
+		console.log(assigNo,stuId);
+		
+		if(assigScore< assubScore){
+			swal("잘못된 점수값", "해당과제의 배점보다 높은 점수를 입력할 수 없습니다!", "error");
+		}
+		else{
+			swal({
+	            title: "점수를 입력하시겠습니까?",
+	            text: "반드시 체크해주세요! 한번 입력한 점수값은 성적변경신청없이 수정불가합니다.",
+	            icon: "warning",
+	            buttons: ["확인","취소"]
+			}).then(async (willDelete)=>{
+				if(!willDelete){
+					try{
+						let resp = await fetch(url,{
+							method: 'POST'
+							,headers: {
+								'content-type' : 'application/json'
+							}
+							,body: JSON.stringify({
+								assigNo: assigNo
+								,stuId: stuId
+								,assubScore: assubScore
+							})
+						});//fetch
+						if(resp.ok){
+							swal("점수입력완료.","점수가 정상적으로 입력되었습니다.","success")
+							.then(()=>{
+								location.reload();
+							})
+						}else{
+							let jsonData = await resp.json();
+							swal("실패",jsonData.message,"error");
+						}
+					}catch(e){
+						console.log("에러:",e);
+						swal("서버 오류", "과제 제출 취소 중 오류가 발생했습니다.", "error");
+					}
+				}else{
+					swal("취소","취소되었습니다!","success")
+						.then(()=>{
+							location.reload();
+						})
+				}
+				
+			})
+			
+		}
+		
+		
+		
+	});//gradesubmitBtn 이벤트 끝
+	
+	
+});//DOM 끝
+
+async function fndataTable(Url, target){
+	try{
+		const resp = await fetch(Url);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		
+		target.DataTable({
+			data: jsonData,
+			columns: [
+				{
+					data: 'rnum'
+					,title: '번호'
+				}
+				,{
+					data: 'lectNm'
+					,title: '강의명'
+				}
+				,{
+					data: 'assignment.assigNm'
+					,title: '과제명'
+					,render: function(data, type, row){
+						return `<a href="javascript:void(0)" onclick="fnassignDetail(${row.assigNo})">${data}</a>`;
+					}
+				}
+				,{
+					data: null
+					,title: '점수 / 배점'
+					,render: function(data, type, row){
+						const assigScore = row.assignment.assigScore || 'N/A';
+						const assubScore = row.assubScore || 0;
+						return `${assubScore}/ ${assigScore}`;
+					}
+				}
+				,{
+					data: 'assubYn'
+					,title: '제출여부'
+					,render: function(data, type, row){
+						return row.assubYn == 'Y' ? '제출완료' : '미제출';
+					}
+				}
+				,{
+					data: 'atchFileId'
+					,title: '첨부파일'
+					,render: function(data, type, row){
+						if(data){
+							return ` <span class="file-icon" title="첨부파일 있음">
+                   			 			<i class="fa fa-paperclip" style="color: green;"></i>
+            						</span> `;
+						}
+						else{
+							return '첨부파일 없음';
+						}
+					}//atchFileId render끝
+				}
+				,{
+					data: 'assignment.peerYn'
+					,title: '피어리뷰'
+					,render: function(data, type, row){
+						if(data == 'Y'){
+							if(row.peerYn){
+								return '완료';
+							}
+							else{
+								return '미완료';
+							}
+						}else{
+							return '해당없음';
+						}
+					}
+				}//peerYn 끝
+				,{
+					data: null
+					,title: ''
+					/* 버튼 구조는 수정필요 */
+					,render: function(data, type, row){
+						let res = "";
+						if(row.assubYn=='N'){
+							res+= `<button class="btn btn-primary" onclick="fnsubmitForm(${row.assigNo})">제출</button>`;
+						}
+						if(row.peerYn=='N'&&row.assignment.peerYn=='Y'){
+							res+= `<button class="btn btn-primary" onclick="fnpeerForm()">피어리뷰작성</button>`;
+						}
+						if(row.assubYn=='Y'){
+							res+=`
+							<button class="btn btn-primary" onclick="fnassubDetail(${row.assigNo},${row.stuId})">제출과제보기</button>
+							`;
+						}
+						if(row.assubYn=='Y'&&row.assubScore==''){
+							res+=`<button class="btn btn-primary" onclick="gradeForm(${row.assigNo},${row.stuId},${row.assignment.assigScore})">채점</button>`;
+						}
+						return res;
+					}
+				}
+			]//데이터렌더링끝
+		});//데이터테이블끝
+	}
+	catch(error){
+		console.log(error);
+	}
+}//table생성함수 끝
+
+async function fnassignDetail(assigNo){
+	const getassignDetailUrl = `${Url}/assign/${assigNo}`
+	const assignDetailModal = document.querySelector('#assignDetailModal');
+	try{
+		const resp = await fetch(getassignDetailUrl);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		
+		Object.keys(jsonData).forEach((key)=>{
+			const element = assignDetailModal.querySelector(`.assignment-${key}`);
+			if(element){
+				if(key == 'atchFileId') {
+                    // 첨부파일 처리
+					let fileLinks = '';
+                    let fileDetails = jsonData['fileDetails'];
+		            if (fileDetails && fileDetails.atchFileId && fileDetails.fileSn && fileDetails.orignlFileNm && fileDetails.fileFancysize) {
+		                let atchFileId = fileDetails.atchFileId;
+		                let fileSn = fileDetails.fileSn;
+		                let orignlFileNm = fileDetails.orignlFileNm;
+		                let fileFancysize = fileDetails.fileFancysize;
+		                
+		                const downUrl = `${contextPath}/atch/${atchFileId}/${fileSn}`;
+		                fileLinks += `<a href="${downUrl}">${orignlFileNm} (${fileFancysize})</a>`;
+		            } else {
+		                // 첨부파일이 없을 때 처리
+		                fileLinks = '첨부파일없음';
+		            }
+		
+		            element.innerHTML = fileLinks;
+                }else{
+                   element.innerHTML = jsonData[key] || '-';
+                }
+			}
+		});
+		
+		const bootsModal = new bootstrap.Modal(assignDetailModal);
+		bootsModal.show();
+		
+	}catch(error){
+		console.log(error);
+	}
+	
+}//fnassignDetail끝
+
+//제출폼
+async function fnsubmitForm(assigNo){
+	const getFormUrl = `${Url}/assign/${assigNo}`;
+	const assignSubmitModal = document.querySelector('#assignSubmitModal');
+	try{
+		const resp = await fetch(getFormUrl);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		console.log(jsonData);
+		const submitForm=document.querySelector('#assignSubmitForm');
+		const inputs = submitForm.querySelectorAll('input, textarea, select');
+		
+		inputs.forEach((input) => {
+        const name = input.name; // input의 name 속성
+		if(name=='stuId'){
+			input.value = `${userId}`;
+		}
+        if (name && jsonData[name] !== undefined) {
+            input.value = jsonData[name]; // JSON 데이터의 key와 매칭되는 값 설정
+        }
+    });
+		const bootsModal = new bootstrap.Modal(assignSubmitModal);
+		bootsModal.show();
+		
+	}catch(error){
+		console.log(error);
+	}
+}
+
+//제출과제 상세보기모달
+async function fnassubDetail(assigNo,stuId){
+	const getDetailUrl = `${Url}/detail/${assigNo}/${stuId}`;
+	const assignSubmissionDetailModal = document.querySelector('#assignSubmissionDetailModal');
+	
+	try{
+		const resp = await fetch(getDetailUrl);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		
+		Object.keys(jsonData).forEach((key)=>{
+			//console.log(key);
+			const element = assignSubmissionDetailModal.querySelector(`.assignmentSubmission-${key}`);
+			if(element){
+				if(key == 'atchFileId') {
+                    // 첨부파일 처리
+					let fileLinks = '';
+                    let fileDetails = jsonData['fileDetails'];
+		            if (fileDetails && fileDetails.atchFileId && fileDetails.fileSn && fileDetails.orignlFileNm && fileDetails.fileFancysize) {
+		                let atchFileId = fileDetails.atchFileId;
+		                let fileSn = fileDetails.fileSn;
+		                let orignlFileNm = fileDetails.orignlFileNm;
+		                let fileFancysize = fileDetails.fileFancysize;
+		                
+		                const downUrl = `${contextPath}/atch/${atchFileId}/${fileSn}`;
+		                fileLinks += `<a href="${downUrl}">${orignlFileNm} (${fileFancysize})</a>`;
+		            } else {
+		                // 첨부파일이 없을 때 처리
+		                fileLinks = '첨부파일없음';
+		            }
+		            element.innerHTML = fileLinks;
+                }else{
+                   element.innerHTML = jsonData[key] || '-';
+                }
+			}
+		});
+		
+		
+		const bootsModal = new bootstrap.Modal(assignSubmissionDetailModal);
+		bootsModal.show();
+		
+	}catch(error){
+		console.log(error);
+	}
+	
+}//제출과제 상세보기모달 끝
+
+//채점폼
+async function gradeForm(assigNo, stuId, assigScore){
+	//강의번호, 제출학번, 배점
+	console.log(assigNo,stuId,assigScore);
+	//hidden타입에 식별자값 저장 
+	document.querySelector('.assigNo').value = assigNo;
+	document.querySelector('.stuId').value = stuId;
+	
+	//제출정보가져와서 모달창에띄우기
+	const getUrl = `${Url}/detail/${assigNo}/${stuId}`;
+	const gradeFormModal =document.querySelector('#gradeFormModal');
+	
+	try{
+		const resp = await fetch(getUrl);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		document.querySelector('.assigScore').innerHTML = assigScore;
+		
+		
+		Object.keys(jsonData).forEach((key)=>{
+			//console.log(key);
+			const element = gradeFormModal.querySelector(`.assignmentSubmission-${key}`);
+			if(element){
+				if(key == 'atchFileId') {
+                    // 첨부파일 처리
+					let fileLinks = '';
+                    let fileDetails = jsonData['fileDetails'];
+		            if (fileDetails && fileDetails.atchFileId && fileDetails.fileSn && fileDetails.orignlFileNm && fileDetails.fileFancysize) {
+		                let atchFileId = fileDetails.atchFileId;
+		                let fileSn = fileDetails.fileSn;
+		                let orignlFileNm = fileDetails.orignlFileNm;
+		                let fileFancysize = fileDetails.fileFancysize;
+		                
+		                const downUrl = `${contextPath}/atch/${atchFileId}/${fileSn}`;
+		                fileLinks += `<a href="${downUrl}">${orignlFileNm} (${fileFancysize})</a>`;
+		            } else {
+		                // 첨부파일이 없을 때 처리
+		                fileLinks = '첨부파일없음';
+		            }
+		            element.innerHTML = fileLinks;
+                }else{
+                   element.innerHTML = jsonData[key] || '-';
+                }
+			}
+		});
+		
+		
+		const bootsModal = new bootstrap.Modal(gradeFormModal);
+		bootsModal.show();
+		
+	}catch(error){
+		console.log(error);
+	}
+	
+	
+}
+
+
+
+//피어리뷰폼
+fnpeerForm
+//제출취소
+fncancelSumbit

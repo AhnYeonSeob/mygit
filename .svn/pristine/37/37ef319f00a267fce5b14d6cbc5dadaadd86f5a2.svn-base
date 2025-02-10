@@ -1,0 +1,41 @@
+package kr.or.ddit.yguniv.attendcoeva.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.DummyVO;
+
+@Mapper
+public interface AttendCoevaMapper {
+	
+	//강의평가 LCRUD
+	//목록 : 등록 가능한 강의 평가 목록 가져오기[학생] / 등록된 강의 평가 가져오기 [교수]
+	//상세 : 해당 강의의 강의평가 가져오기 [ 교수? 학생]?
+	//생성 : 학생이 새로운 강의평가를 등록?
+	//수정 : 학생이 새로운 강의평가를 수정?.
+
+	/** 
+	 * 강의 평가 가져오기
+	 * @return [학생] 등록 가능한 강의평가 목록 / [교수] 등록된 강의 평가 가져오기
+	 */
+	public List<DummyVO> selectCoevaList(); //강의 LectureVO로 수정하기
+
+	/**
+	 * [교수]한 건의 강의 평가 조회하기
+	 * @return DummyVO / NULL
+	 */
+	public DummyVO selectCoevaPaper ();
+
+	/** [학생] 강의 평가 등록하기
+	 * @return 성공 : 1 / 실패 : 0
+	 */
+	public int insertCoeva();
+	/** [교수] 강의 평가 후 성적 업데이트
+	 * @return 성공 : 1 / 실패 : 0
+	 */
+	public int updateCoeva();
+	
+	
+	public int deleteCoeva();
+}

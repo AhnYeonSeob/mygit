@@ -1,0 +1,23 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<table class="table table-primary table-borderd">
+	<colgroup>
+		
+	</colgroup>
+	<thead>
+		<tr>
+			<th>학기</th>
+			<th>강의명</th>
+			<th>강의주차</th>
+			<th>총차시</th>
+			<th>모집인원</th>
+			<th>온라인/오프라인</th>
+			<th>진행상태</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td></td>
+		</tr>
+	</tbody>
+</table>

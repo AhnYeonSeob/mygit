@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.commons.dao.CommonCodeMapper">
+	<select id="getCodeList" resultType="CommonCodeVO">
+		SELECT COCO_CD, PAR_COCO_CD, COCO_STTS
+		FROM COMMON_CODE
+		WHERE PAR_COCO_CD = #{parCocoCd}
+		ORDER BY COCO_CD
+	</select>
+	
+	<select id="getClassRoomList" resultType="ClassRoomVO">
+		SELECT CROOM_CD	/* 강의실코드 */
+			, CROOM_NM	/* 강의실명 */
+			, CROOM_PSTN	/* 강의실건물,호실 */
+			, CROOM_TNOPE	/* 강의실수용인원 */
+		FROM CLASS_ROOM
+		WHERE CROOM_YN = 'Y'
+	</select>
+	
+	<select id="getSemesterList" resultType="SemesterVO">
+		<choose>
+			<when test="@org.apache.commons.lang3.StringUtils@isNotBlank(id)">
+				SELECT DISTINCT(SEMSTR_NO)	/* 학기번호 */
+				FROM LECTURE
+				WHERE PROFE_ID = #{id, jdbcType=VARCHAR}
+			</when>
+			<otherwise>
+				SELECT SEMSTR_NO	/* 학기번호 */
+				FROM SEMESTER
+			</otherwise>
+		</choose>
+		ORDER BY SEMSTR_NO DESC
+	</select>
+</mapper>

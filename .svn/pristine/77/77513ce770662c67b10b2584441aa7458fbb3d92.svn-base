@@ -1,0 +1,118 @@
+/**
+ * <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+ */
+
+
+/*
+document.addEventListener("DOMContentLoaded", function(){
+	// 출결 수정 버튼 클릭
+	
+	const updateButton = document.querySelector('.updateBtn');
+	
+	updateButton.addEventListener('click', function(){
+		alert('수정 버튼이 클릭됨');
+	});
+		
+});
+
+*/
+
+// script.js
+
+// 버튼 클릭 시 비동기 처리
+document.getElementById("updateButton").addEventListener("click", function() {
+    // 클릭된 버튼에서 data-id 값을 가져옴
+    const attendanceId = this.getAttribute("data-id");
+
+    // 비동기 요청을 위한 XMLHttpRequest 객체 생성
+    const xhr = new XMLHttpRequest();
+
+    // 비동기 요청 초기화 (POST 방식, URL 설정)
+    xhr.open("POST", "updateAttendance", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    // 요청이 완료되었을 때 실행할 콜백 함수 설정
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            // 성공 시 알림을 띄움
+            alert("수정 완료!");
+        } else {
+            // 실패 시 알림
+            alert("수정 실패. 다시 시도해주세요.");
+        }
+    };
+
+    // 요청 본문에 `attendanceId`를 보냄
+    xhr.send("attendanceId=" + attendanceId);
+});
+
+
+
+
+
+
+/*
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const updateBtns = document.querySelectorAll('.updateBtn');
+    
+    updateBtns.forEach(button => {
+      button.addEventListener('click', function() {
+        // AJAX 요청 예시
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/yguniv/attendance/List", true); // 서버 URL
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        // 서버로 데이터를 보내는 부분
+        xhr.send("action=update"); // 서버에서 처리할 데이터
+
+        // 응답 처리
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            alert("수정 완료!");
+          } else {
+            alert("서버 오류");
+          }
+        };
+      });
+    });
+  });
+</script>
+*/
+
+
+/* attendan/{lectNo} url 쓸껀데
+	어떻게 쓸건지 정하기 예를들어서 각 강의번호 별로 입력받은걸로 조회 및 수정 할건데
+	조회는 앞에서 이미 했으니까 조회정보에 이미 강의번호가 등록되어 있으니까 그걸 바라보고 
+	수정 작업할꺼니까 나머지 url에 부분을 앞에서 받아온 데이터를 가지고 js(여기서) 저장 해야함
+*/
+
+/*
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const updateBtns = document.querySelectorAll('.updateBtn');
+    
+    updateBtns.forEach(button => {
+      button.addEventListener('click', function() {
+        // AJAX 요청 예시
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/yguniv/attendance/List", true); // 서버 URL
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+        // 서버로 데이터를 보내는 부분
+        xhr.send("action=update"); // 서버에서 처리할 데이터
+
+        // 응답 처리
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            alert("수정 완료!");
+          } else {
+            alert("서버 오류");
+          }
+        };
+      });
+    });
+  });
+</script>
+*/

@@ -1,0 +1,39 @@
+package kr.or.ddit.yguniv.board.answerBoard.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller // 문의 답변 관련 컨트럴ㄹ러
+@RequestMapping("/yguniv/resultBoard")
+public class ResultBoardCotroller {
+	
+//	// 답변 추가 
+//	@PostMapping
+//	public String createResult() {
+//		return "resultBoard/resultBoardForm";
+//	}
+//	// 답변 수정
+//	@PutMapping("{SibAns}")
+//		public String UpdateResult() {
+//			
+//			return "resultBoard/resultBoardEdit";
+//		}
+//	
+//	// 답변 삭제 
+//	@DeleteMapping("{SibAns}")
+//		public String DeleteResult() {
+//			
+//		return "resultBoard/resultBoardDetail";
+//	}
+	// 답변 조회
+	@GetMapping("{SibAns}")
+	public String SelectResult() {
+		
+	return "resultBoard/resultBoardDetail";
+}
+
+}

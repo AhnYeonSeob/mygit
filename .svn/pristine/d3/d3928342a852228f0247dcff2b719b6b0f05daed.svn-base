@@ -1,0 +1,28 @@
+/**
+ *  입장 시 팀번호 검증
+ */
+
+document.addEventListener("DOMContentLoaded",()=>{
+	const contextPath = document.querySelector('#mainArea').dataset.path;
+	const lectNo = document.querySelector('#mainArea').dataset.lectNo;
+	const teamCd = document.querySelector('#mainArea').dataset.teamCd;
+	const enterBtns = document.querySelectorAll('.enter-btn');
+	
+	 enterBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            const enterRoom = btn.dataset.enter;
+			const taskNo = btn.dataset.taskNo;
+			console.log(taskNo);
+            if (teamCd !== enterRoom) {
+                swal("입장 불가", "본인 팀 채팅방만 입장 가능합니다.", "error");
+                return;
+            }
+
+            // 입장 가능한 경우 처리 로직
+            const chatRoomUrl = `${contextPath}/lecture/${lectNo}/projectChatRoom/${taskNo}/${teamCd}`;
+            window.location.href = chatRoomUrl;
+        });
+	});
+	
+	
+});//DOM끝

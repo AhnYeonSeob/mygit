@@ -1,0 +1,36 @@
+document.addEventListener('DOMContentLoaded', async function(){
+	let grid = document.querySelector('#grid');
+	
+	let gridOption = {
+		cellHeight: 100
+        , cellWidth: 100
+	    , minRow: 1  // 최소 행수
+	    , margin: 3  // 위젯 간격
+	    , removable: '.trash'  // trash 클래스에 가져가면 삭제
+	    , disableResize: true  // 크기조정 막기
+	};
+	let gridInst = GridStack.init(gridOption, grid);
+	
+	let modules = [];
+	await axios.get(`${cp.value}/mainui/my`)
+	.then(({data})=>{
+		for(let mod of data){
+			console.log(mod);
+			modules.push(mod);
+		}
+		gridInst.load(modules);
+	    const items = grid.querySelectorAll('.grid-stack-item');
+	    items.forEach((item, index) => {
+	        const content = item.querySelector('.grid-stack-item-content');
+	        if (content) {
+	            content.innerHTML = modules[index].content;
+				content.dataset.modId = modules[index].modId;
+	        }
+	    });
+	});
+	
+	// 페이지 종료시 수정된 메인UI 저장 이벤트
+	window.addEventListener('beforeunload', (e)=>{
+		
+    });
+})

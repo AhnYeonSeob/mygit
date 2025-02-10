@@ -1,0 +1,75 @@
+package kr.or.ddit.yguniv.projectTask.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @author AYS
+ * lvn에 ?는 디테일로 갈 수 있게 해당넘버를 붙여줘야함
+ */
+@Controller
+@RequestMapping("/projectTask")
+public class ProjectTaskController {
+	
+	
+	//프로젝트 목록조회
+	@GetMapping()
+	public String selectList() {
+		
+		return "projectTask/projectTaskList";
+	}
+	
+	//프로젝트 상세조회
+	@GetMapping("{taskCd}")
+	public String select(@PathVariable()int taskCd) {
+		
+		return "projectTask/projectTaskDetail";
+	}
+	//프로젝트 생성폼 이동
+	@GetMapping("{taskCd}/new")
+	public String createForm() {
+		
+		return "projectTask/projectTaskForm";
+	}
+	
+	
+	//프로젝트 생성
+	@PostMapping("{taskCd}")
+	public String create(@PathVariable()int taskCd) {
+		
+		return "projectTask/?";
+	}
+	
+	//프로젝트 수정폼이동
+	@GetMapping("{taskCd}/edit")
+	public String updateForm(@PathVariable()int taskCd) {
+		
+		
+		return "projectTask/projectTaskEditForm";
+	}
+	
+	//프로젝트 수정
+	@PutMapping("{taskCd}")
+	public String update(@PathVariable()int taskCd) {
+		
+		
+		return "projectTask/?";
+	}
+	
+	//프로젝트 삭제
+	@DeleteMapping("{taskCd}")
+	public String delete(@PathVariable()int taskCd) {
+		
+		
+		return "projectTask/projectTaskList";
+	}
+	
+	
+	
+	
+}

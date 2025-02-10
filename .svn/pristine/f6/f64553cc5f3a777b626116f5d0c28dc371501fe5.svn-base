@@ -1,0 +1,43 @@
+package kr.or.ddit.yguniv.student.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/student")
+public class StudentRecordsController {
+	@PostMapping("academicProbation/{stuId}")
+	public void createAcademicProbation(@PathVariable String stuId) {
+		
+	}
+	
+	@PostMapping("studentRecords")
+	public void createStudentRecords() {
+		
+	}
+	
+	@GetMapping("studentRecords")
+	public String selectStudentRecordsList() {
+		return "student/studentRecordsList";
+	}
+	
+	@GetMapping("studentRecords/{docIssuCd}")
+	public void selectStudentRecords(@PathVariable String docIssuCd) {
+		
+	}
+	
+	@PutMapping("studentRecords/{docIssuCd}/consent")
+	public void consentStudentRecords(@PathVariable String docIssuCd) {
+		
+	}
+	
+	
+	@PutMapping("studentRecords/{docIssuCd}/return")
+	public void returnStudentRecords(@PathVariable String docIssuCd) {
+		
+	} 
+}

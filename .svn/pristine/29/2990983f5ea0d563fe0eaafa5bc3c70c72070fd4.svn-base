@@ -1,0 +1,132 @@
+/**
+ * 
+ */
+
+  const id = document.getElementById("id").value;
+  const contextPath = document.getElementById("contextPath").value;
+  const baseUrl = `${contextPath}/attendCoeva`;
+document.addEventListener('DOMContentLoaded', async function() {
+
+ 	await getSemesterList();
+
+	const semBox = document.getElementById('semBox');
+
+	semBox.addEventListener("change", async (e) => {
+	    const semVal = e.target.value; // 선택된 option의 value
+//	    console.log(e.target.value); // 선택된 option의 value
+	 //   console.log(e.target.options[e.target.selectedIndex].text); // 선택된 option의 텍스트
+	
+	
+	
+	
+	});
+
+
+
+
+
+
+
+
+ 
+});
+async function getSemesterList(){
+    try {
+        const response = await fetch(`${baseUrl}/${id}`);
+        const data = await response.json();
+        const semesterList = data.coevaList;
+        
+        const selectElement = document.querySelector('.form-select');
+        selectElement.innerHTML = '<option value="">학기</option>';
+        
+        semesterList.forEach(semester => {
+            const option = document.createElement('option');
+            option.value = semester.semstrNo;
+            option.textContent = `${semester.year}-${semester.semester}`;
+            selectElement.appendChild(option);
+        });
+        
+        return semesterList;
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function getAttendCoevaList(semVal){
+	try {
+        const response = await fetch(`${baseUrl}/${id}/${semVal}`);
+        const data = await response.json();
+        const semesterList = data.coevaList;
+        
+       
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

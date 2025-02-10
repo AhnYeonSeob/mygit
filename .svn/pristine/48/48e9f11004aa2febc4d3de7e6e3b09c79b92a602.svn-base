@@ -1,0 +1,30 @@
+package kr.or.ddit.yguniv.projectchatmessage.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/projectChatMessage")
+public class ProjectChatMessageController {
+	
+	//메세지 수신
+	@GetMapping
+	public String getChat() {
+		
+		return "";
+	}
+	
+	//메세지 송신
+	@PostMapping
+	public String postChat() {
+		return "";
+	}
+	
+	//웹소켓 연결 처리
+	public void connect() {
+		
+	}
+	
+}

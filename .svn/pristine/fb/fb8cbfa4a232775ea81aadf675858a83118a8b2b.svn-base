@@ -1,0 +1,107 @@
+package kr.or.ddit.yguniv.absencecertificatereceipt.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import kr.or.ddit.yguniv.absencecertificatereceipt.dao.AbsenceCertificateReceiptMapper;
+import kr.or.ddit.yguniv.atch.service.AtchFileService;
+import kr.or.ddit.yguniv.attendance.dao.AttendanceMapper;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.AbsenceCertificateReceiptVO;
+
+@Service
+public class AbsenceCertificateReceiptServiceImpl {
+	
+	@Autowired
+	private AbsenceCertificateReceiptMapper mapper;
+	
+	@Autowired
+	private AttendanceMapper attendanceMapper;
+	
+	@Autowired
+	private AtchFileService atchFileService;
+	
+	@Value("#{dirInfo.saveDir}")
+	private Resource saveFolderRes;
+	private File saveFolder;
+
+	@PostConstruct
+	public void init() throws IOException {
+		this.saveFolder = saveFolderRes.getFile();
+	}
+	
+	/**
+	 * 단건조회
+	 */
+	public AbsenceCertificateReceiptVO selectAbsenceCertificateReceipt(String stuId) {
+		return mapper.selectAbsenceCertificateReceipt(stuId);
+	}
+	
+	public List<AbsenceCertificateReceiptVO> selectAbsenceCertificateReceiptList(
+			AbsenceCertificateReceiptVO absenceVO
+			, PaginationInfo<AbsenceCertificateReceiptVO> paging
+	){
+		paging.setTotalRecord(mapper.selectTotalRecord(absenceVO, paging));
+		return mapper.selectAbsenceCertificateReceiptList(absenceVO, paging);
+	}
+	
+	public boolean insertAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		Integer atchFileId = Optional.ofNullable(absenceCertificateReceiptVO.getAtchFile())
+				.filter(af->! CollectionUtils.isEmpty(af.getFileDetails()))
+				.map(af -> {
+					atchFileService.createAtchFile(af, saveFolder);
+					return af.getAtchFileId();
+				}).orElse(null);
+		
+		absenceCertificateReceiptVO.setAtchFileId(atchFileId);
+		
+		return mapper.insertAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+	public boolean updateAbsence(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.updateAbsence(absenceCertificateReceiptVO) > 0;
+	}
+	
+	
+	// 공결인증서'만' 업데이트하는 서비스
+	public boolean updateAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+	    return mapper.updateAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+	@Transactional // 둘중 하나라도 안되면 에러처리
+	// 공결인정서 상태와 출결 상태를 동시에 업데이트
+	public boolean updateAbsenceAndAttendance(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		
+//		System.out.println("업데이트 서비스 여기까지는 들어온다.");
+//		System.out.println("absenceCertificateReceiptVO.getAttendanceVO()");
+		
+		int result1 = attendanceMapper.updateAttendance(absenceCertificateReceiptVO.getAttendanceVO());
+		int result2 = mapper.updateAbsenceAndAttendance(absenceCertificateReceiptVO);
+		
+		if(result1 * result2 != 1) {
+			throw new RuntimeException(); // 커스텀 에러처리 해도된다.
+			// 트라이캐치를 사용해야함
+		}
+		
+//	    return  mapper.updateAbsenceAndAttendance(absenceCertificateReceiptVO) > 0;
+	    return true;
+		
+	}
+	
+	
+	public boolean deleteAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.deleteAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+}

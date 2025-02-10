@@ -1,0 +1,45 @@
+package kr.or.ddit.yguniv.attendeetest.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/attendeeTest")
+public class AttendeeTestController {
+	
+	/*
+	 * 학생이 강의페이지로 이동
+	 * 시험 버튼 클릭
+	 * 등록된 시험 링크 클릭
+	 * 시험 대기화면 이동
+	 * 응시버튼 클릭
+	 * 문제 풀기
+	 * 푼 이후 제출 버튼 클릭
+	 * 전송 완료 하고 다시 밖으로 나옴
+	 */
+	
+	
+	//학생이 시험페이지로 이동
+	@GetMapping("{testNo}")
+	public String getTestPage(@PathVariable int testNo) {
+		
+		return "attendTest/attendeeTest";
+	}
+	//학생이 시험페이지로 이동
+	@GetMapping("{testNo}/new")
+	public String getTest() {
+		
+		return "attendTest/attendeeTestForm";
+	}
+	//문제 채점하기
+	@PostMapping
+	public String scoreCheck() {
+		
+		return "attendTest/attendeeTest";
+	}
+	
+	
+}

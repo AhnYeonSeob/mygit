@@ -1,0 +1,86 @@
+package kr.or.ddit.yguniv.jobboard.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import kr.or.ddit.yguniv.atch.service.AtchFileService;
+import kr.or.ddit.yguniv.board.answerBoard.exception.BoardException;
+import kr.or.ddit.yguniv.jobboard.dao.JobBoardMapper;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.AtchFileDetailVO;
+import kr.or.ddit.yguniv.vo.JobBoardVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class JobBoardServiceImpl implements JobBoardService {
+	private final JobBoardMapper mapper;
+	private final AtchFileService atchFileService;
+	
+	
+	@Value("#{dirInfo.fsaveDir}")
+	private Resource saveFolderRes;
+	private File saveFolder;
+
+	@PostConstruct
+	public void init() throws IOException {
+		this.saveFolder = saveFolderRes.getFile();
+	}
+	@Override
+	public List<JobBoardVO> selectJobBoardListPaging(PaginationInfo<JobBoardVO> paging) {
+		paging.setTotalRecord(mapper.selectTotalRecord(paging));
+		List<JobBoardVO>boardList = mapper.selectJobBoardListPaging(paging);
+		return boardList;
+	}
+	
+	@Override
+	public JobBoardVO selectJobBoard(String jobNo) {
+		JobBoardVO board = mapper.selectJobBoard(jobNo);
+		if(board==null) {
+			throw new BoardException(String.format("%d번 글이 없음", jobNo));
+		}
+		mapper.jobCount(jobNo);
+		return board;
+	}
+	
+	@Override
+	public AtchFileDetailVO download(int atchFileId, int fileSn) {
+		return Optional.ofNullable(atchFileService.readAtchFileDetail(atchFileId, fileSn, saveFolder))
+				.filter(fd -> fd.getSavedFile().exists())
+				.orElseThrow(() -> new BoardException(String.format("[%d, %d]해당 파일이 없음.", atchFileId, fileSn)));
+	}
+	
+	
+	
+	@Override
+	public void insertJobBoard(final JobBoardVO board) {
+		
+		Integer atchFileId = Optional.ofNullable(board.getAtchFile())
+				.filter(af->! CollectionUtils.isEmpty(af.getFileDetails()))
+				.map(af -> {
+					atchFileService.createAtchFile(af, saveFolder);
+					return af.getAtchFileId();
+				}).orElse(null);
+		
+		board.setAtchFileId(atchFileId);
+	    mapper.insertJobBoard(board);
+		
+	}
+	@Override
+	public int jobCount(String jobNo) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

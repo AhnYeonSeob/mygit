@@ -1,0 +1,45 @@
+package kr.or.ddit.yguniv.award.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/award")
+public class AwardCategoryController {
+	
+	//장학금 유형 조회 
+	@GetMapping
+	public String selectAward() {
+		return "award/awardList";
+		
+	}
+	
+	@GetMapping("/inserAward")
+	public String insertAward() {
+		return  "award/awardForm";
+		
+	}
+	// 장학금 유형 추가 
+	@PostMapping
+	public String Award() {
+		return "award/awardForm";
+	}
+	//장학금 유형 수정
+	@PutMapping("{awardCd}")
+	public String updateAward(@PathVariable()String awardCd) {
+		return "award/awardList";
+	}
+	// 장학금 유형 삭제
+	@DeleteMapping("{awardCd}")
+	public String deleteAward(@PathVariable()String awardCd) {
+		return "award/awardList";
+	}
+	
+	
+
+}

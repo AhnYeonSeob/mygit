@@ -1,0 +1,17 @@
+/**
+ * 
+ */
+
+
+document.addEventListener("DOMContentLoaded", function(){
+	if(exception.value){  // 로그인 오류 발생시 동작
+		// swal 다셈
+	}
+});
+
+function fnLogin(role){
+	let loginForm = document.forms["loginForm"];
+	loginForm.id.value = `2024${role}00001`;
+	loginForm.pswd.value = 'java';
+	loginForm.requestSubmit();
+}

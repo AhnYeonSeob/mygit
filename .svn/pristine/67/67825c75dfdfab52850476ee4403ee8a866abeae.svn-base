@@ -1,0 +1,40 @@
+  /**
+ * 
+ */// 전송을 누르면 데이터를 전송하고 컨트롤러는 값을 등록하고 시험 페이지는 닫혀야함. 씨ㅏ
+document.addEventListener("DOMContentLoaded", () => {
+	const form = document.querySelector("#newQuestion");
+
+	form.addEventListener("submit", (e) => {
+		e.preventDefault();
+
+		// FormData 객체로 데이터 수집
+		const formData = new FormData(form);
+
+		// JSON 데이터 배열 생성
+		const jsonData = [];
+		formData.forEach((value, key) => {
+				jsonData.push({
+					queNo: key,
+					queAnswer: value
+				});
+		});
+
+		console.log("JSON Data:", jsonData);
+
+		// JSON 데이터 전송
+		fetch(form.action, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(jsonData),
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				console.log("Response:", data);
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+			});
+	});
+});

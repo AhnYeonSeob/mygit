@@ -1,0 +1,134 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+
+<style>
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .team-members {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .team-members li {
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .team-members li i {
+            color: gold;
+            margin-left: 5px;
+        }
+
+        .announcement-section {
+            margin-top: 20px;
+        }
+
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card {
+            min-height: 400px;
+        }
+
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .announcement-section .card {
+            min-height: 150px;
+        }
+</style>
+<div id="mainArea" class="container" data-path="${pageContext.request.contextPath }" data-lectno="${lectNo }" data-teamcd="${projectMember.projectTeam.teamCd }" data-leadyn="${projectMember.leadYn }">
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">일감</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">채팅방</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">제출관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">게시판</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="row">
+        <!-- Left Section -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">프로젝트 주제: ${projectMember.projectTeam.teamPurpo }</h5>
+                    <p class="card-text">프로젝트 내용: ${projectMember.projectTeam.teamNotes }</p>
+
+                    <div class="progress-container">
+                        <label for="progressRange" class="form-label">프로젝트 진척도</label>
+                        <div class="progress-bar-container">
+                            <input type="range" id="progressRange" class="form-range" min="0" max="100" step="10" value="${projectMember.projectTeam.teamProge }">
+                            <span id="progressPercentage">${projectMember.projectTeam.teamProge }%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Section -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">프로젝트 N 팀 구성원</h5>
+                    <ul class="team-members">
+                        <c:forEach items="${projectMemberList }" var="projectMemberVO">
+                            <c:choose>
+                                <c:when test="${projectMemberVO.leadYn eq 'Y' }">
+                                    <li>${projectMemberVO.nm }(${projectMemberVO.stuId }) <i class="fas fa-star"></i></li>
+                                </c:when>
+                                <c:otherwise>
+                                    <li>${projectMemberVO.nm }(${projectMemberVO.stuId })</li>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Announcement Section -->
+    <div class="announcement-section">
+        <h5 class="text-center">공지</h5>
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">공지게시글제목</h6>
+                <p class="card-text">게시판에서 공지 체크한 게시글 표시하면</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="${pageContext.request.contextPath }/resources/js/projectPersonal/projectPersonal.js"></script>
+
+

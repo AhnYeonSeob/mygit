@@ -1,0 +1,142 @@
+/**
+ * 입력폼 js
+ */
+
+var contextPath = document.querySelector('#form-table').dataset['path'];
+
+var editorInstance;
+	
+	import {
+		ClassicEditor,
+		SimpleUploadAdapter,
+		Bold,
+		Italic,
+		Underline,
+		BlockQuote,
+		Essentials,
+		Heading,
+		Image,
+		ImageUpload,
+		Link,
+		List,
+		MediaEmbed,
+		Table,
+		TableToolbar,
+		FontSize,
+		FontFamily,
+		FontColor,
+		Undo
+	
+	} from '../../../resources/js/ckeditor5/ckeditor5.js';
+	
+	const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+	const csrfToken = csrfMetaTag ? csrfMetaTag.getAttribute('content') : null;
+	
+	ClassicEditor.create( document.querySelector('#editor'),{
+		licenseKey: 'GPL'
+		,  plugins: [
+            Essentials, Bold, Italic, Underline, Link, Image, ImageUpload,
+            List, BlockQuote, Heading, MediaEmbed, Table, TableToolbar, 
+            FontSize, FontFamily, FontColor, Undo, SimpleUploadAdapter
+        ],
+        toolbar: [
+            'undo', 'redo', '|', 'bold', 'italic', 'underline', '|', 'link', 'imageUpload', '|',
+            'bulletedList', 'numberedList', '|', 'blockquote', 'insertTable', '|',
+            'fontSize', 'fontFamily', 'fontColor', '|', 'mediaEmbed'
+        ],language: 'ko' // 한국어 설정
+		, simpleUpload: { 
+					uploadUrl: `${contextPath}/imageUpload`
+					, headers:  csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}
+					
+			}
+	})
+	
+	 .then(editor => {
+		editor.editing.view.change(writer=>{
+            writer.setStyle('height', '280px', editor.editing.view.document.getRoot());
+        });
+        editorInstance = editor;
+    })
+    .catch(error => {
+        console.error(error);
+
+	})//create에디터 끝
+
+
+document.addEventListener("DOMContentLoaded",()=>{
+	
+	document.querySelectorAll("[data-atch-file-id][data-file-sn]").forEach(el=>{
+    	el.addEventListener("click", async (e)=>{
+    		e.preventDefault();
+    		let atchFileId = el.dataset.atchFileId;
+    		let fileSn = el.dataset.fileSn;
+			let resp = await fetch(`${contextPath}/atch/${atchFileId}/${fileSn}`, {
+    			method:"delete"
+    			, headers:{
+    				"accept":"application/json"
+    			}
+    		});
+    		if(resp.ok){
+    			let obj = await resp.json();
+    			if(obj.success){
+					el.parentElement.remove();    				
+    			}
+    		}
+    	});
+    });
+
+	
+	/*
+	const cForm = document.querySelector('#editForm');
+	
+	cForm.addEventListener("submit",async function(e){
+		e.preventDefault();
+		const formData = new FormData(cForm);
+		const url = `${contextPath}/noticeboard/${ntcCd}`;
+		
+		try {
+        // PUT 요청
+        const resp = await fetch(url, {
+            method: "PUT", // HTTP PUT 요청
+            body: formData, // Form 데이터 전송
+        });
+
+        if (!resp.ok) {
+            // 응답이 성공적이지 않을 경우
+            throw new Error(`응답이 오지 않음. 상태: ${resp.status}`);
+        }
+
+        // JSON 응답 처리
+        const res = await resp.json();
+
+        // SweetAlert로 성공 메시지 표시
+        Swal.fire({
+            icon: "success", // 성공 아이콘
+            title: "수정 완료!",
+            text: "게시글이 성공적으로 수정되었습니다.",
+            confirmButtonText: "확인",
+        }).then(() => {
+            // 확인 버튼 클릭 시 상세보기 페이지로 이동
+            window.location.href = `${contextPath}/noticeboard/${res.ntcCd}`;
+        });
+    } catch (error) {
+        // 에러 처리
+        console.error("에러 발생:", error);
+        Swal.fire({
+            icon: "error", // 에러 아이콘
+            title: "오류 발생!",
+            text: "게시글 수정 중 오류가 발생했습니다.",
+            confirmButtonText: "확인",
+        });
+    }
+		
+		
+	});
+	*/
+	
+});
+
+
+
+
+

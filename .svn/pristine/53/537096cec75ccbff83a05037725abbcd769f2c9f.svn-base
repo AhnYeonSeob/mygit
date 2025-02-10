@@ -1,0 +1,27 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@Data
+@ToString
+@EqualsAndHashCode(of = "empId" )
+public class EmployeeVO implements Serializable{
+	
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String empId; //사번 
+	private String empDept; //부서
+	private String empJbgd; //직급 
+	
+	
+	@ToString.Exclude
+	private PersonVO person;
+
+}

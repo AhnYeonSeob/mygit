@@ -1,0 +1,104 @@
+package kr.or.ddit.yguniv.assignment.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import kr.or.ddit.yguniv.assignment.dao.AssignmentMapper;
+import kr.or.ddit.yguniv.atch.service.AtchFileService;
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.noticeboard.exception.BoardException;
+import kr.or.ddit.yguniv.vo.AssignmentVO;
+import kr.or.ddit.yguniv.vo.AtchFileDetailVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class AssignmentServiceImpl implements AssignmentService {
+	private final AssignmentMapper mapper;
+	private final AtchFileService atchFileService;
+	
+	@Value("#{dirInfo.fsaveDir}")
+	private Resource saveFolderRes;
+	private File saveFolder;
+	
+	@PostConstruct
+	public void init() throws IOException {
+		this.saveFolder = saveFolderRes.getFile();
+	}
+	
+	@Override
+	public void createAssignment(final AssignmentVO assignment) {
+		if(mapper.checkLecture(assignment.getLectNo())!=null) {
+			
+			Integer atchFileId = Optional.ofNullable(assignment.getAtchFile())
+					.filter(af->! CollectionUtils.isEmpty(af.getFileDetails()))
+					.map(af -> {
+						atchFileService.createAtchFile(af, saveFolder);
+						return af.getAtchFileId();
+					}).orElse(null);
+			
+			assignment.setAtchFileId(atchFileId);
+			mapper.insertAssignment(assignment);
+		}
+		else {
+			throw new PKNotFoundException("해당강의번호는 존재하지않습니다.");
+		}
+		
+	}
+
+	@Override
+	public AssignmentVO readAssignment(int assig) {
+		AssignmentVO assignment = mapper.selectAssignment(assig);
+		if(assignment == null) {
+			throw new BoardException(String.format("%d 번 과제가 없습니다.", assig));
+		}
+		
+		return assignment;
+	}
+
+	@Override
+	public List<AssignmentVO> readAssignmentList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<AssignmentVO> readAssignmentListPaging() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void modifyAssignment(AssignmentVO assignment) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void removeAssignment(int assig) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public AtchFileDetailVO download(int atchFileId, int fileSn) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void removeFile(int atchFileId, int fileSn) {
+		// TODO Auto-generated method stub
+
+	}
+
+}

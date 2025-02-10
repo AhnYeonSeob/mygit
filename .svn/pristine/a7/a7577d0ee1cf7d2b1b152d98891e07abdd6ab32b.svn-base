@@ -1,0 +1,91 @@
+package kr.or.ddit.yguniv.jobtest.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.jobtest.dao.JobTestMapper;
+import kr.or.ddit.yguniv.vo.JobTestResultVO;
+import kr.or.ddit.yguniv.vo.JobTestVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class JobTestServiceImpl implements JobTestService {
+	private final JobTestMapper mapper;
+
+	@Override
+	public void insertjobTest(JobTestVO jobtest) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public JobTestVO selectjobTest(String jobtestNo) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public JobTestResultVO selectjobTestResult(String stuId) {
+		return mapper.selectjobTestResult(stuId);
+	}
+
+	@Override
+	public List<JobTestVO> selectjobTestList() {
+		List<JobTestVO>jobTestList = mapper.selectjobTestList();
+		return jobTestList;
+	}
+
+	@Override
+	public void updatejobTest(JobTestVO jobtest) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void deletejobTest(String jobtestNo) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void insertJobTestResult(JobTestResultVO jobtestresult) {
+		mapper.insertJobTestResult(jobtestresult);
+		
+	}
+
+	@Override
+	public List<JobTestVO> getJobTestByNo(String jobtestNo) {
+		List<JobTestVO> test=mapper.getJobTestByNo(jobtestNo);
+		return test;
+	}
+
+	@Override
+	public boolean checkTestToday(String stuId) {
+		int count = mapper.checkTestToday(stuId);
+		return count>0;
+	}
+	
+	@Override
+	public void saveOrUpdateJobTestResult(JobTestResultVO jobTestResult) {
+	    // 오늘 응시 여부 확인
+	    int count = mapper.checkTestToday(jobTestResult.getStuId());
+
+	    if (count > 0) {
+	        // 이미 응시한 경우 데이터 업데이트
+	        mapper.updateJobTestResult(jobTestResult);
+	    } else {
+	        // 처음 응시하는 경우 데이터 삽입
+	        mapper.insertJobTestResult(jobTestResult);
+	    }
+	}
+
+	@Override
+	public void updateJobTestResult(String stuId) {
+		
+	}
+
+
+}

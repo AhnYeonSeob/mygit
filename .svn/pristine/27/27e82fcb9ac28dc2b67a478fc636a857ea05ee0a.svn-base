@@ -1,0 +1,150 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
+
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/js/ckeditor5/ckeditor5.css">
+<script type="importmap">
+{
+	"imports": {
+					"ckeditor5": "${pageContext.request.contextPath }resources/js/ckeditor5/ckeditor5.js",
+					"ckeditor5/": "${pageContext.request.contextPath }/resources/js/ckeditor5/translations/ko.js/"
+	}
+}	
+</script>
+
+<input type="hidden" value="${pageContext.request.contextPath}" id="contextPath">
+<input type="hidden" value="${lectNo}" id="lectNo">
+<input type="hidden" value="${cnbNo}" id="cnbNo">
+
+<span style="font-size: 2em; font-weight: bold;">공지사항 상세페이지</span> 입니다.
+
+<div>
+	<table class="table table-primary align-middle table-bordered" id="lectBoardTable">
+		<tbody>
+			<tr>
+				<td style="width: 10%; text-align: center;">제목</td>
+				<td class="table table-bordered align-middle table-bordered"  >
+				${selectLectureNoticeBoard.cnbNm}</td>
+				<td style="width: 70%; text-align: center;">교수명</td>
+				<td class="table table-bordered align-middle table-bordered" style="text-align: center;" >
+				${selectLectureNoticeBoard.professorVO.nm }</td>
+			</tr>
+				<td style="width: 10%; text-align: center;">내용</td>
+				<td class="table table-bordered align-middle table-bordered" colspan="3">
+					<span id="absenceReason2" class="large-text"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 15%; text-align: center;">첨부파일</td>
+				<td class="table table-bordered align-middle table-bordered" colspan="3">
+					<div id="fileDetailsContainer"></div>
+				</td>
+			</tr>
+			<security:authorize access="hasRole('PROFESSOR')">
+				<tr>
+					<td style="text-align: right;" colspan="4">
+						<button type="button" 
+							id="editButton" 
+							class="btn btn-primary" 
+							data-bs-toggle="modal"
+							data-bs-target="#staticBackdropEdit">
+							수정
+						</button>
+						<button type="button" id="dropButton" class="btn btn-danger atnd-insert-btn">삭제</button>
+					</td>
+				</tr>
+			</security:authorize>
+		</tbody>
+	</table>
+</div>
+
+<tbody>
+			<tr>
+				<td style="width: 10%; text-align: center;">제목</td>
+				<td class="table table-bordered align-middle table-bordered"  >
+				${selectLectureNoticeBoard.cnbNm}</td>
+				<td style="width: 70%; text-align: center;">교수명</td>
+				<td class="table table-bordered align-middle table-bordered" style="text-align: center;" >
+				${selectLectureNoticeBoard.professorVO.nm }</td>
+			</tr>
+				<td style="width: 10%; text-align: center;">내용</td>
+				<td class="table table-bordered align-middle table-bordered" colspan="3">
+					<span id="absenceReason2" class="large-text"></span>
+				</td>
+			</tr>
+			<tr>
+				<td style="width: 15%; text-align: center;">첨부파일</td>
+				<td class="table table-bordered align-middle table-bordered" colspan="3">
+					<div id="fileDetailsContainer"></div>
+				</td>
+			</tr>
+
+
+<div class="modal fade" id="staticBackdropEdit" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabelEdit" aria-hidden="true">
+    <div class="modal-dialog" style="max-width: 80%; width: 80%;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabelEdit">수정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	        </div>
+	            <div class="modal-body">
+	                <table class="table">
+	                    <thead>
+				        <tr>
+							<td style="text-align: center;">제목</td>
+							<td class="table table-bordered align-middle table-bordered" >
+							${selectLectureNoticeBoard.cnbNm}</td>
+							<td style="width: 70%; text-align: center;" >교수명</td>
+							<td class="table table-bordered align-middle table-bordered" style="text-align: center;" >
+							${selectLectureNoticeBoard.professorVO.nm }</td>
+						</tr>
+							<td style="text-align: center;">내용</td>
+							<td class="table table-bordered align-middle table-bordered" >
+								<span id="absenceReason2" class="large-text"></span>
+							</td>
+						</tr>
+						<tr>
+							<td style="width: 10%; text-align: center;">첨부파일</td>
+							<td class="table table-bordered align-middle table-bordered" >
+								<div id="fileDetailsContainer"></div>
+							</td>
+						</tr>
+			              
+			              
+			              
+			              
+			            </thead>
+			            <tbody>
+					        <tr>
+					          <td colspan="4">
+					              <p><strong>사유:</strong></p>
+					              <!-- <div class="mb-3"> -->
+						          <form id="edit-table" data-path="${pageContext.request.contextPath}">
+						              <textarea class="form-control" id="updateEditor" rows="3"></textarea>
+						          </form>
+								  <form id="fileForm" method="put" enctype="multipart/form-data">
+					          	  	<input type="file" name="uploadFiles" multiple class="form-control" style="float: left">
+					          	  </form>
+					          	  <div id="fileDetailsContainer">
+								      <!-- 조회 결과가 여기에 표시됩니다 -->
+								  </div>
+					          </td>
+					        </tr>
+				        </tbody>
+	                </table>
+	            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="saveEditButton">수정</button>
+				<button type="button" class="absenceDeleteBtn btn btn-danger atnd-insert-btn" >삭제</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+            </div>
+        </div>
+    </div>
+</div>	
+
+
+
+<script src="${pageContext.request.contextPath }/resources/js/lecture/lectureNoticeBoard.js" type="module"></script>
+

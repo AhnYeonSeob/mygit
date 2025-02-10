@@ -1,0 +1,36 @@
+package kr.or.ddit.yguniv.student.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.AcademicProbationVO;
+import kr.or.ddit.yguniv.vo.StudentRecordsVO;
+
+@Mapper
+public interface StudentRecordsMapper {
+	/**
+	 * C-학생 학사경고 추가
+	 */
+	public int insertAcademicProbation(AcademicProbationVO academicProbationVO);
+	/**
+	 * C-학적 변동 신청
+	 */
+	public int insertStudentRecords(StudentRecordsVO studentRecordsVO);
+	/**
+	 * R-학적 변동 신청 목록 조회
+	 */
+	public List<StudentRecordsVO> selectStudentRecordsList();
+	/**
+	 * R-학적 변동 신청 상세 조회
+	 */
+	public StudentRecordsVO selectStudentRecords(StudentRecordsVO studentRecordsVO);
+	/**
+	 * U-학적 변동 서류 승인
+	 */
+	public int consentStudentRecords(StudentRecordsVO studentRecordsVO);
+	/**
+	 * U-학적 변동 서류 반려
+	 */
+	public int returnStudentRecords(StudentRecordsVO studentRecordsVO);
+}

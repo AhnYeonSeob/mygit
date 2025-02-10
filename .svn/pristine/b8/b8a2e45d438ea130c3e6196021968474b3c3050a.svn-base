@@ -1,0 +1,56 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<input type="hidden" id="stuId" name="stuId" value="${stuId }">
+<input type="hidden" id="cp" value="${pageContext.request.contextPath }">
+<h4>예비수강신청</h4>
+<div class="d-none"><!-- TODO 트래픽 설정용 UI(관리자 페이지 이동 필요) -->
+	초<input type="number" id="second" name="second"> 
+	개<input type="number" id="token" name="token">
+	<button id="bucketBtn" onclick="bucket()">트래픽 재설정</button>
+</div>
+
+<div class="d-flex">
+    <!-- 왼쪽 영역 (60%) -->
+    <div id="parentDiv" class="flex-grow-1 me-2 col-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+			<select id="pageLength" class="form-select" style="width: 80px;">
+			    <option value="10">10</option>
+			    <option value="25">25</option>
+			    <option value="50">50</option>
+			    <option value="100">100</option>
+			</select>
+            <div id="searchContainer">
+                <select id="searchColumn" class="form-select d-inline-block w-auto me-2">
+                    <option value="lectNm">강의명</option>
+                    <option value="professorVO.nm">교수명</option>
+                </select>
+                <input type="search" id="searchInput" onkeypress="if(event.keyCode==13)fnEnterKeyEvent();" class="form-control d-inline-block w-auto me-2" placeholder="검색어 입력...">
+                <button id="searchButton" class="btn btn-primary me-2">검색</button>
+                <button id="resetButton" class="btn btn-secondary">전체 보기</button>
+            </div>
+        </div>
+        <table id="parentTable" class="table table-bordered table-primary table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center align-middle">강의명</th>
+                    <th class="text-center align-middle">교수명</th>
+                    <th class="text-center align-middle">학과</th>
+                    <th class="text-center align-middle">학년</th>
+                    <th class="text-center align-middle">학점</th>
+                    <th class="text-center align-middle">정원</th>
+                    <th class="text-center align-middle">시간표</th>
+                    <th class="text-center align-middle"></th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <!-- 오른쪽 영역 (40%) -->
+    <div class="d-flex flex-column p-2 pt-0 col-4">
+        <div class="cj-schedule mb-2"></div>
+        <div id="cartDiv"></div>
+    </div>
+</div>
+
+<script  src="${pageContext.request.contextPath }/resources/js/lecturecart/lectureCartScript.js"></script>

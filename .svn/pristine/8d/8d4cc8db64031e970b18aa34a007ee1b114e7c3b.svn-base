@@ -1,0 +1,89 @@
+/**
+ * 
+ */
+function showConfirm(button) {
+    // 버튼에서 데이터 추출
+    const testNo = button.dataset.testNo;
+    const lectNo = button.dataset.lectNo;
+
+    // Context Path 가져오기
+ //   const dataElement = document.getElementById('contextData');
+//    const contextPath = dataElement.dataset.contextPath;
+    const contextPath = document.getElementById('contextPath').value;
+    console.log(contextPath);
+    
+    // SweetAlert confirm 창 띄우기
+    swal({
+        title: "시험을 응시하시겠습니까?",
+        text: "응시를 시작하려면 예를 클릭하세요.",
+        icon: "warning",
+        buttons: ["취소", "응시"],
+    }).then(function(isConfirm) {
+        if (isConfirm) {
+            // 팝업 창 열기
+            window.open(`${contextPath}/lecture/${lectNo}/attendeeTest/attendeeTest/${testNo}`, 
+                        "testPopup", 
+                        "width=700,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no");
+        } else {
+            // 취소 시 경고
+            swal("취소되었습니다!", "응시를 취소했습니다.", "error");
+        }
+    });
+}
+
+function getProfessorAttendeeTestListPage(button){
+	const testNo = button.dataset.testNo;
+    const lectNo = button.dataset.lectNo;
+
+    // Context Path 가져오기
+    const contextPath = document.getElementById('contextPath').value;
+ //   const contextPath = dataElement.dataset.contextPath;
+    console.log(contextPath);
+    //   	location.href=`${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}`
+
+   	location.href=`${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}`
+   
+}
+function getProfessorNewTestPage(button){
+    const lectNo = button.dataset.lectNo;
+
+    // Context Path 가져오기
+    const contextPath = document.getElementById('contextPath').value;
+ //   const contextPath = dataElement.dataset.contextPath;
+    console.log(contextPath);
+    console.log(lectNo);
+       	location.href=`${contextPath}/test/${lectNo}/new`
+
+  // 	location.href=`${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}`
+   
+}
+function getProfessorDetailTestPage(button){
+    const lectNo = button.dataset.lectNo;
+	const testNo = button.dataset.testNo;
+    // Context Path 가져오기
+    const contextPath = document.getElementById('contextPath').value;
+ //   const contextPath = dataElement.dataset.contextPath;
+
+       	location.href=`${contextPath}/test/${testNo}`
+
+  // 	location.href=`${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}`
+   
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

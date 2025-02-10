@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.attendcoeva.dao.AttendCoevaMapper">
+	
+	
+	
+<select id="selectAttenSemesterList" resultType="SemesterVO">
+	--하나의 수강생이 수강기록이 있는 학기만 리스트로 
+	SELECT 
+		  DISTINCT(L.SEMSTR_NO)
+	FROM 
+		  ATTENDEE A
+		           INNER JOIN LECTURE L ON A.LECT_NO = L.LECT_NO
+	WHERE 
+		  STU_ID = #{stuId}
+</select>
+	
+	
+	
+	
+</mapper>

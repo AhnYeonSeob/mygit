@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.lecture.dao.LectureMapper">
+	<select id="selectLectureRequestList"></select>
+	<select id="selectLectureRequest"></select>
+	<insert id="insertLectureRequest"></insert>
+	<update id="updateLectureRequest"></update>
+	<delete id="deleteLectureRequest"></delete>
+	
+	<update id="lectureRequestConsent"></update>
+	<update id="lectureRequestReturn"></update>
+	
+	<select id="selectLectureAbolitionList"></select>
+	<update id="lectureAbolition"></update>
+	<update id="cancelLectureAbolition"></update>
+	
+	<update id="lectureAbolitionConsent"></update>
+	<update id="lectureAbolitionReturn"></update>
+</mapper>

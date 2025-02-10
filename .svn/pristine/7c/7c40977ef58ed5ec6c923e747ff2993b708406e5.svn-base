@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
+    
+<h4>교수가 보는 장학금 추천서 상세 보기 </h4>
+<input type="hidden" value="${ask.shapDocNo }" id="shapDocNo" />
+<script>
+    const contextPath = "${pageContext.request.contextPath}/";
+</script>
+
+<table class="table table-bordered" >
+				<tr>
+				    <th>상태</th>
+				    	<td>${ask.commonCodeVO.cocoStts}</td>
+				    <th>반려사유</th>
+					    <td>
+					        <c:if test="${empty ask.shapNoReason}">
+					            - <!-- 반려사유가 없을 때 -->
+					        </c:if>
+					        <c:if test="${not empty ask.shapNoReason}">
+					            <span style="color: red;">${ask.shapNoReason}</span> <!-- 반려사유가 있을 때 -->
+					        </c:if>
+					    </td>
+				</tr>
+                <tr>
+                <th>접수일자</th>
+                	<td>${fn:split(ask.shapRcptDate, 'T')[0] } ${fn:split(ask.shapRcptDate, 'T')[1] }</td>
+                <th>승인일자</th>
+		            <td id="approvalDate">
+					    ${fn:split(ask.shapChcDate, 'T')[0]} ${fn:split(ask.shapChcDate, 'T')[1]}
+					</td>
+           </tr>
+            <tr>
+                <th>학기번호</th>
+                <td> ${fn:substring(ask.semstrNo, 0, 4)}-${fn:substring(ask.semstrNo, 4, 6)} </td>
+                <th>장학금이름</th>
+                <td>${ask.awardVO.awardNm}</td>
+            </tr>
+            <tr>
+                <th>교번</th>
+                <td>${ask.profeId }</td>
+                <th>교수 이름</th>
+                <td>${ask.professorVO.nm}</td>
+            </tr>
+            <tr>
+                <th>추천 사유</th>
+                <td colspan="3">${ask.shapRecommend }</td>
+                
+            </tr>
+            
+           
+            
+           
+            <tr>
+                <th>학번</th>
+                <td>${ask.stuId}</td>
+                <th>이름</th>
+                <td>${ask.studentVO.nm}</td>
+            </tr>
+           
+     
+        
+            <tr>
+                <th>생년월일</th>
+            
+               <td colspan="3"> 
+				    ${fn:substring(fn:replace(ask.studentVO.brdt, '-', ''), 0, 4)}년&nbsp;
+				    ${fn:substring(fn:replace(ask.studentVO.brdt, '-', ''), 4, 6)}월&nbsp;
+				    ${fn:substring(fn:replace(ask.studentVO.brdt, '-', ''), 6, 8)}일
+				</td>
+
+                
+                  
+            </tr>
+            <tr>
+                <th>집주소</th>
+            <td colspan="4">(${ask.studentVO.zip}) &nbsp;  ${ask.studentVO.rdnmadr} &nbsp;  ${ask.studentVO.daddr}</td>
+                 
+            </tr>
+            <tr>
+                <th>전화번호</th>
+            <td colspan="4">
+            ${ask.studentVO.mbtlnum}
+            </td>
+                 
+            </tr>
+           
+            <tr>
+                <th>이메일</th>
+            <td colspan="4">${ask.studentVO.eml}</td>
+                 
+            </tr>
+           
+           
+            <tr>
+                <th>첨부파일</th>
+	                <td colspan="3">
+		              <c:forEach items="${ask.atchFile.fileDetails }" var="fd" varStatus="vs">
+				
+				
+				<c:url value='/recommendAward/${ask.shapDocNo}/atch/${fd.atchFileId}/${fd.fileSn}' var="downUrl"/>
+				
+				<a href="${downUrl }">${fd.orignlFileNm }(${fd.fileFancysize })</a>
+				${not vs.last ? '|' : ''}
+			</c:forEach>
+			
+					<c:if test="${empty ask.atchFile.fileDetails}">
+					    첨부파일없음
+					</c:if>
+					</td>
+            </tr>
+</table>
+
+
+			<div align="right">
+			    <c:if test="${ask.commonCodeVO.cocoStts != '승인' && ask.commonCodeVO.cocoStts != '반려'}">
+			        <form action="<c:url value='/recommendAward/delete/${ask.shapDocNo}' />" method="post" style="display:inline;">
+			            <button type="submit" class="btn btn-danger">삭제</button>
+			        </form>
+			    </c:if>
+			    <a href="<c:url value='/recommendAward/selectPro/${ask.profeId}' />" class="btn btn-primary">목록</a>
+			</div>
+
+
+<!-- 이거는 게시물 삭제  -->
+<script src="${pageContext.request.contextPath }/resources/js/awardRec/awardRecDelete.js"></script>
+

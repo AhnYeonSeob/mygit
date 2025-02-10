@@ -1,0 +1,16 @@
+package kr.or.ddit.yguniv.eventregistrant.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.EventRegistrantVO;
+
+@Mapper
+public interface EventRegistrantMapper {
+	//행사신청학생 상세보기
+	public EventRegistrantVO selecteventreg(String jobNo);
+	//행사신청학생 리스트 조회
+	public List<EventRegistrantVO>selecteventregList();
+		
+	}

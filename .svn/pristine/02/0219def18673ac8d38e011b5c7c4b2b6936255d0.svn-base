@@ -1,0 +1,27 @@
+/**
+ * 입력폼 js
+ */
+
+
+/*
+document.addEventListener("DOMContentLoaded", ()=>{
+	
+	var editorInstance;
+	ClassicEditor.create( document.querySelector('#editor'),{
+		licenseKey: 'GPL'
+		, plugins: [ 
+			
+			
+		]
+		
+		
+		
+		
+	})//create에디터 끝
+	
+	
+	
+	
+});
+
+*/

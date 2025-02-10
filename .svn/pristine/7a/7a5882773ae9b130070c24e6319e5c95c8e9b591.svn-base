@@ -1,0 +1,102 @@
+package kr.or.ddit.yguniv.projectteam.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.noticeboard.exception.BoardException;
+import kr.or.ddit.yguniv.projectTask.service.ProjectTaskService;
+import kr.or.ddit.yguniv.projectteam.dao.ProjectTeamMapper;
+import kr.or.ddit.yguniv.vo.ProjectTeamVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ProjectTeamServiceImpl implements ProjectTeamService {
+	private final ProjectTeamMapper mapper;
+	private final ProjectTaskService projectTaskService;
+	
+	@Override
+	public int createProjectTeam(ProjectTeamVO projectTeam) {
+		try {
+			projectTaskService.readProjectTask(projectTeam.getTaskNo());
+		}catch(RuntimeException e){
+			throw new BoardException("해당과제는 존재하지않습니다.",e);
+		}
+		
+		return mapper.insertProjectTeam(projectTeam);
+	}
+
+	@Override
+	public ProjectTeamVO readProjectTeam(String teamCd) {
+		try {
+			ProjectTeamVO projectTeam = mapper.selectProjectTeam(teamCd);
+			return projectTeam;
+			
+		}catch(RuntimeException e) {
+			throw new BoardException("해당 팀번호의 팀은 존재하지않습니다.",e);
+		}
+		
+	}
+
+	@Override
+	public List<ProjectTeamVO> readProjectTeamList(String taskNo) {
+		if(taskNo==null||taskNo.isEmpty()) {
+			throw new BoardException("과제번호가 입력되지않았습니다.");
+		}
+		
+		return mapper.selectProjectTeamlistWithTask(taskNo);
+	}
+
+	@Override
+	public int modifyProjectTeam(ProjectTeamVO projectTeam) {
+		
+		return mapper.updateProjectTeam(projectTeam);
+	}
+
+	@Override
+	public int removeProjectTeam(String teamCd) {
+		try {
+			return mapper.deleteProjectTeam(teamCd);
+			
+		}catch(RuntimeException e) {
+			throw new BoardException("해당 팀번호의 팀은 존재하지않습니다.",e);
+		}
+	}
+
+	@Override
+	public int updateStatus(String teamCd) {
+		try {
+			ProjectTeamVO projectTeam = mapper.selectProjectTeam(teamCd);
+			String status= projectTeam.getTeamStatus();
+			if(status.equalsIgnoreCase("Y")) {
+				status = "N";
+			}else {
+				status = "Y";
+			}
+			projectTeam.setTeamStatus(status);
+			
+			return mapper.updateStatus(projectTeam);
+			
+		}catch(RuntimeException e) {
+			throw new BoardException("해당 팀번호의 팀은 존재하지않습니다.",e);
+		}
+	}
+
+	@Override
+	public int updateEvyn(String teamCd) {
+		try {
+			return mapper.updateEvyn(teamCd);
+			
+		}catch(RuntimeException e) {
+			throw new BoardException("해당 팀번호의 팀은 존재하지않습니다.",e);
+		}
+	}
+
+	@Override
+	public int updateProge(ProjectTeamVO projectTeam) {
+		
+		return mapper.updateProge(projectTeam);
+	}
+
+}

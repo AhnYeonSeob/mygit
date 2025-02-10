@@ -1,0 +1,199 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath }/resources/js/ckeditor5/ckeditor5.css">
+<script type="importmap">
+{
+	"imports": {
+					"ckeditor5": "${pageContext.request.contextPath }resources/js/ckeditor5/ckeditor5.js",
+					"ckeditor5/": "${pageContext.request.contextPath }/resources/js/ckeditor5/translations/ko.js/"
+	}
+}
+</script>
+
+
+
+<input id="lectNo" type="hidden" value="${lectNo }"> 
+<h4>제출과제리스트</h4>
+<h4>${pageContext.request.userPrincipal.name }</h4>
+<table id="parentTable" class="table table-bordered" 
+	data-path="${pageContext.request.contextPath }" 
+	data-auth="${pageContext.request.userPrincipal.name }"
+	data-lectNo="${lectNo }"
+	>
+	<thead>
+		<tr>
+			<!-- rownum -->
+			<th>번호</th>
+			<!-- 강의명 assignment에서 가져옴-->
+			<th>강의명</th>
+			<!-- 과제명 assignment에서 가져옴-->
+			<th>과제명</th>
+			<!-- 과제배점 assignment / 점수-->
+			<th>점수</th>
+			<!-- 제출여부 Y제출완료/N미제출-->
+			<th>제출여부</th>
+			<th>첨부파일</th>
+			<th>피어리뷰</th>
+		</tr>
+	</thead>
+</table>
+
+<!-- 과제 상세보기 모달 창 -->
+<div class="modal fade" id="assignDetailModal" tabindex="-1" aria-labelledby="assignDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignDetailModalLabel">과제 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+             <div class="modal-body">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>강의명</th>
+                            <td class="assignment-lectNm"></td>
+                        </tr>
+                        <tr>
+                            <th>과제명</th>
+                            <td class="assignment-assigNm"></td>
+                        </tr>
+                        <tr>
+                            <th>내용</th>
+                            <td class="assignment-assigNotes"></td>
+                        </tr>
+                        <tr>
+                            <th>배점</th>
+                            <td class="assignment-assigScore"></td>
+                        </tr>
+                        <tr>
+                            <th>제출마감일</th>
+                            <td class="assignment-assigEd"></td>
+                        </tr>
+                        <tr>
+                            <th>첨부파일</th>
+                            <td class="assignment-atchFileId"></td>
+                        </tr>
+                        <tr>
+                            <th>피어리뷰여부</th>
+                            <td class="assignment-peerYn"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 과제제출 모달 창 -->
+<div class="modal fade" id="assignSubmitModal" tabindex="-1" aria-labelledby="assignSubmitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignSubmitModalLabel">과제 제출 창</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+             <div class="modal-body">
+                <form method="POST" action="${pageContext.request.contextPath }/lecture/${lectNo}/assignmentSubmission" id="assignSubmitForm" enctype="multipart/form-data">
+                    <table class="table table-bordered">
+                        <tbody>
+                            <tr>
+                                <th>강의명</th>
+                                <td><input name="lectNm" value="lectNm" class="form-control assignmentSubmission-lectNm" readonly /></td>
+                            </tr>
+                            <tr>
+                                <th>과제명</th>
+                                <td><input name="assigNm" value="assigNm" class="form-control assignmentSubmission-assigNm" readonly/></td>
+                            </tr>
+                            <tr>
+                                <th>학번</th>
+                                <td><input name="stuId" value="stuId" class="form-control assignmentSubmission-stuId" readonly/></td>
+                            </tr>
+                            <tr>
+                                <th>내용</th>
+                                <td><textarea name="assubNotes" class="form-control assignmentSubmission-assubNotes"></textarea></td>
+                            </tr>
+                            <tr>
+                                <th>첨부파일</th>
+                                <td><input name="uploadFiles" type="file" multiple class="form-control"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <input type="hidden" name="assigNo" value="assigNo">
+                    <button type="submit" class="btn btn-primary">제출</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 제출과제 상세보기 모달 창 -->
+<div class="modal fade" id="assignSubmissionDetailModal" tabindex="-1" aria-labelledby="assignSubmissionDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="assignSubmissionDetailModalLabel">제출과제 상세 정보</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+             <div class="modal-body">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>강의명</th>
+                            <td class="assignmentSubmission-lectNm"></td>
+                        </tr>
+                        <tr>
+                            <th>과제번호</th>
+                            <td class="assignmentSubmission-assigNo"></td>
+                        </tr>
+                        <tr>
+                            <th>과제명</th>
+                            <td class="assignmentSubmission-assigNm"></td>
+                        </tr>
+                        <tr>
+                            <th>내용</th>
+                            <td class="assignmentSubmission-assubNotes"></td>
+                        </tr>
+                        <tr>
+                            <th>점수</th>
+                            <td class="assignmentSubmission-assubScore"></td>
+                        </tr>
+                        <tr>
+                            <th>제출마감일</th>
+                            <td class="assignmentSubmission-assigEd"></td>
+                        </tr>
+                        <tr>
+                            <th>제출일</th>
+                            <td class="assignmentSubmission-assubDate"></td>
+                        </tr>
+                        <tr>
+                            <th>첨부파일</th>
+                            <td class="assignmentSubmission-atchFileId"></td>
+                        </tr>
+                        <tr>
+                            <th>피어리뷰제출여부</th>
+                            <td class="assignmentSubmission-peerYn"></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                    	<tr class="text-end">
+                    	<td colspan="2">
+                    	<button id="cancelBtn" class="btn btn-danger">제출취소</button>
+                    	</td>
+                    	</tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script src="${pageContext.request.contextPath }/resources/js/assignmentSubmission/assignmentSubmission.js" ></script>
+

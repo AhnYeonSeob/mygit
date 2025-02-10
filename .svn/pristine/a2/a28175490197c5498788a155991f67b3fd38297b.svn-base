@@ -1,0 +1,11 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<form method="post" action="${pageContext.request.contextPath}/mypage/${id}/auth" class="d-flex align-items-center">
+    <label for="pswd" class="me-2">비밀번호:</label>
+    <input type="password" class="form-control me-2" style="width: 200px;" name="pswd" id="pswd" required>
+    <button type="submit" class="btn btn-primary">확인</button>
+    <c:if test="${not empty message}">
+        <div class="error text-danger ms-2">${message}</div>
+    </c:if>
+</form>
+

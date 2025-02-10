@@ -1,0 +1,61 @@
+package kr.or.ddit.yguniv.student.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.student.service.StudentRecordsServiceImpl;
+
+@Controller
+@RequestMapping("/student")
+public class StudentRecordsController {
+	@Autowired
+	StudentRecordsServiceImpl srService;
+	
+	@GetMapping("studentRecords")
+	public String selectStudentRecordsList(
+		Authentication authentication
+		, Model model
+	) {
+		String id = authentication.getName();
+		
+		return "student/studentRecordsList";
+	}
+	
+	@PostMapping("academicProbation/{stuId}")
+	public void createAcademicProbation(@PathVariable String stuId) {
+		
+	}
+	
+	@GetMapping("studentRecords/new")
+	public void studentRecordForm() {
+		
+	}
+	
+	@PostMapping("studentRecords/new")
+	public void createStudentRecords() {
+		
+	}
+	
+	@GetMapping("studentRecords/{docIssuCd}")
+	public void selectStudentRecords(@PathVariable String docIssuCd) {
+		
+	}
+	
+	@PutMapping("studentRecords/{docIssuCd}/consent")
+	public void consentStudentRecords(@PathVariable String docIssuCd) {
+		
+	}
+	
+	
+	@PutMapping("studentRecords/{docIssuCd}/return")
+	public void returnStudentRecords(@PathVariable String docIssuCd) {
+		
+	} 
+}

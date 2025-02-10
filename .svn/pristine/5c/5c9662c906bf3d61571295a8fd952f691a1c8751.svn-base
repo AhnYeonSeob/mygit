@@ -1,0 +1,30 @@
+package kr.or.ddit.yguniv.eventregistrant.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/eventregistrant")
+public class EventRegistrantController {
+
+		// 전체조회
+		@GetMapping()
+		public String selectlist() {
+
+			return "eventRegistrant/eventRegistrantList";
+		}
+
+	
+		// 상세조회
+		@GetMapping("{jobNo}")
+		public String select(@PathVariable() String jobNo) {
+
+			return "eventRegistrant/eventRegistrantDetail";
+		}
+
+
+
+}
+

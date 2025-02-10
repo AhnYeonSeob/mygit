@@ -1,0 +1,4 @@
+#saveDir=file:D:/multipartDir/saveDir/
+saveDir=/resources/saveDir/
+saveDir=file:C:/multipartDir/saveDir/
+prodImages=/resources/prodImages/

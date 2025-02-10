@@ -1,0 +1,43 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<table class="table table-primary align-middle table-bordered">
+	<tr>
+		<th class="text-center">제목</th>
+		<td class="table-light" colspan="3">${lib.libSj }</td>
+	</tr>
+	<tr>
+		<th class="text-center" style="width: 100px;">글번호</th>
+		<td class="table-light" style="width: 200px;">${lib.libNo }</td>
+		<th class="text-center" style="width: 100px;">작성일</th>
+		<td class="table-light" style="width: 200px;">${fn:split(lib.libDt, 'T')[0] } ${fn:split(lib.libDt, 'T')[1] }</td>
+	</tr>
+	<tr>
+		<th class="text-center">작성자</th>
+		<td class="table-light">${lib.personVO.nm }</td>
+		<th class="text-center">조회수</th>
+		<td class="table-light">${lib.libHit }</td>
+	</tr>
+	<tr>
+		<td class="table-light align-top" colspan="4" style="height: 200px;">${lib.libCn }</td>
+	</tr>
+</table>
+<c:if test="${not empty lib.libAnsDt }">
+	<table class="table table-primary align-middle table-bordered mb-0">
+		<tr>
+			<th class="text-center" style="width: 100px;">답변자</th>
+			<td class="table-light" style="width: 200px;">${lib.professorVO.person.nm } 교수님</td>
+			<th class="text-center" style="width: 100px;">답변일</th>
+			<td class="table-light" style="width: 200px;">${fn:split(lib.libAnsDt, 'T')[0] } ${fn:split(lib.libAnsDt, 'T')[1] }</td>
+		</tr>
+		<tr>
+			<td class="table-light align-top" colspan="4" style="height: 200px;">${lib.libAnsCn }</td>
+		</tr>
+	</table>
+</c:if>
+<br>
+<c:if test="${empty lib.libAnsDt }">
+<h3 class="text-center">등록된 답변이 없습니다</h3>
+</c:if>
+<a class="btn btn-primary float-end" href="${pageContext.request.contextPath }/lecture/${lecture.lectNo }/inquiry">목록</a>

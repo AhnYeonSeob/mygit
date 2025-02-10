@@ -1,0 +1,80 @@
+/**
+ *
+	 제출과제 js 
+	1. 리스트 출력 (권한에 따라 해당강의 교수의경우 채점버튼 / 학생의 경우 미제출시 제출 || 제출 시 수정/삭제 )
+ 	2. 제출(submitBtn)/수정(modifyBtn)/삭제(delBtn)/채점(gradeBtn)
+	
+	3. 현재 로그인한 사용자의 아이디를 가져와 비교
+
+ */
+
+var contextPath = document.getElementById('form-table').dataset['path'];
+var userId = document.getElementById('form-table').dataset['auth'];
+var lectNo = document.getElementById('form-table').value;
+var Url = `${contextPath}/lecture/${lectNo}/assignmentSubmission`;
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+	// 채점하기버튼
+	const gradeBtn = document.querySelector('#gradeBtn');
+	
+	if(gradeBtn){
+		gradeBtn.addEventListener("click",async (e)=>{
+			
+			const assigScore = gradeBtn.dataset.limit;
+			const assigNo = gradeBtn.dataset.assigno;
+			const stuId = gradeBtn.dataset.stuid;
+			const inputGrade = document.querySelector('#inputGrade').value;
+			const url = `${Url}/grade`;
+			console.log(assigScore,assigNo,stuId,lectNo,inputGrade);
+			
+			if(assigScore< inputGrade){
+				swal("잘못된 점수값", "해당과제의 배점보다 높은 점수를 입력할 수 없습니다!", "error");
+			}
+			else{
+				swal({
+		            title: "점수를 입력하시겠습니까?",
+		            text: "한번 입력한 점수값은 성적변경신청없이 수정불가합니다.",
+		            icon: "warning",
+		            buttons: ["확인","취소"]
+				}).then(async (willDelete)=>{
+					if(!willDelete){
+						try{
+							let resp = await fetch(url,{
+								method: 'POST'
+								,headers: {
+									'content-type' : 'application/json'
+								}
+								,body: JSON.stringify({
+									lectNo: lectNo
+									,assigNo: assigNo
+									,stuId: stuId
+									,assubScore: inputGrade
+								})
+							});//fetch
+							if(resp.ok){
+								swal("점수입력완료.","점수가 정상적으로 입력되었습니다.","success")
+								.then(()=>{
+									location.reload();
+								})
+							}else{
+								let jsonData = await resp.json();
+								swal("실패",jsonData.message,"error");
+							}
+						}catch(e){
+							console.log("에러:",e);
+							swal("서버 오류", "과제 제출 취소 중 오류가 발생했습니다.", "error");
+						}
+					}else{
+						swal("취소","취소되었습니다!","success")
+							.then(()=>{
+								location.reload();
+							})
+					}
+					
+				})
+				
+			}
+			
+		});//gradesubmitBtn 이벤트 끝
+	}
+});//DOM 끝

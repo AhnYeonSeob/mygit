@@ -1,0 +1,220 @@
+function showPersonDetail(personId) {
+    axios.get(`../person/detail/${personId}`)
+        .then(resp => {
+            const person = resp.data; // 서버 응답 데이터
+            const personDetailModal = new bootstrap.Modal(document.getElementById('personDetailModal'));
+            personDetailModal.show();
+			for(key in person){
+				console.log(key);
+				$(`#detail-${key}`).text(person[key]);
+			}
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보실패");
+        });
+}
+
+
+
+function showPersonUpdate(personId) {
+    axios.get(`../person/editform/${personId}`) 
+        .then(resp => {
+            console.log(resp.data);
+            const person = resp.data; 
+            const personUpdateModal = new bootstrap.Modal(document.getElementById('personUpdateModal'));
+            personUpdateModal.show();
+
+            //매핑
+            for (const key in person) {
+                const element = document.getElementById(`update-${key}`);
+                if (element) {
+                    //console.log(`매핑된 요소: #update-${key}, 값: ${person[key]}`);
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.value = person[key]; // input, textarea에 값 설정
+                    } else {
+                        element.textContent = person[key]; // 일반 텍스트 요소에 값 설정
+                    }
+                } else {
+                    console.log(`없어`);
+                }
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보를 불러오는 데 실패했습니다.");
+        });
+}
+
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const insertBtn = document.querySelector("#singleinsert-btn");
+	const pwBtn = document.querySelector("#resetpwBtn");
+	const delBtn = document.querySelector("#deleteBtn");
+	
+	
+
+	
+	insertBtn.addEventListener("click", () => {
+		window.location.href = "../person/new";
+		
+	});
+	
+
+
+	
+	pwBtn.addEventListener("click",()=>{
+		console.log("나여기");
+	const updateData={
+		  id: document.getElementById("update-id").textContent
+	};
+	console.log("수정할 id" , updateData);
+		swal({
+			title: "비밀번호를 초기화 하시겠습니까?",
+			//text: ,
+			icon: "warning",
+			buttons: ["취소", "확인"],
+			dangerMode: true,
+		}).then(btnVal=>{
+			if(btnVal){
+				axios.put(`../person/pwedit/${updateData.id}`, updateData)
+				.then(resp=>{
+					swal({
+						title: "초기화 완료",
+						text: "사용자의 비밀번호가 성공적으로 초기화되었습니다",
+						icon: "success",
+						button: "확인"
+					});
+				}).catch(err=>{
+					swal({
+						title: "초기화 실패",
+						text: err.response.data.message,
+						icon: "error",
+						button: "확인"
+					});
+				})
+			}
+		});
+	})
+	
+	
+	delBtn.addEventListener("click",()=>{
+		console.log("삭제버튼");
+		
+	const updateData={
+		id: document.getElementById("detail-id").textContent
+	};
+	console.log("삭제할 id", updateData);
+		swal({
+			title: "정말로 삭제하시겠습니까?",
+			//text: ,
+			icon: "warning",
+			buttons: ["취소", "삭제"],
+			dangerMode: true,
+		}).then(btnVal=>{
+			if(btnVal){
+				axios.put(`../person/delete/${updateData.id}`, updateData)
+				.then(resp=>{
+					swal({
+						title: "삭제완료",
+						text: "사용자가 성공적으로 삭제되었습니다",
+						icon: "success",
+						button: "확인"
+					});
+				}).catch(err=>{
+					swal({
+						title: "삭제실패",
+						text: err.response.data.message,
+						icon: "error",
+						button: "확인"
+					});
+				})
+			}
+		});
+	})
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+});
+
+
+document.getElementById("saveUpdateBtn").addEventListener("click", function () {
+    const updatedData = {
+        id: document.getElementById("update-id").textContent,  
+        mbtlnum: document.getElementById("update-mbtlnum").value, 
+        eml: document.getElementById("update-eml").value,    
+    };
+
+    console.log("수정 데이터:", updatedData); // 수정된 데이터 확인용
+
+    // 수정 요청
+    axios.put(`../person/edit/${updatedData.id}`, updatedData)
+        .then(response => {
+            console.log("수정 성공:", response.data);
+
+            if (response.data === "OK") { // 수정 성공시
+                // 수정된 정보로 상세보기 모달을 갱신
+                const personDetailModal = new bootstrap.Modal(document.getElementById("personDetailModal"));
+                const personDetail = updatedData; // 서버에서 반환된 수정된 데이터
+
+                // 상세정보 모달에 수정된 값 넣기
+                for (const key in personDetail) {
+                    const detailElement = document.getElementById(`detail-${key}`);
+                    if (detailElement) {
+                        detailElement.textContent = personDetail[key];
+                    }
+                }
+
+                // personUpdateModal을 숨기고, personDetailModal을 표시
+                const personUpdateModal = bootstrap.Modal.getInstance(document.getElementById("personUpdateModal"));
+                if (personUpdateModal) {
+                    personUpdateModal.hide();  // 수정 모달 숨기기
+                }
+
+                personDetailModal.show();  // 상세보기 모달 표시
+            } else {
+                alert("수정에 실패했습니다.");
+            }
+        })
+        .catch(err => {
+            console.error("수정 실패:", err);
+            alert("수정 요청에 실패했습니다.");
+        });
+});
+
+
+
+/*
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	const updateBtn = document.querySelector("#update-Btn");
+	updateBtn.addEventListener("click", () => {
+		const personId = document.querySelector("#personId").value;
+		$.ajax({
+			url: '../person/edit/' + personId, //여기로보내
+			type: 'PUT',  
+			success: function() {
+				window.location.href = "../person/list";
+			},
+			error: function() {
+				alert("수정 실패");
+			}
+		});
+	});
+});
+
+*/
+
+

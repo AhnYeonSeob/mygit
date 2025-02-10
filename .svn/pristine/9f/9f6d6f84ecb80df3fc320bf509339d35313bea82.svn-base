@@ -1,0 +1,25 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="jobTestEx")
+public class JobTestVO implements Serializable{
+	@NotNull
+	@Size(max = 300)
+	private String jobTestEx; //문제번호
+	
+	@NotNull
+	@Size(max = 200)
+	private String jobTestSel; //선택지
+	
+	@NotNull
+	@Size(max = 8)
+	private String jobTestType; //선호도유형
+}

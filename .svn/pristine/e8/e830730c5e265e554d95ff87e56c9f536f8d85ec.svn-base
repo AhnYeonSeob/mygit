@@ -1,0 +1,108 @@
+package kr.or.ddit.yguniv.person.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.commons.enumpkg.ServiceResult;
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.person.dao.PersonMapper;
+import kr.or.ddit.yguniv.vo.EmployeeVO;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import kr.or.ddit.yguniv.vo.ProfessorVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PersonServiceImpl implements PersonService {
+	
+	private final PersonMapper dao;
+	
+	 @Transactional
+	    public void insertPersonAndProfessor(PersonVO person) {
+	        try {
+	            // Person을 먼저 삽입
+	            dao.insertPerson(person);
+
+	            // Person 삽입이 성공하면, 교수 정보를 삽입
+	            if (person.getProfessor() != null) {
+	            	
+	            }
+	        } catch (Exception e) {
+	            // 예외 발생 시 트랜잭션 롤백
+	            throw new RuntimeException("Person or Professor insert failed", e);
+	        }
+	    }
+
+
+	
+	
+	
+	
+	
+	@Override
+	public ServiceResult createPerson(PersonVO person) {
+	    ServiceResult result = null;
+
+	    if(dao.selectPerson(person.getId()) != null) {  
+	        result = ServiceResult.PKDUPLICATED;
+	    } else {
+	      
+	        int rowcnt = dao.insertPerson(person);  
+	        result = rowcnt > 0 ? ServiceResult.OK : ServiceResult.FAIL;
+	    }
+
+	    return result; 
+	}
+
+
+	@Override
+	public PersonVO readPerson(String Id) {
+		return Optional.ofNullable(dao.selectPerson(Id))
+				.orElseThrow(()->new PKNotFoundException(String.format("%s 사용자 없음.", Id)));
+	}
+
+	@Override
+	public List<PersonVO> readPersonList() {
+		return dao.selectPersonList();
+	}
+
+	@Override
+	public ServiceResult modifyPerson(PersonVO person) {
+		return dao.updatePerson(person);
+	}
+
+	@Override
+	public ServiceResult removePerson(PersonVO person) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+
+
+
+
+
+	@Override
+	public ServiceResult insertProfessor(ProfessorVO professor) {
+		
+		return dao.insertProfessor(professor);
+	}
+
+
+
+
+
+
+
+	@Override
+	public ServiceResult insertEmployee(EmployeeVO employee) {
+		return dao.insertEmployee(employee);
+	}
+
+}

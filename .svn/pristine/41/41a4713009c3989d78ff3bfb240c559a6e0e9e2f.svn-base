@@ -1,0 +1,191 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
+
+<style>
+
+    .button-group {
+        display: flex;
+        justify-content: flex-start; /* 버튼들을 왼쪽 정렬 */
+        gap: 10px; /* 버튼 간 간격 */
+        margin-bottom: 20px; /* 버튼 아래 여백 */
+    }
+
+    #applyBtn {
+        padding: 8px 16px; /* 버튼 크기 조정 */
+        font-size: 14px;
+        background-color: #007bff; /* 파란색 배경 */
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #applyBtn:hover {
+        background-color: #0056b3; /* 호버 시 어두운 파란색 */
+    }
+
+    .star-container {
+        display: inline-block;
+        position: relative;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+    }
+
+    .star-container input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .star-container .star {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        background-color: #ccc; /* 기본 회색 */
+        clip-path: polygon(
+            50% 0%,
+            61% 35%,
+            98% 35%,
+            68% 57%,
+            79% 91%,
+            50% 70%,
+            21% 91%,
+            32% 57%,
+            2% 35%,
+            39% 35%
+        );
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    .star-container input:checked ~ .star {
+        background-color: #ffc107; /* 노란색 */
+        transform: scale(1.2); /* 크기 확대 */
+    }
+    .btn-area{
+    	text-align:right;
+    }
+</style>
+
+
+<h4>취업정보게시판 상세보기</h4>
+<br>
+<table class="table table-bordered" id="form-table" data-path="${pageContext.request.contextPath }">
+    <tr>
+        <th>No</th>
+        <td id="detail-id">${jobboard.jobNo}</td>
+        <c:if test="${jobboard.jobCate == '채용공고'}">
+            <th>스크랩</th>
+            <td>
+                <div class="button-group">
+                    <security:authorize access="hasRole('STUDENT')">
+                        <label class="star-container">
+                            <input type="checkbox" id="favoriteCheckbox">
+                            <span class="star"></span>
+                        </label>
+                    </security:authorize>
+                </div>
+            </td>
+        </c:if>
+    </tr>
+    <tr>
+        <th>제목</th>
+        <td>${jobboard.jobNm}</td>
+        <th>카테고리</th>
+        <td>${jobboard.jobCate}</td>
+    </tr>
+    <tr>
+        <th>공고 시작일</th>
+        <td>${jobboard.jobDt}</td>
+        <th>공고 마감일</th>
+        <td>${jobboard.jobEt}</td>
+    </tr>
+    <tr>
+        <th>작성자</th>
+        <td>${jobboard.writerNm}</td>
+        <th>작성일</th>
+        <td>${jobboard.jobDate}</td>
+    </tr>
+
+    <!-- 첨부파일 -->
+    <tr>
+        <th>첨부파일</th>
+        <td colspan="3">
+            <c:forEach items="${jobboard.atchFile.fileDetails}" var="fd" varStatus="vs">
+                <c:url value='/atch/${fd.atchFileId}/${fd.fileSn}' var="downUrl"/>
+                <a href="${downUrl}">${fd.orignlFileNm} (${fd.fileFancysize})</a>
+                ${not vs.last ? '|' : ''}
+            </c:forEach>
+            <c:if test="${empty jobboard.atchFile.fileDetails}">
+                첨부파일 없음
+            </c:if>
+        </td>
+    </tr>
+
+    <!-- 내용 -->
+    <tr>
+    	<th></th>
+        <td colspan="4">
+            <!-- 게시글 내용 -->
+            <div>${jobboard.jobContent}</div>
+
+            <!-- 첨부된 이미지 파일을 내용에 추가 -->
+            <c:forEach items="${jobboard.atchFile.fileDetails}" var="fd">
+                <!-- 이미지 파일 확장자 검사 -->
+                <c:if test="${fn:toLowerCase(fd.fileExtsn) == 'jpg' || 
+                             fn:toLowerCase(fd.fileExtsn) == 'jpeg' || 
+                             fn:toLowerCase(fd.fileExtsn) == 'png' || 
+                             fn:toLowerCase(fd.fileExtsn) == 'gif'}">
+                    <div style="margin-top: 10px;">
+                        <img src="<c:url value='/jobboard/${jobboard.jobNo}/atch/${fd.atchFileId}/${fd.fileSn}' />" 
+                             alt="${fd.orignlFileNm}" 
+                             style="max-width: 80%; height: auto;" />
+                    </div>
+                </c:if>
+            </c:forEach>
+        </td>
+    </tr>
+</table>
+
+<!-- 우측 하단에 신청하기 버튼 -->
+<c:if test="${jobboard.jobCate == '채용설명회'}">
+    <div style="text-align: right; margin-top: 20px;">
+        <security:authorize access="hasRole('STUDENT')">
+            <button type="submit" id="applyBtn" class="btn btn-primary">신청하기</button>
+        </security:authorize>
+    </div>
+</c:if>
+<br>
+<br>
+<br>
+
+
+<form id="applyForm">
+<!-- 신청하기에 들어가는 jobNo, stuId가져오는 폼 -->
+<security:authentication property="principal" var="person"/>
+	<table style="display:none;" >
+	<tr>
+	 	<th>jobNo</th>
+        <td id="apply-jobno">${jobboard.jobNo}</td>
+        <th>로그인한사용자id</th>
+        <td id="apply-id">${person.realUser.id}</td>
+     </tr>
+	</table>
+</form>
+
+
+
+<security:authorize access="hasRole('EMPLOYEE')">
+<div class="btn-area">
+    <a href="<c:url value='/jobboard/${jobboard.jobNo}/edit' />" class="btn btn-info">수정</a>
+    <button type="submit" id="deleteBtn" class="btn btn-danger">삭제</button>
+</div>
+</security:authorize>    
+<div class="btn-area1">    
+    <a href="<c:url value='/jobboard' />" class="btn btn-primary">목록</a>
+</div>
+
+<script src="${pageContext.request.contextPath }/resources/js/jobboard/jobBoardDelete.js"></script>

@@ -1,0 +1,49 @@
+package kr.or.ddit.yguniv.coursecart.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.coursecart.dao.LectureCartMapper;
+import kr.or.ddit.yguniv.vo.LectureCartVO;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import lombok.RequiredArgsConstructor;
+@Service
+@RequiredArgsConstructor
+public class LectureCartServiceImpl implements LectureCartService {
+
+	private final LectureCartMapper dao;
+	@Override
+	public List<LectureVO> getLectureList() {
+		// TODO Auto-generated method stub
+		return dao.getLectureList();
+	}
+	@Override
+	public List<LectureVO> getStudentLectureList(String stuId) {
+		// TODO Auto-generated method stub
+		return dao.getStudentLectureList(stuId);
+	}
+
+	@Override
+	public List<LectureVO> getLecturePaper(String lectNo) {
+		// TODO Auto-generated method stub
+		return dao.selectLecturePaper(lectNo);
+	}
+
+	
+	@Override
+	public int insertCart(LectureCartVO lcVo) {
+		
+		
+		return dao.insertCart(lcVo);
+	}
+	@Override
+	public int deleteCart(LectureCartVO lcVo) {
+		// TODO Auto-generated method stub
+		return dao.deleteCart(lcVo);
+	}
+	
+	
+
+}

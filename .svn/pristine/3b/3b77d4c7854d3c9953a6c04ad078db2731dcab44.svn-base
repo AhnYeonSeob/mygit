@@ -1,0 +1,166 @@
+/**
+ *
+	 제출과제 js 
+	1. 리스트 출력
+ 	2. 채점(gradeBtn)
+	
+	3. 현재 로그인한 사용자의 아이디를 가져와 비교
+
+ */
+
+var contextPath = document.getElementById('mainDiv').dataset['path'];
+var userId = document.getElementById('mainDiv').dataset['auth'];
+var lectNo = document.getElementById('mainDiv').dataset.lectNo;
+var Url = `${contextPath}/lecture/${lectNo}/assignmentSubmission`;
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+	// 채점하기버튼
+	const gradeBtn = document.querySelector('#gradeBtn');
+	
+	async function getChart(lectNo){
+		const resp = await fetch(`${Url}/getChart`);
+		
+		if (!resp.ok) {
+            console.error("데이터 로드 실패:", resp.statusText);
+            return;
+        }
+
+		const data = await resp.json();
+		
+		console.log(data);
+		// 각 과제에 대해 차트 렌더링
+	    // 배열에 접근
+	    const assignments = data.assignmentList || []; // data.assignmentList가 없으면 빈 배열 사용
+	
+	    assignments.forEach(assignment => {
+	        const submissionChartId = `submissionChart-${assignment.assigNo}`;
+	        const gradedChartId = `gradedChart-${assignment.assigNo}`;
+	
+	        // 제출률 계산
+	        const totalSubmissions = assignment.assignmentsubmissionList.length; // 전체 제출 수
+	        const completedSubmissions = assignment.assignmentsubmissionList.filter(sub => sub.assubYn === 'Y').length; // 제출 완료 수
+	        const submissionRate = Math.round((completedSubmissions / totalSubmissions) * 100);
+	        const remainingSubmissions = totalSubmissions - completedSubmissions;
+	
+	        // 채점 완료률 계산
+	        const gradedSubmissions = assignment.assignmentsubmissionList.filter(sub => sub.assubScore !== null).length; // 채점 완료 수
+	        const gradedRate = Math.round((gradedSubmissions / totalSubmissions) * 100);
+	        const ungradedSubmissions = totalSubmissions - gradedSubmissions;
+	
+	        // 제출률 차트
+	        const submissionCtx = document.getElementById(submissionChartId).getContext("2d");
+	        new Chart(submissionCtx, {
+	            type: "doughnut",
+	            data: {
+	                labels: ["제출", "미제출"],
+	                datasets: [{
+	                    label: `제출률: ${submissionRate}%`,
+	                    data: [completedSubmissions, remainingSubmissions],
+	                    backgroundColor: ["#3498db", "#e0e0e0"]
+	                }]
+	            },
+	            options: {
+	                responsive: true,
+	                plugins: {
+	                    legend: { display: true, position: "top" },
+	                    tooltip: {
+	                        callbacks: {
+	                            label: function(context) {
+	                                return `${context.label}: ${context.raw}명`;
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	
+	        // 채점 완료률 차트
+	        const gradedCtx = document.getElementById(gradedChartId).getContext("2d");
+	        new Chart(gradedCtx, {
+	            type: "doughnut",
+	            data: {
+	                labels: ["채점 완료", "미채점"],
+	                datasets: [{
+	                    label: `채점 완료률: ${gradedRate}%`,
+	                    data: [gradedSubmissions, ungradedSubmissions],
+	                    backgroundColor: ["#4caf50", "#b0bec5"]
+	                }]
+	            },
+	            options: {
+	                responsive: true,
+	                plugins: {
+	                    legend: { display: true, position: "top" },
+	                    tooltip: {
+	                        callbacks: {
+	                            label: function(context) {
+	                                return `${context.label}: ${context.raw}명`;
+	                            }
+	                        }
+	                    }
+	                }
+	            }
+	        });
+	    });
+	}
+	getChart(lectNo);
+	
+	if(gradeBtn){
+		gradeBtn.addEventListener("click",async (e)=>{
+			
+			const assigScore = gradeBtn.dataset.limit;
+			const assigNo = gradeBtn.dataset.assigno;
+			const stuId = gradeBtn.dataset.stuid;
+			const inputGrade = document.querySelector('#inputGrade').value;
+			const url = `${Url}/grade`;
+
+			if(assigScore< inputGrade){
+				swal("잘못된 점수값", "해당과제의 배점보다 높은 점수를 입력할 수 없습니다!", "error");
+			}
+			else{
+				swal({
+		            title: "점수를 입력하시겠습니까?",
+		            text: "한번 입력한 점수값은 성적변경신청없이 수정불가합니다.",
+		            icon: "warning",
+		            buttons: ["확인","취소"]
+				}).then(async (willDelete)=>{
+					if(!willDelete){
+						try{
+							let resp = await fetch(url,{
+								method: 'POST'
+								,headers: {
+									'content-type' : 'application/json'
+								}
+								,body: JSON.stringify({
+									lectNo: lectNo
+									,assigNo: assigNo
+									,stuId: stuId
+									,assubScore: inputGrade
+								})
+							});//fetch
+							if(resp.ok){
+								swal("점수입력완료.","점수가 정상적으로 입력되었습니다.","success")
+								.then(()=>{
+									location.reload();
+								})
+							}else{
+								let jsonData = await resp.json();
+								swal("실패",jsonData.message,"error");
+							}
+						}catch(e){
+							console.log("에러:",e);
+							swal("서버 오류", "과제 제출 취소 중 오류가 발생했습니다.", "error");
+						}
+					}else{
+						swal("취소","취소되었습니다!","success")
+							.then(()=>{
+								location.reload();
+							})
+					}
+					
+				})
+				
+			}
+			
+		});//gradesubmitBtn 이벤트 끝
+	}
+});//DOM 끝

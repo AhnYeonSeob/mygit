@@ -1,0 +1,45 @@
+package kr.or.ddit.yguniv.assignment.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.AssignmentVO;
+import kr.or.ddit.yguniv.vo.AtchFileDetailVO;
+
+public interface AssignmentService {
+	/**과제 생성
+	 * @param assignment
+	 */
+	public void createAssignment(AssignmentVO assignment);
+	/**과제 상세조회
+	 * @param assig
+	 * @return
+	 */
+	public AssignmentVO readAssignment(int assig);
+	/**논페이징 목록조회
+	 * @return
+	 */
+	public List<AssignmentVO> readAssignmentList();
+	/**페이징 목록조회
+	 * @return
+	 */
+	public List<AssignmentVO> readAssignmentListPaging();
+	/**과제 수정
+	 * @param assignment
+	 */
+	public void modifyAssignment(AssignmentVO assignment);
+	/**과제 삭제
+	 * @param assig
+	 */
+	public void removeAssignment(int assig);
+	/** 파일 다운로드
+	 * @param atchFileId
+	 * @param fileSn
+	 * @return
+	 */
+	public AtchFileDetailVO download(int atchFileId, int fileSn);
+	/** 파일 한건 삭제
+	 * @param atchFileId
+	 * @param fileSn
+	 */
+	public void removeFile(int atchFileId, int fileSn);
+}

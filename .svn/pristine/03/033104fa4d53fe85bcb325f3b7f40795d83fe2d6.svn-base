@@ -1,0 +1,72 @@
+/**
+ * 학생이 이의신청 페이지에 들어온다. 가장 베스트는 이번 학기에 들은 강의를 선택하고 해당 학기에서 교수에게 받은 점수를 조회할 수 있어야 한다
+ */
+
+document.addEventListener("DOMContentLoaded",()=>{
+	
+})
+
+
+const url = "../yguniv/dissent"
+const upBtn = document.getElementById("upBtn")
+const selDiv = document.getElementById("selDiv");
+
+//1인 조회용도
+async function findOne(stu,lec){
+	
+	const findUrl = `${url}/${stu}/${lec}`;
+	
+	
+	console.log(findUrl)
+	var resp = await fetch(findUrl);
+	var pars = await resp.json();
+	var data = await pars.dissOne;
+	console.log(data)
+	
+	code=``;
+	code+=`
+	<table class="table table-bordered">
+			<tr>
+				<th>강의번호</th>
+				<th>강의명</th>
+				<th>학번</th>
+				<th>이름</th>
+				<th>출석</th>
+				<th>과제</th>
+				<th>시험</th>
+			</tr>		
+			<tr>
+				<input type='hidden' name='lectNo' id='lectNo' value='${data.lectNo}'></input>
+				<input type='hidden' name='stuId' id='stuId' value='${data.attenVO.stuId}'></input>
+				<td>${data.lectNo}</td>
+				<td>${data.lectVO.lectNm}</td>
+				<td>${data.attenVO.stuId}</td>
+				<td>${data.nm}</td>
+				<td><input type='number' name='attenVO.assigScore' id='assigScore' value='${data.attenVO.assigScore}'></input></td>
+				<td><input type='number' name='attenVO.attenAtndScore' id='attenAtndScore' value='${data.attenVO.attenAtndScore}'></input></td>
+				<td><input type='number' name='attenVO.testScore' id='testScore' value='${data.attenVO.testScore}'></input></td>
+
+			</tr>	
+			<tr>
+				<th colspan='7'>이의 내용</th>
+			</tr>	
+			<tr>
+				<td colspan='7'>${data.objcCn}</td>				
+			</tr>	
+			<tr>
+				<th colspan='7'>답변 작성</th>
+			</tr>	
+			<tr>
+				<td colspan='7'><textarea id='answerCn' name='answerCn'></textarea></td>				
+			</tr>
+			<tr>
+			<td colspan='7'><button type="button"  onclick="updateForm();" id="upBtn"> 수정하기 </button>
+			<button type="button" id="delBtn" onclick="deleteUp()"> 삭제하기 </button></td>
+			</tr>
+
+	</table>
+	
+	`;
+	selDiv.innerHTML=code;
+	console.log(document.getElementById("selForm")); // 확인용
+}

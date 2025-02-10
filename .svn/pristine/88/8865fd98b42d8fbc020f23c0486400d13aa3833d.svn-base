@@ -1,0 +1,83 @@
+package kr.or.ddit.yguniv.lecture.dao;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.annotation.RootContextWebConfig;
+import kr.or.ddit.yguniv.vo.LectureWeekVO;
+import kr.or.ddit.yguniv.vo.OrderLectureDataVO;
+
+@RootContextWebConfig
+@Transactional
+class LectureMaterialsMapperTest {
+	@Autowired
+	LectureMaterialsMapper mapper;
+	
+	LectureWeekVO lectureWeek;
+	
+	OrderLectureDataVO orderLectureData;
+	
+	@BeforeEach
+	void beforeEach() {
+		lectureWeek = new LectureWeekVO();
+		lectureWeek.setLectNo("L001");
+		lectureWeek.setWeekCd("W01");
+		lectureWeek.setLeweNm("더미강의1주차");
+		assertEquals(1, mapper.insertLectureWeek(lectureWeek));
+		
+		orderLectureData = new OrderLectureDataVO();
+		orderLectureData.setLectOrder(1L);
+		orderLectureData.setWeekCd("W01");
+		orderLectureData.setLectNo("L001");
+		orderLectureData.setSectNm("더미강의1차수");
+		orderLectureData.setSectDt("20241210");
+		orderLectureData.setSectEt("20241217");
+		orderLectureData.setSectIdnty("0100");
+		assertEquals(1, mapper.insertOrderLectureData(orderLectureData));
+	}
+
+	@Test
+	void testSelectOrderLectureDataList() {
+		assertNotNull(mapper.selectOrderLectureDataList("L001"));
+	}
+
+	@Test
+	void testSelectOrderLectureData() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testInsertLectureWeek() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testUpdateLectureWeek() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testDeleteLectureWeek() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testInsertOrderLectureData() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testUpdateOrderLectureData() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	void testDeleteOrderLectureData() {
+		fail("Not yet implemented");
+	}
+
+}

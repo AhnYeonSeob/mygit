@@ -1,0 +1,75 @@
+/**
+ * 
+ */
+let fnPaging;
+let fnDetail;
+let fnStreCateChange;
+let fnStreResSelChange;
+document.addEventListener('DOMContentLoaded', function(){
+	let search = document.getElementById('search');
+	let searchDiv = document.getElementById('searchDiv');
+	let searchBtn = document.getElementById('searchBtn');
+	let resetBtn = document.getElementById('resetBtn');
+	let show = document.getElementById('show');
+	let searchForm = document.forms['searchForm'];
+	
+	// 검색 컬랩스 이벤트에 따른 전송 버튼 가시성 수정
+	const toggleBtn = function(){
+		if (searchDiv.classList.contains('hidden')) {
+	        searchDiv.classList.remove('hidden');
+	        searchDiv.classList.add('visible');
+	    } else {
+	        searchDiv.classList.remove('visible');
+	        searchDiv.classList.add('hidden');
+	    }
+	}
+	search.addEventListener('hide.bs.collapse', function(){
+		toggleBtn();
+		show.value = "N";
+	});
+	search.addEventListener('show.bs.collapse', function(){
+		toggleBtn();
+		show.value = "Y";
+	});
+	
+	// 검색버튼으로 검색
+	searchBtn.addEventListener('click', function(){
+		searchForm.requestSubmit();
+	});
+	
+	// reset버튼으로 초기화
+	resetBtn.addEventListener('click', function(){
+		$('#search').find('input, select').each((i,v)=>{
+			v.value = '';
+		});
+	});
+	
+	fnPaging = function(page){
+		document.querySelector('#page').value = page;
+		searchForm.requestSubmit();
+	};
+	
+	fnDetail = function(tr){
+		let streIssuNo = tr.dataset['streIssuNo'];
+		axios(`${cp.value}/student/studentRecords/${streIssuNo}`)
+		.then(({data})=>{
+			console.log(data);
+		});
+	};
+	
+	fnStreCateChange = function(select){
+		let $streResSel = $('#streResSel');
+		$streResSel.find('option').each((i,v)=>{
+			if(v.classList.contains(select.value)){
+				$(v).show();
+			}else{
+				$(v).hide();
+			}
+		});
+		$streResSel.val('');
+	};
+	
+	fnStreResSelChange = function(select){
+		console.log(select.value);
+	};
+});

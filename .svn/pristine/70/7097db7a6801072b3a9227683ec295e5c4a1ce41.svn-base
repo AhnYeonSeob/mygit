@@ -1,0 +1,185 @@
+/**
+ * 
+ */
+
+document.addEventListener("DOMContentLoaded", async () => {
+	const testNo = document.getElementById('testNo').value;
+	const lectNo = document.getElementById('lectNo').value;
+
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+
+	const url = `${contextPath}/attendeeTest/${lectNo}/professor/${testNo}/get`;
+	console.log('Fetch URL:', url);
+
+	try {
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const boxElement = document.getElementById('box');
+
+		data.professorTestList.forEach(testVO => {
+			let html = `
+                <div id="testData" data-context-test1="${testVO.testNo}" data-context-test2="${testVO.lectNo}">
+                    <h3>시험 정보</h3>
+                    <p><strong>시험 번호:</strong> ${testVO.testNo}</p>
+                    <p><strong>교과목 번호:</strong> ${testVO.lectNo}</p>
+                    <p><strong>시험 종류:</strong> ${testVO.testSe}</p>
+                    <p><strong>시험 종료 시간:</strong> ${testVO.testEt || 'N/A'}</p>
+                </div>
+
+                <h4>문제 정보</h4>
+            `;
+
+			testVO.questionVO.forEach(question => {
+				html += `
+                    <div>
+                        <p><strong>문제 번호:</strong> ${question.queNo}</p>
+                        <p><strong>문제 타입:</strong> ${question.queType}</p>
+                        <p><strong>문제 답안:</strong> ${question.queDescr}</p>
+                    </div>
+                `;
+			});
+
+			html += `<div><h4>응시 기록</h4>`;
+
+			testVO.examList.forEach(exam => {
+				html += `<p><strong>학생 ID:</strong> ${exam.stuId}</p>`;
+
+				exam.questionAnswerList.forEach(qa => {
+					html += `
+                        <p><strong>문제 번호:</strong> ${qa.queNo}</p>
+                        <p><strong>학생 답안:</strong> ${qa.queAnswer}</p>
+                        <input type="number" id="${exam.stuId}-${qa.queNo}" name="${exam.stuId}-${qa.queNo}">
+                        <button class="btn btn-primary" onclick="submitScore('${exam.stuId}', '${qa.queNo}')">점수 등록</button>
+                    `;
+				});
+			});
+
+			html += `</div><hr>`;
+			boxElement.innerHTML += html;
+		});
+	} catch (error) {
+		console.error('Error fetching data:', error);
+	}
+});
+
+// 점수 제출 함수
+function submitScore(stuId, queNo) {
+    const dataElement = document.getElementById('contextData');
+    const testElement = document.getElementById('testData');
+    const score = document.getElementById(`${stuId}-${queNo}`).value;
+    const contextPath = dataElement.dataset.contextPath;
+    const testNo = testElement.dataset.contextTest1;
+    const lectNo = testElement.dataset.contextTest2;
+
+    const url = `${contextPath}/attendeeTest/${lectNo}/${queNo}/score`;
+
+    if (!score) {
+        alert("점수를 입력해 주세요.");
+        return;
+    }
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            testNo: testNo,
+            lectNo: lectNo,
+            stuId: stuId,
+            queNo: queNo,
+            quesScore: score
+        })
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.status === 'success') {
+            alert("점수가 성공적으로 등록되었습니다.");
+            loadProfessorTestList(); // 리스트 새로고침
+        } else if (data.status === 'fail') {
+            alert("점수 등록에 실패했습니다.");
+        } else {
+            alert("알 수 없는 오류가 발생했습니다.");
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("점수 등록 중 오류가 발생했습니다.");
+    });
+}
+
+
+async function loadProfessorTestList() {
+    const testNo = document.getElementById('testNo').value;
+    const lectNo = document.getElementById('lectNo').value;
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const url = `${contextPath}/attendeeTest/${lectNo}/professor/${testNo}/get`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP 오류! 상태: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const boxElement = document.getElementById('box');
+        boxElement.innerHTML = ''; // 기존 내용 삭제
+
+        // 여기에 기존의 HTML 생성 코드를 넣습니다
+        data.professorTestList.forEach(testVO => {
+				let html = `
+                <div id="testData" data-context-test1="${testVO.testNo}" data-context-test2="${testVO.lectNo}">
+                    <h3>시험 정보</h3>
+                    <p><strong>시험 번호:</strong> ${testVO.testNo}</p>
+                    <p><strong>교과목 번호:</strong> ${testVO.lectNo}</p>
+                    <p><strong>시험 종류:</strong> ${testVO.testSe}</p>
+                    <p><strong>시험 종료 시간:</strong> ${testVO.testEt || 'N/A'}</p>
+                </div>
+
+                <h4>문제 정보</h4>
+            `;
+
+			testVO.questionVO.forEach(question => {
+				html += `
+                    <div>
+                        <p><strong>문제 번호:</strong> ${question.queNo}</p>
+                        <p><strong>문제 타입:</strong> ${question.queType}</p>
+                        <p><strong>문제 답안:</strong> ${question.queDescr}</p>
+                    </div>
+                `;
+			});
+
+			html += `<div><h4>응시 기록</h4>`;
+
+			testVO.examList.forEach(exam => {
+				html += `<p><strong>학생 ID:</strong> ${exam.stuId}</p>`;
+
+				exam.questionAnswerList.forEach(qa => {
+					html += `
+                        <p><strong>문제 번호:</strong> ${qa.queNo}</p>
+                        <p><strong>학생 답안:</strong> ${qa.queAnswer}</p>
+                        <input type="number" id="${exam.stuId}-${qa.queNo}" name="${exam.stuId}-${qa.queNo}">
+                        <button class="btn btn-primary" onclick="submitScore('${exam.stuId}', '${qa.queNo}')">점수 등록</button>
+                    `;
+				});
+			});
+
+			html += `</div><hr>`;
+			boxElement.innerHTML += html;
+            // ... (기존 HTML 생성 코드)
+        });
+    } catch (error) {
+        console.error('데이터 가져오기 오류:', error);
+    }
+}

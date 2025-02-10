@@ -1,0 +1,14 @@
+package kr.or.ddit.yguniv.login.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.PersonVO;
+
+@Mapper
+public interface PersonFindLoginMapper {
+
+	public PersonVO selectFindForm();
+	
+	
+
+}

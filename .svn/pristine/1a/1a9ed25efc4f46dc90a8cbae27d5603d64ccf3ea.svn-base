@@ -1,0 +1,65 @@
+package kr.or.ddit.yguniv.lecture.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/lecture/{lectNo}/inquiry")
+public class LectureInquiryController {
+	
+	
+	@GetMapping
+	public String selectLectureInquiryBoardList(@PathVariable String lectNo) {
+		return "lecture/lectureInquiryBoardList";
+	}
+	
+	@GetMapping("{cibCd}")
+	public String selectLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		return "lecture/lectureInquiryBoardDetail";
+	}
+	
+	@GetMapping("new")
+	public String lectureInquiryBoardForm(@PathVariable String lectNo) {
+		return "lecture/lectureInquiryBoardForm";
+	}
+	
+	@PostMapping("new")
+	public void insertLectureInquiryBoard() {
+		
+	}
+	
+	@GetMapping("{cibCd}/edit")
+	public String lectureInquiryBoardEdit(@PathVariable String lectNo, @PathVariable String cibCd) {
+		return "lecture/lectureInquiryBoardEdit";
+	}
+	
+	@PostMapping("{cibCd}/edit")
+	public void updateLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@DeleteMapping("{cibCd}")
+	public void deleteLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@PostMapping("{cibCd}/answer")
+	public void insertLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@PutMapping("{cibCd}/answer")
+	public void updateLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@DeleteMapping("{cibCd}/answer")
+	public void deleteLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+}

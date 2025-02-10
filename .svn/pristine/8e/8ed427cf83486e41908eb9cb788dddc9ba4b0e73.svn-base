@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.lecturenoticeboard.dao.LectureNoticeBoardMapper">
+
+<!-- <resultMap type="LectureNoticeBoardVO" id="lectureNoticeBoardMap" autoMapping="true"> -->
+<!-- 	<association property="lectureVO" javaType="LectureVO"> -->
+<!-- 		<association property="professorVO" javaType="ProfessorVO"> -->
+<!-- 			<association property="personVO" javaType="PersonVO"> -->
+<!-- 				</association> -->
+<!-- 		</association> -->
+<!-- 	</association> -->
+<!-- 	<collection property="fileList" ofType="String"> -->
+<!-- 		<result property="fileRealName" column="ATCH_FILE_ID"/> -->
+<!-- 	</collection> -->
+<!-- </resultMap> -->
+
+<!-- 아이디는 바로 조인해서 찾으면된다 -->
+
+	<!-- 강의 공지사항 상세 조회 -->
+<!-- 	<select id="selectLectureNoticeBoard" resultMap="lectureNoticeBoardMap"> -->
+<!-- 		SELECT A.CNB_NM , C.NM, A.CNB_DT, A.CNB_INQ, A.CNB_NOTES, E.STRE_FILE_NM -->
+<!-- 		FROM LECTURE_NOTICE_BOARD A -->
+<!-- 			INNER JOIN LECTURE B ON B.LECT_NO = A.LECT_NO -->
+<!-- 			INNER JOIN PERSON C ON C.ID = B.PROFE_ID -->
+<!-- 			INNER JOIN ATCH_FILE_DETAIL E ON E.ATCH_FILE_ID = A.ATCH_FILE_ID -->
+<!-- 		WHERE CNB_NM LIKE '%#{optionParam}%' -->
+<!-- 		ORDER BY A.CNB_NO DESC -->
+<!-- 	</select> -->
+
+
+
+	
+	<!-- 강의 공지사항 조회 -->
+<!-- 	<select id="selectLectureNoticeBoardList" resultMap="lectureNoticeBoardMap"> -->
+<!-- 		SELECT A.CNB_NO, A.CNB_NM , B.LECT_NM, D.NM, A.CNB_DT, A.CNB_INQ -->
+<!-- 		FROM LECTURE_NOTICE_BOARD A -->
+<!-- 			INNER JOIN LECTURE B ON B.LECT_NO = A.LECT_NO -->
+<!-- 			INNER JOIN PROFESSOR C ON C.PROFE_ID = B.PROFE_ID -->
+<!-- 			INNER JOIN PERSON D ON D.ID = C.PROFE_ID -->
+<!-- 			<where> -->
+<!-- 				<if test="searchOption == 'content' "> -->
+<!-- 					A.CNB_NOTES LIKE '%#{optionParam}%'  -->
+<!-- 				</if> -->
+<!-- 				<if test="searchOption == 'writer' "> -->
+<!-- 					D.NM LIKE '%#{optionParam}%' -->
+<!-- 				</if> -->
+<!-- 				<if test="searchOption == 'title' "> -->
+<!-- 					CNB_NM LIKE '%#{optionParam}%' -->
+<!-- 				</if> -->
+<!-- 			</where>		 -->
+<!-- 		ORDER BY A.CNB_NO DESC -->
+<!-- 	</select> -->
+	
+	<insert id="insertLectureNoticeBoard">
+		INSERT INTO LECTURE_NOTICE_BOARD
+		(CNB_NO, LECT_NO, CNB_NM, CNB_NOTES, CNB_DT, CNB_INQ, ATCH_FILE_ID)
+		VALUES
+		(#{cnbNo}, #{lectNo}, #{cnbNm}, #{cnbNotes}, #{cnbDt}, #{cnbInq}, #{atchFileId})
+	</insert>
+	
+<!-- 	<update id="updateLectureNoticeBoard"> -->
+<!-- 		UPDATE LECTURE_NOTICE_BOARD -->
+<!-- 		SET -->
+<!-- 		WHERE -->
+<!-- 	</update> -->
+
+<!-- 	<delete id="deleteLectureNoticeBoard"> -->
+<!-- 		DELETE  -->
+<!-- 		FROM LECTURE_NOTICE_BOARD -->
+<!-- 		WHERE  -->
+<!-- 	</delete> -->
+
+
+</mapper>

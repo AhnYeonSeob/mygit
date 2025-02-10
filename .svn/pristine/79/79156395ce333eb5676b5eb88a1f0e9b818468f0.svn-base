@@ -1,0 +1,57 @@
+package kr.or.ddit.yguniv.projectTaskSubmission.controller;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.projectTaskSubmission.service.ProjectTaskSubmissionService;
+import kr.or.ddit.yguniv.vo.LectureVO;
+
+@Controller
+@RequestMapping("/lecture/{lectNo}/projectTaskSubmission")
+public class ProjectTaskSubmissionController {
+	
+	@Autowired
+	private ProjectTaskSubmissionService service;
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureservice;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureservice.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+	}
+	
+	//제출프로젝트과제 조회
+	@GetMapping
+	public String getList(
+			@PathVariable String lectNo
+			, Model model) {
+		
+		model.addAttribute("projectTaskSubmissionList", service.readProjectTaskSubmissionList(lectNo));
+		
+		return "lecture/materials/projectTaskSubmission/projectTaskSubmission";
+	}
+	//프로젝트과제 제출폼 이동
+	@GetMapping("{teamCd}")
+	public String getSubmissionForm() {
+		//lectno랑 projectmember보내야함
+		
+		
+		return "lecture/materials/projectPersonal/projectSubmission";
+	}
+	
+	
+	
+}

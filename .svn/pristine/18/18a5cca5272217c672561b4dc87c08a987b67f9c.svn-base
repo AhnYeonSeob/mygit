@@ -1,0 +1,8 @@
+package kr.or.ddit.yguniv.board.answerBoard.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper 
+public interface ResultBoardMapper {
+
+}

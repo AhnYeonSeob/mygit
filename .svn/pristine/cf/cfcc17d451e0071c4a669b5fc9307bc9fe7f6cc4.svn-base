@@ -1,0 +1,29 @@
+/**
+ * 
+ */
+
+const testInsertBtn=document.querySelector("#testInsertBtn")
+
+
+ document.addEventListener("DOMContentLoaded",()=>{
+	 
+ })
+ 
+ function insertForm(){
+	 console.log(testInsertBtn)
+ }
+ 
+ function getTestInfoAndDateTime() {
+    const testInfo = {
+        examName: document.querySelector('input[name="testName"]').value,
+        classroom: document.querySelector('input[name="croomNm"]').value,
+        testType: document.querySelector('select[name="testSe"]').value,
+        onlineStatus: document.querySelector('input[name="testOnlineYn"]:checked')?.value,
+        startDate: document.querySelector('#dateDiv input[type="date"]').value,
+        startTime: document.querySelector('.date-time-section input[type="time"]:first-of-type').value,
+        endTime: document.querySelector('.date-time-section input[type="time"]:last-of-type').value
+    };
+    console.log(testInfo)
+    
+    return testInfo;
+}

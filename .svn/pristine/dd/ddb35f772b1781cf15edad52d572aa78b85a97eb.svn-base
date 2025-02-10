@@ -1,0 +1,186 @@
+/**
+ *
+	 제출과제 js 
+	1. 리스트 출력 (권한에 따라 해당강의 교수의경우 전체출력/ 학생의 경우 부분출력)
+ 	2. 리스트 출력시 (권한에 따라 제출/삭제 || 채점/삭제 )
+	3. 현재 로그인한 사용자의 아이디를 가져와 비교
+
+ */
+
+var contextPath = document.getElementById('parentTable').dataset['path'];
+const lectNo = document.getElementById('lectNo').value;
+var Url = `${contextPath}/lecture/${lectNo}/assignmentSubmission`;
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+	const targetTable = document.getElementById('parentTable');
+	const $targetTable = $('#parentTable');
+	const userId = targetTable.dataset['auth'];
+	console.log(userId);
+	
+	const getListURL = `${Url}/get`;
+	
+	await fndataTable(getListURL, $targetTable);
+	
+})
+
+async function fndataTable(Url, target){
+	try{
+		const resp = await fetch(Url);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		
+		target.DataTable({
+			data: jsonData,
+			columns: [
+				{
+					data: 'rnum'
+					,title: '번호'
+				}
+				,{
+					data: 'lectNm'
+					,title: '강의명'
+				}
+				,{
+					data: 'assignment.assigNm'
+					,title: '과제명'
+					,render: function(data, type, row){
+						return `<a href="javascript:void(0)" onclick="fnassignDetail(${row.assigNo})">${data}</a>`;
+					}
+				}
+				,{
+					data: null
+					,title: '점수 / 배점'
+					,render: function(data, type, row){
+						const assigScore = row.assignment.assigScore || 'N/A';
+						const assubScore = row.assubScore || 0;
+						return `${assubScore}/ ${assigScore}`;
+					}
+				}
+				,{
+					data: 'assubYn'
+					,title: '제출여부'
+					,render: function(data, type, row){
+						return row.assubYn == 'Y' ? '제출완료' : '미제출';
+					}
+				}
+				,{
+					data: 'atchFileId'
+					,title: '첨부파일'
+					,render: function(data, type, row){
+						if(data){
+							return ` <span class="file-icon" title="첨부파일 있음">
+                   			 			<i class="fa fa-paperclip" style="color: green;"></i>
+            						</span> `;
+						}
+						else{
+							return '첨부파일 없음';
+						}
+					}//atchFileId render끝
+				}
+				,{
+					data: 'assignment.peerYn'
+					,title: '피어리뷰'
+					,render: function(data, type, row){
+						if(data == 'Y'){
+							if(row.peerYn){
+								return '완료';
+							}
+							else{
+								return '미완료';
+							}
+						}else{
+							return '해당없음';
+						}
+					}
+				}//peerYn 끝
+				,{
+					data: null
+					,title: ''
+					/* 버튼 구조는 수정필요 */
+					,render: function(data, type, row){
+						let res = "";
+						if(row.assubYn=='N'){
+							res+= `<button class="btn btn-primary" onclick="fnsubmitForm()">제출</button>`;
+						}
+						if(row.peerYn=='N'){
+							res+= `<button class="btn btn-primary" onclick="fnpeerForm()">피어리뷰작성</button>`;
+						}
+						if(row.assubYn=='Y'){
+							res+=`
+							<button class="btn btn-danger" onclick="fncancelSumbit()">제출취소</button>
+							<button class="btn btn-primary" onclick="gradeForm()">채점</button>`;
+						}
+						return res;
+					}
+				}
+			]//데이터렌더링끝
+		});//데이터테이블끝
+	}
+	catch(error){
+		console.log(error);
+	}
+}//table생성함수 끝
+
+async function fnassignDetail(assigNo){
+	const getDetailUrl = `${Url}/assign/${assigNo}`
+	const assignDetailModal = document.querySelector('#assignDetailModal');
+	try{
+		const resp = await fetch(getDetailUrl);
+		if(!resp.ok){
+			throw new Error(resp.status);
+		}
+		const jsonData = await resp.json();
+		
+		Object.keys(jsonData).forEach((key)=>{
+			console.log(key);
+			const element = assignDetailModal.querySelector(`.assignment-${key}`);
+			if(element){
+				if(key == 'atchFileId') {
+                    // 첨부파일 처리
+					let fileLinks = '';
+                    let fileDetails = jsonData['fileDetails'];
+		            if (fileDetails && fileDetails.atchFileId && fileDetails.fileSn && fileDetails.orignlFileNm && fileDetails.fileFancysize) {
+		                let atchFileId = fileDetails.atchFileId;
+		                let fileSn = fileDetails.fileSn;
+		                let orignlFileNm = fileDetails.orignlFileNm;
+		                let fileFancysize = fileDetails.fileFancysize;
+		                
+		                const downUrl = `${contextPath}/atch/${atchFileId}/${fileSn}`;
+		                fileLinks += `<a href="${downUrl}">${orignlFileNm} (${fileFancysize})</a>`;
+		            } else {
+		                // 첨부파일이 없을 때 처리
+		                fileLinks = '첨부파일없음';
+		            }
+		
+		            element.innerHTML = fileLinks;
+                }else{
+                   element.innerHTML = jsonData[key] || '-';
+                }
+			}
+		});
+		
+		const bootsModal = new bootstrap.Modal(assignDetailModal);
+		bootsModal.show();
+		
+	}catch(error){
+		console.log(error);
+	}
+	
+}//fnassignDetail끝
+
+//제출폼
+function fnsubmitForm(){
+	
+}
+
+
+
+
+//피어리뷰폼
+fnpeerForm
+//제출취소
+fncancelSumbit
+//채점폼
+gradeForm

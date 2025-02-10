@@ -1,0 +1,56 @@
+package kr.or.ddit.yguniv.mypage.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.board.answerBoard.exception.BoardException;
+import kr.or.ddit.yguniv.mypage.dao.MypageMapper;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@RequiredArgsConstructor
+@Slf4j
+@Service
+public class MypageServiceImpl implements MypageService {
+	
+	
+	@Autowired
+	private MypageMapper mapper;
+	
+
+	@Override
+	public PersonVO selectPerson(String id) {
+		PersonVO person = mapper.selectMyPage(id);
+		log.info("id가 있는지 없는지 확인 {}", id);
+		
+		if(person == null ) {
+			throw new BoardException(String.format("%s 번 글이 없음.", id));
+		}
+	
+		return person;
+	}
+
+	@Override
+	public void updatePerson(PersonVO person) {
+		
+		
+		mapper.updateMyPage(person);
+
+	}
+
+	@Override
+	public PersonVO authenticateUser(String id, String pswd) {
+		PersonVO person = mapper.selectMyPage(id);
+		
+		 if (person == null || !person.getPswd().equals(pswd)) {
+		        throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+		    }
+		return person;
+		
+	}
+
+
+}
+
+

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.attendeetest.dao.AttendeeTestMapper">
+	
+<select id="getTestPage" resultType="TestVO">
+SELECT /*하나의 강의에 등록된 시험을 들고오는 페이지. 리스트 형태로 중간-기말 2개*/
+    t.test_no
+    , t.lect_no
+    , t.test_se
+    , t.test_cd
+    , t.test_online_yn
+    , t.test_schdl
+    , t.test_dt
+    , t.test_et
+    , t.croom_cd
+FROM
+    test t inner join lecture a on (t.lect_no = a.lect_no)
+WHERE
+    a.lect_no = #{lectNo} and t.test_cd='OPEN'
+</select>
+
+<select id="getTestOne" resultType="TestVO">
+  SELECT 
+        T.TEST_NO, T.TEST_SE, T.TEST_CD, T.TEST_ONLINE_YN, T.TEST_SCHDL, T.TEST_DT, T.TEST_ET,
+        Q.QUE_NO, Q.QUE_DESCR, Q.QUE_TYPE, Q.QUE_SCORE, Q.QUE_ANSWER,
+        AC.ANCH_NO, AC.ANCH_DESCR
+    FROM 
+        TEST T
+        INNER JOIN QUESTION Q ON T.TEST_NO = Q.TEST_NO
+        LEFT OUTER JOIN ANSWER_CHOICE AC ON T.TEST_NO = AC.TEST_NO AND Q.QUE_NO=AC.QUE_NO
+    WHERE 
+        T.TEST_NO = #{testNo}
+    ORDER BY Q.QUE_NO
+</select>
+	
+<insert id="createRecord">
+INSERT INTO examination_record ( /*학생 하나의 시험 기록 하나 생성*/
+    lect_no,
+    stu_id,
+    test_no,
+    examin_date
+) VALUES (
+    #{lectNo},
+    #{stuId},
+    #{testNo},
+    (SELECT TO_CHAR(SYSDATE, 'YYYYMMDD') FROM dual)
+)
+</insert>
+
+<select id="checkRecord" resultType="Integer">
+select 
+    lect_no,stu_id,test_no,examin_date,test_score
+from 
+    examination_record
+where 
+    test_no=#{testNo} and stu_id=#{stuId}
+
+</select>
+	
+	
+	
+	
+	
+	
+	
+</mapper>

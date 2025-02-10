@@ -1,0 +1,33 @@
+package kr.or.ddit.yguniv.attendance;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.annotation.RootContextWebConfig;
+import kr.or.ddit.yguniv.attendance.dao.AttendanceMapper;
+import kr.or.ddit.yguniv.vo.AttendanceVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RootContextWebConfig
+@Transactional
+class AttendanceTest {
+	
+	@Autowired
+	AttendanceMapper mapper;
+	
+	AttendanceVO attendan;
+	
+
+	@Test
+	void test() {
+	    List<AttendanceVO> result = mapper.selectAttendanceByWeekAndOrder("W01", "1");
+	    assertNotNull(result);
+	    log.info("체크 : {}", result.toString());
+	}
+
+}

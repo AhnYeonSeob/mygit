@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.assignment.dao.AssignmentMapper">
+<sql id="columns">
+/*과제번호*/			ASSIG_NO 
+/*강의번호*/			,LECT_NO
+/*과제명*/			,ASSIG_NM
+/*내용*/				,ASSIG_NOTES
+/*배점*/				,ASSIG_SCORE
+/*등록일자*/			,ASSIG_DATE
+/*제출마감일자*/		,ASSIG_ED	
+/*파일그룹번호*/		,ATCH_FILE_ID
+/*피어리뷰코드*/		,PEER_CODE
+	
+</sql>
+
+
+</mapper>

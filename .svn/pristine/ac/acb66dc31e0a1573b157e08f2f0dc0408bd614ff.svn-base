@@ -1,0 +1,37 @@
+
+
+function showContent(awardCd, awardEdnstNm,awardNm, awardType, awardGiveAmt, awardDetail, awardBenefit, awardDocument) {
+   
+	console.log("데이터 확인:", awardCd, awardNm, awardType, awardGiveAmt, awardDetail, awardBenefit, awardDocument);
+
+    const resultBody = document.getElementById("resultBody");
+  
+    resultBody.innerHTML = "";
+
+    const data = [
+        { label: "장학금 코드", value: awardCd },
+        { label: "지급 기관명", value: awardEdnstNm },
+        { label: "장학금 이름", value: awardNm },
+        { label: "장학금 유형", value: awardType },
+        { label: "장학금 금액", value: awardGiveAmt },
+        { label: "장학금 설명", value: awardDetail },
+        { label: "장학 혜택", value: awardBenefit },
+        { label: "제출 서류", value: awardDocument },
+    ];
+
+   
+    data.forEach(item => {
+        const row = document.createElement("tr");
+
+        const cellLabel = document.createElement("td");
+        cellLabel.textContent = item.label;
+
+        const cellValue = document.createElement("td");
+        cellValue.textContent = item.value;
+
+        row.appendChild(cellLabel);
+        row.appendChild(cellValue);
+
+        resultBody.appendChild(row);
+    });
+}

@@ -1,0 +1,33 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+
+<h4>로그인창</h4>
+
+
+
+<table class="table table-bordered">
+
+
+ <div class="login-container" align="center">
+        <img src="${pageContext.request.contextPath }/resources/NiceAdmin/assets/img/yglogo.png" alt="연근대학교" width="100">
+     
+        <h2>통합 로그인</h2>
+        <form action="${pageContext.request.contextPath }/login" method="post">
+	        <input type="text" name="id" placeholder="학번/교번">
+	        <br>
+	        <input type="pswd" name="pswd" placeholder="비밀번호">
+	        <br>
+	        <button type="submit">로그인</button>
+        </form>
+        <p>
+            <a href="#">학번 찾기 ></a><br>
+            <a href="#">비밀번호 변경 및 찾기 ></a>
+        </p>
+    </div>
+</table>
+<input type="hidden" value="${pageContext.request.contextPath }" id="cp">
+<script src ="${pageContext.request.contextPath }/resources/js/login/login.js"></script>
+

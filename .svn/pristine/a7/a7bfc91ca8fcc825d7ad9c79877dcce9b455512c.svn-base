@@ -1,0 +1,38 @@
+package kr.or.ddit.yguniv.introduce.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.IntroduceVO;
+import kr.or.ddit.yguniv.vo.JobTestVO;
+
+@Mapper
+public interface IntroduceMapper {
+	/**
+	 * 자기소개서 추가
+	 * @param introduce
+	 */
+	public void insertintroduce(IntroduceVO introduce);
+	/**
+	 * 자기소개서 상세 보기
+	 * @param stuId
+	 * @return
+	 */
+	public JobTestVO selectintroduce(String stuId);
+	/**
+	 * 자기소개서 전체 리스트 조회
+	 * @return
+	 */
+	public List<JobTestVO>selectintroduceList();
+	/**
+	 * 자기소개서 수정
+	 * @param introduce
+	 */
+	public void updateintroduce(IntroduceVO introduce);
+	/**
+	 * 자기소개서 삭제
+	 * @param stuId
+	 */
+	public void deleteintroduce(String stuId);
+}

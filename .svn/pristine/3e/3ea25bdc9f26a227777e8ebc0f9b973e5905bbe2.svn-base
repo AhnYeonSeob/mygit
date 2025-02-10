@@ -1,0 +1,37 @@
+document.addEventListener('DOMContentLoaded', function(){
+	let grid = document.querySelector('#grid');
+	
+	let gridOption = {
+		cellHeight: 100
+        , cellWidth: 100
+	    , minRow: 1  // 최소 행수
+	    , margin: 3  // 위젯 간격
+	    , removable: '.trash'  // trash 클래스에 가져가면 삭제
+	    , disableResize: true  // 크기조정 막기
+		
+	};
+	
+	let dummy = [
+		{ x: 0, y: 0, w: 4, h: 5
+			, content: `
+				<div class="card m-0" style="height: 100%;">
+				  <div class="card-body p-2">
+			        <div class="cj-schedule mb-2"></div>
+			        <h6 class="m-0">수강학점 <span class="badge rounded-pill text-bg-secondary"><span id="total-score">0</span> / 18</span></h6>
+				  </div>
+				</div>
+			`
+		}
+	];
+	
+	let gridInst = GridStack.init(gridOption, grid);
+	gridInst.load(dummy);
+	
+    const items = grid.querySelectorAll('.grid-stack-item');
+    items.forEach((item, index) => {
+        const content = item.querySelector('.grid-stack-item-content');
+        if (content) {
+            content.innerHTML = dummy[index].content;
+        }
+    });
+})

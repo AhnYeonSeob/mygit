@@ -1,0 +1,25 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+
+@Data
+public class ScheduleVO  implements Serializable {
+	
+	@Size(max = 4)
+	private String lectNo;
+	@Size(max = 5)
+	private String croomCd;
+	@Size(max = 3)
+	private String dateCd;
+	@Size(max = 1)
+	private String edcTimeCd;
+	
+	private EducationTimeTableCodeVO ettcVO;
+	private ClassRoomVO classRoomVO;
+
+}

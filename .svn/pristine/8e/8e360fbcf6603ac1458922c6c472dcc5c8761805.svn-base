@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.dissent.dao.DissentMapper">
+
+<resultMap type="ScoreFormalObjectionVO" id="scoreMap" autoMapping="true">
+	<association property="attenVO" javaType="AttendeeVO" autoMapping="true">
+		<association property="studentVO" javaType="StudentVO" autoMapping="true">
+			<result property="stuGrade" column="GRADE_CD"/>
+			<association property="person" javaType="PersonVO" autoMapping="true">
+			</association>
+		</association>
+	</association>
+	<association property="lectVO" javaType="LectureVO" autoMapping="true"></association>
+</resultMap>
+
+
+<select id="selectDissentList" resultMap="scoreMap">
+	SELECT
+	    A.ID,A.NM,C.GRADE_CD,B.ATTEN_ATND_SCORE,B.ASSIG_SCORE,B.TEST_SCORE,B.ATTEN_SCORE,D.LECT_NM
+        ,E.OBJC_CN,E.ANSWER_CN
+    FROM
+	    PERSON A   INNER JOIN ATTENDEE B ON A.ID = B.STU_ID
+	               INNER JOIN STUDENT C ON A.ID = C.STU_ID
+	               INNER JOIN LECTURE D ON B.LECT_NO = D.LECT_NO
+                   INNER JOIN SCORE_FORMAL_OBJECTION E ON A.ID = E.STU_ID
+    WHERE E.ANSWER_CN is NULL
+</select>
+
+<select id="selectDissentOne" resultMap="scoreMap">
+	SELECT
+	    A.ID,A.NM,C.GRADE_CD,B.ATTEN_ATND_SCORE,B.ASSIG_SCORE,B.TEST_SCORE,B.ATTEN_SCORE
+	FROM
+	    PERSON A   INNER JOIN ATTENDEE B ON A.ID = B.STU_ID
+	               INNER JOIN STUDENT C ON A.ID = C.STU_ID
+	               INNER JOIN LECTURE D ON B.LECT_NO = D.LECT_NO
+	WHERE A.ID=#{id}
+</select>
+
+<insert id="insertDissent">
+	
+	INSERT INTO SCORE_FORMAL_OBJECTION (
+	    LECT_NO, STU_ID, OBJC_CN, ANSWER_CN
+	) VALUES (
+	    자동생성 시퀀스, 로그인 계정, #{objcCn}, #{answerCn}
+	)
+	
+</insert>
+
+<update id="updateDissent">
+
+UPDATE ATTENDEE
+SET
+    ATTEN_ATND_SCORE = :V2
+    AND ASSIG_SCORE = :V3
+    AND TEST_SCORE = :V4    
+WHERE
+    LECT_NO = #{lectNo}  AND STU_ID = #{id}
+</update>
+
+<delete id="deleteDissent">
+
+DELETE FROM SCORE_FORMAL_OBJECTION
+
+WHERE
+        LECT_NO = :V0
+
+</delete>
+
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

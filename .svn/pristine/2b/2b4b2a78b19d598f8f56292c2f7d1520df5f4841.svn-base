@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.absencecertificatereceipt.dao.AbsenceCertificateReceiptMapper">
+
+<resultMap type="AbsenceCertificateReceiptVO" id="absenceMap" autoMapping="true">
+	<association property="attendanceVO" javaType="AttendanceVO" autoMapping="true">
+	</association>
+</resultMap>
+
+	<select id="selectAbsenceCertificateReceipt" resultMap="absenceMap">
+	SELECT 
+		A.ID, A.NM, F.LECT_NO, F.LECT_NM, G.LECT_ORDER, G.SECT_NM, G.SECT_IDNTY, I.COCO_STTS
+	FROM
+		PERSON A
+		INNER JOIN STUDENT B ON A.ID = B.STU_ID
+		INNER JOIN ATTENDEE C ON  B.STU_ID = C.STU_ID
+		INNER JOIN ATTENDANCE D ON C.STU_ID = D.STU_ID
+		INNER JOIN ABSENCE_CERTIFICATE_RECEIPT E ON D.STU_ID = E.STU_ID
+		INNER JOIN LECTURE F ON C.LECT_NO = F.LECT_NO
+	    INNER JOIN ORDER_LECTURE_DATA G ON D.LECT_ORDER = G.LECT_ORDER
+	    INNER JOIN LECTURE_WEEK H ON G.WEEK_CD = H.WEEK_CD
+	    INNER JOIN COMMON_CODE I ON G.WEEK_CD = I.COCO_CD;
+	</select> 
+	
+	<select id="selectAbsenceCertificateReceiptList ">
+		SELECT STU_ID ,LECT_ORDER ,LECT_NO ,ABSENCE_RESN ,ATCH_FILE_ID ,WEEK_CD  
+		FROM ABSENCE_CERTIFICATE_RECEIPT
+	</select>
+	
+	<insert id="insertAbsenceCertificateReceipt">
+		INSERT INTO ABSENCE_CERTIFICATE_RECEIPT(
+		<include refid="columns" />
+		) VALUES (
+		#{stuId,jdbcType=VARCHAR}
+		, #{lectNo,jdbcType=VARCHAR}
+		, #(lectOrder,jdbcType=VARCHAR)
+		, #{weekCd,jdbcType=VARCHAR}
+		, #{absenceResn,jdbcType=CLOB}
+		, #{atchFileId,jdbcType=NUMERIC}
+		)
+	</insert>
+		
+
+	<update id="updateAbsenceCertificateReceipt">
+		
+	</update>
+
+	<delete id="deleteAbsenceCertificateReceipt">
+	
+	</delete>
+
+
+
+
+</mapper>

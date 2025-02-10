@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.notification.dao.NotificationMapper">
+	
+<select id="selectNotificationList" resultType="NotificationVO">
+
+select 
+    recp_id
+    , noti_no
+    , noti_cd
+    , noti_cn
+    , noti_date
+    , noti_yn
+    , noti_url
+    , send_id
+from 
+	notification
+where 
+	recp_id=#{recpId} 
+	and noti_yn='N'
+
+</select>	
+	
+	<insert id="insertNotification" parameterType="NotificationVO">
+	INSERT INTO notification (
+    recp_id
+    , noti_no
+    , noti_cd
+    , noti_cn
+    , noti_date
+    , noti_yn
+    , noti_url
+    , send_id
+) VALUES (
+    #{recpId,jdbcType=VARCHAR},
+    (SELECT COALESCE(MAX(noti_no), 0) + 1 FROM notification),
+    #{notiCd,jdbcType=VARCHAR},
+    #{notiCn,jdbcType=VARCHAR},
+    (select to_char(sysdate,'YYYY/MM/DD HH24:MI:SS') from dual),
+    'N',
+    #{notiUrl,jdbcType=VARCHAR},
+    #{sendId,jdbcType=VARCHAR}
+)
+
+	</insert>
+	
+	
+	
+</mapper>

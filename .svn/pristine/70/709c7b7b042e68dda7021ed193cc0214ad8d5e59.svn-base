@@ -1,0 +1,45 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+
+<form:form method="POST" enctype="application/x-www-form-urlencoded" modelAttribute="board" action="${pageContext.request.contextPath }/answer/createAnswerBoard">
+	<table class="table table-bordered">
+		 
+		<th>제목 </th>
+	 	<td>
+	 	<form:input type="text" path="sibTtl" cssClass="form-control" required="true" /> 
+	 	<form:errors path="sibTtl" element="span" cssClass="text-danger" />
+	 	</td>
+		</tr>
+		
+	<tr>
+			<th>학번 </th>
+			<td>
+			<form:input path="userId" cssClass="form-control" required="true" /> 
+			<form:errors path="userId" element="span" cssClass="text-danger" />
+			</td>
+		</tr>
+	
+	
+		<tr>
+			<td colspan="2"><form:textarea path="sibCn" class="tinymce-editor" /> 
+			<form:errors path="sibCn" cssClass="text-danger" /></td>
+		</tr>  
+		
+
+		<tr>
+			<td colspan="2" align="right">
+			<input type="submit" class="btn btn-primary" value="등록" />
+			
+		<a href="<c:url value='/answer'/>" class="btn btn-primary">목록</a> 
+			</td>
+			
+		</tr>
+		
+
+	</table>
+
+</form:form>
+

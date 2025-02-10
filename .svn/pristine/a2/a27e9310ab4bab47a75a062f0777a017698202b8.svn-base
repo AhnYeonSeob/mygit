@@ -1,0 +1,40 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+
+/**
+ * 수강생
+ */
+@Data
+@EqualsAndHashCode(of = {"lectNo", "stuId"})
+@ToString(exclude = "attenCoeva")
+public class AttendeeVO implements Serializable{
+	@NotBlank
+	@Size(max = 10)
+	private String lectNo;  // 강의번호
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String stuId;  // 학생번호
+	@Size(min = 0, max = 100)
+	private Double attenAtndScore;  // 출석점수
+	@Size(min = 0, max = 100)
+	private Double assigScore;  // 과제종합점수
+	@Size(min = 0, max = 100)
+	private Double testScore;  // 시험종합점수
+	@Size(min = 0, max = 5)
+	private Double attenScore;  // 성적
+	@Size(max = 3000)
+	private String attenCoeva;  // 강의평가
+	
+	private LectureVO lectureVO;
+	private StudentVO studentVO;
+	private PersonVO personVO;
+}

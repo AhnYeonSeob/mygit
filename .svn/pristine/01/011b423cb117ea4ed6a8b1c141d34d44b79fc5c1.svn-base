@@ -1,0 +1,79 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const delBtn = document.querySelector("#deleteBtn");
+	const applyBtn = document.querySelector("#applyBtn");
+	
+	
+	delBtn.addEventListener("click",(e)=>{
+		e.preventDefault();
+		console.log("삭제버튼");
+		
+	const updateData={
+		jobNo: document.getElementById("detail-id").textContent
+	};
+	console.log("삭제할 게시글", updateData);
+		swal({
+			title: "정말로 삭제하시겠습니까?",
+			//text: ,
+			icon: "warning",
+			buttons: ["취소", "삭제"],
+			dangerMode: true,
+		}).then(btnVal=>{
+			if(btnVal){
+				axios.put(`/yguniv/jobboard/${updateData.jobNo}/delete`, updateData)
+				.then(resp=>{
+					swal({
+						title: "삭제완료",
+						text: "게시글이 성공적으로 삭제되었습니다",
+						icon: "success",
+						button: "확인"
+					}).then(() => {
+                            location.href = '/yguniv/jobboard';
+                        });
+				}).catch(err=>{
+					swal({
+						title: "삭제실패",
+						text: err.response.data.message,
+						icon: "error",
+						button: "확인"
+					});
+				})
+			}
+		});
+	})
+	
+	applyBtn.addEventListener("click", ()=>{
+			console.log("신청하기");
+	const updateData={
+		jobNo: document.getElementById("apply-jobno").textContent,
+		stuId: document.getElementById("apply-id").textContent
+	};
+	console.log("야야야",updateData);
+		axios.post(`/yguniv/eventregistrant`, updateData)
+		.then(resp=>{
+			swal({
+					title: "신청완료",
+					text: "채용설명회가 성공적으로 신청되었습니다",
+					icon: "success",
+					button: "확인"
+				}).then(() => {
+                        location.href = '/yguniv/jobboard';
+                    });
+			}).catch(err=>{
+				swal({
+					title: "신청실패",
+					text: err.response.data.message,
+					icon: "error",
+					button: "확인"
+				});
+			})
+		})
+	});
+	
+	
+
+
+

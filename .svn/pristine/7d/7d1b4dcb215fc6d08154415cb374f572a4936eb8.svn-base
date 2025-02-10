@@ -1,0 +1,68 @@
+/**
+ * 
+
+<td class="bind-target" data-name="email" data-defualt="aa.naver.com"></td>
+<td class="bind-target" data-name="count" data-defualt="0"></td>
+<td class="bind-target" data-name="flag" data-defualt="true"></td>
+
+비동기 데이터를 하나 받고 
+function showPersonDetail(personId) {
+    axios.get(`../person/detail/${personId}`)
+        .then(resp => {
+            const person = resp.data; // 서버 응답 데이터
+            const personDetailModal = new bootstrap.Modal(document.getElementById('personDetailModal'));
+            personDetailModal.show();
+         for(key in person){
+            console.log(key);
+            $(`#detail-${key}`).text(person[key]);
+         }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보실패");
+        });
+}
+
+resp.data = json의 결과물을 객체로 변환한 것 
+
+key in person => person 객체의 키값 . 프로퍼티 명만 가져옴
+ $(`#detail-${key}`).text(person[key]); ==> 
+
+id가 detail${key}의 값을 person[key]로 설정함
+
+function makeTag(parseData){
+	code='';
+	for(key in parseData){
+		if(person[key]){
+			code+=`<td class='bind-target' id=${key} name='${key}'  value='${person[key]}'>`		
+		}else{
+			code+=`<td class='bind-target' id=${key}  name='${key}' value='${person[key]}'>`					
+		}
+	}
+	
+	console.log(makeTag)
+}
+
+ */
+
+    function showApprovalButtons() {
+        document.getElementById('approval-buttons').style.display = 'block';
+        document.getElementById('waiting-button').style.display = 'none';
+    }
+
+    function change(status) {
+        let check = status == 'approved' ? '시험 승인됨' : '시험 반려됨';
+        document.getElementById('test-status').innerHTML = '상태: ' + check;
+        var testNo = document.getElementById('testNo').value;
+    	console.log(testNo,status)
+        testCheck(testNo,status);
+    }
+    
+	function testCheck(testNo,ch){
+	   	const url = "../yguniv/dissent";
+	   	const pUrl = `${url}/${testNo}/${ch}`
+	   	console.log(pUrl);
+	   	fetch(pUrl,{method:'put'})
+	   	.then(resp=>console.log(resp.ok))
+    	
+    }

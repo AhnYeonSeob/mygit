@@ -1,0 +1,45 @@
+package kr.or.ddit.yguniv.jobboard.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.JobBoardVO;
+import kr.or.ddit.yguniv.vo.NoticeBoardVO;
+
+@Mapper
+public interface JobBoardMapper {
+	/**
+	 * 취업정보 추가
+	 * @param jobboard
+	 */
+	public void insertJobBoard(JobBoardVO jobboard);
+	/**
+	 * 취업정보 게시글 상세보기
+	 * @param jobNo
+	 * @return
+	 */
+	public JobBoardVO selectJobBoard(String jobNo);
+	/**
+	 * 취업정보 게시글 전체 리스트 조회
+	 * @return
+	 */
+	public List<JobBoardVO>selectJobBoardListPaging(PaginationInfo<JobBoardVO>paging);
+	/**
+	 * 취업정보게시글 수정
+	 * @param jobboard
+	 */
+	public void updatejobBoard(JobBoardVO jobboard);
+	/**
+	 * 취업정보게시글 삭제
+	 * @param jobboard
+	 */
+	public void deletejobBoard(String jobboard);
+	/** 게시글 목록수조회
+	 * @param paging
+	 * @return
+	 */
+	public int selectTotalRecord(PaginationInfo<JobBoardVO> paging);
+	
+}

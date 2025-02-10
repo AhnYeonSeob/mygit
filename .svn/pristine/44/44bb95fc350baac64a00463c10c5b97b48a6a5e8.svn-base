@@ -1,0 +1,37 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+
+<style>
+    .copyright {
+        background-color: #0033A0;
+        padding: 10px;
+        position: fixed; 
+        bottom: 0; /* 화면 하단에 위치 */
+        left: 0; /* 좌측부터 시작 */
+        width: 100%; /* 전체 폭 사용 */
+        box-sizing: border-box; 
+    }
+
+    .copyright .logo {
+        text-align: right;
+        color: white;
+    }
+    
+    #copyright {
+        font-family: "Bitter", serif;
+        text-align: right;
+        color: white;
+    }
+</style>
+
+<div class="copyright">
+
+    <div id="copyright">
+        Copyright &copy; <strong><span>1999 YONGUEN UNIVERSITY</span></strong>. All Rights Reserved
+    </div>
+</div>
+

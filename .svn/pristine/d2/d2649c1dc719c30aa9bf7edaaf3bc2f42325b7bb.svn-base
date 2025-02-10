@@ -1,0 +1,25 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.Max;
+
+import lombok.Data;
+
+@Data
+public class ProjectTeamMember implements Serializable {
+	
+	private String lectNo;
+	private String stuId;
+	private String teamCd;
+	private String leadYn;
+	
+	@Max(100)
+	private Integer peerScore;
+	
+	//has a
+	ProjectTeamVO team;
+	
+	//has a
+	AttendeeVO attendee;
+}

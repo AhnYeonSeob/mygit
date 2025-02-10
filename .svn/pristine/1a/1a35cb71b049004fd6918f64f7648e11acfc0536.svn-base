@@ -1,0 +1,35 @@
+package kr.or.ddit.yguniv.commons.mycalendar.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.MyCalendarVO;
+
+@Mapper
+public interface MyCalendarMapper {
+	/**
+	 * @param calendar
+	 * @return
+	 */
+	public int insert(MyCalendarVO calendar);
+	/**
+	 * @param myCalendarNo
+	 * @return
+	 */
+	public MyCalendarVO select(int myCalendarNo);
+	/**
+	 * @return
+	 */
+	public List<MyCalendarVO> selectList();
+	/**
+	 * @param calendar
+	 * @return
+	 */
+	public int update(MyCalendarVO calendar);
+	/**
+	 * @param myCalendarNo
+	 * @return
+	 */
+	public int delete(int myCalendarNo);
+}

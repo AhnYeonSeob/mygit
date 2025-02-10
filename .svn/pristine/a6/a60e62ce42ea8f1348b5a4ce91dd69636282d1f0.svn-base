@@ -1,0 +1,32 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.springframework.lang.NonNull;
+
+import lombok.Data;
+
+@Data
+public class MyCalendarVO implements Serializable{
+	@NotBlank
+	@Size(max = 10)
+	private String prsId;
+	@NonNull
+	private int myCalendarNo;
+	@Size(max = 100)
+	private String myCalendarTitle;
+	@Size(max = 3000)
+	private String myCalendarContent;
+	@Size(max = 12)
+	private String myCalendarSd;
+	@Size(max = 12)
+	private String myCalendarEd;
+	@Size(max = 10)
+	private String boardNo;
+	@Size(max = 4)
+	private String calendarCd;
+	
+}

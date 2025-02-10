@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.attendance.dao.AttendanceMapper">
+<!-- <resultMap type="AttendanceVO" id="attendanceMap" autoMapping="true"> -->
+<!-- 	<association property="orderLectureDataVO" javaType="OrderLectureDataVO"> -->
+<!-- 		<association property="lectureWeekVO" javaType="LectureWeekVO"> -->
+<!-- 			<association property="lectureVO" javaType="LectureVO"> -->
+<!-- 				<association property="attendeeVO" javaType="AttendeeVO"> -->
+<!-- 					<association property="studentVO" javaType="StudentVO"> -->
+<!-- 						<association property="personVO" javaType="PersonVO"> -->
+<!-- 						</association> -->
+<!-- 					</association> -->
+<!-- 				</association> -->
+<!-- 			</association> -->
+<!-- 		</association> -->
+<!-- 		<association property="commonCodeVO" javaType="CommonCodeVO"> -->
+<!-- 		</association> -->
+<!-- 	</association> -->
+<!-- </resultMap> -->
+
+<!-- 아이디는 바로 조인해서 찾으면된다 -->
+
+	<select id="selectAttendance">
+		SELECT DISTINCT D.LECT_NM, (SELECT DISTINCT MAX (K.COCO_STTS)
+		FROM LECTURE_WEEK C INNER JOIN COMMON_CODE K ON C.WEEK_CD = K.COCO_CD),
+			B.LECT_ORDER, J.ID, J.NM, D.LECT_ONLINE_YN, K.COCO_STTS
+			FROM ATTENDANCE A
+			    INNER JOIN ORDER_LECTURE_DATA B ON A.LECT_ORDER = B.LECT_ORDER
+			    INNER JOIN LECTURE_WEEK C ON B.LECT_NO = C.LECT_NO
+			    INNER JOIN LECTURE D ON D.LECT_NO = C.LECT_NO
+			    INNER JOIN SCHEDULE E ON D.LECT_NO = E.LECT_NO
+			    INNER JOIN EDUCATION_TIME_TABLE_CODE G ON E.EDC_TIME_CD = G.EDC_TIME_CD
+			    INNER JOIN ATTENDEE H ON A.STU_ID = H.STU_ID
+			    INNER JOIN STUDENT I ON H.STU_ID = I.STU_ID
+			    INNER JOIN PERSON J ON I.STU_ID = J.ID
+			    INNER JOIN COMMON_CODE K ON K.COCO_CD = A.ATND_CD
+		WHERE D.LECT_NM = #{lectNm}
+		ORDER BY B.LECT_ORDER
+	</select>
+	
+	<select id="selectAttendanceList">
+		SELECT DISTINCT D.LECT_NM, (SELECT DISTINCT MAX (K.COCO_STTS)
+		FROM LECTURE_WEEK C INNER JOIN COMMON_CODE K ON C.WEEK_CD = K.COCO_CD) AS 주차데이터,
+			B.LECT_ORDER AS 차수 ,J.ID, J.NM, D.LECT_ONLINE_YN, K.COCO_STTS
+		FROM ATTENDANCE A
+		    INNER JOIN ORDER_LECTURE_DATA B ON A.LECT_ORDER = B.LECT_ORDER
+		    INNER JOIN LECTURE_WEEK C ON B.LECT_NO = C.LECT_NO
+		    INNER JOIN LECTURE D ON D.LECT_NO = C.LECT_NO
+		    INNER JOIN SCHEDULE E ON D.LECT_NO = E.LECT_NO
+		    INNER JOIN EDUCATION_TIME_TABLE_CODE G ON E.EDC_TIME_CD = G.EDC_TIME_CD
+		    INNER JOIN ATTENDEE H ON A.STU_ID = H.STU_ID
+		    INNER JOIN STUDENT I ON H.STU_ID = I.STU_ID
+		    INNER JOIN PERSON J ON I.STU_ID = J.ID
+		    INNER JOIN COMMON_CODE K ON K.COCO_CD = A.ATND_CD
+		ORDER BY B.LECT_ORDER
+	</select>
+	
+	<insert id="insertAttendance">
+	    INSERT INTO ATTENDANCE
+	    (STU_ID, LECT_ORDER, LECT_NO, ATND_CD, ATND_RCOGN_YN, ATND_IDNTY)
+	    VALUES
+	    (#{stuId}, #{lectOrder}, #{lectNo}, #{atndCd}, #{atndRcognYn}, #{atndIdnty})
+	</insert>
+
+
+	<update id="updateAttendance">
+		UPDATE ATTENDANCE
+		SET	ATND_RCOGN_YN = #{atndRcognYn}
+		WHERE STU_ID = #{stuId}
+	</update>
+
+
+	<delete id="deleteAttendance">
+		DELETE 
+		FROM ATTENDANCE
+		WHERE STU_ID = #{stuId}
+	</delete>
+	
+	
+</mapper>

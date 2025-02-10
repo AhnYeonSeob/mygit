@@ -1,0 +1,88 @@
+package kr.or.ddit.yguniv.tuition.controller;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import kr.or.ddit.yguniv.commons.service.CommonCodeServiceImpl;
+import kr.or.ddit.yguniv.paging.DataTablesPaging;
+import kr.or.ddit.yguniv.paging.renderer.BootStrapPaginationRenderer;
+import kr.or.ddit.yguniv.tuition.service.TuitionServiceImpl;
+import kr.or.ddit.yguniv.vo.TuitionVO;
+
+@Controller
+@RequestMapping("/tuition")
+public class TuitionController {
+	@Autowired
+	private TuitionServiceImpl tuiService;
+	@Autowired
+	private CommonCodeServiceImpl cocoService;
+	
+	@GetMapping
+	public String tuitionPage(Model model) {
+		model.addAttribute("condition", new TuitionVO());
+		model.addAttribute("tuitionStatusList", cocoService.getCodeList("TUIT"));
+		model.addAttribute("semesterList", cocoService.getSemesterList(null));
+		return "tuition/tuitionList";
+	}
+	
+	@PostMapping
+	@ResponseBody
+	public Map<String, Object> selectTuitionList(@RequestBody DataTablesPaging<TuitionVO> paging){
+		Map<String, Object> result = new HashMap<>();
+	    result.put("draw", paging.getDraw());
+	    result.put("data", tuiService.selectTuitionList(paging));
+	    result.put("recordsTotal", paging.getRecordsTotal());
+	    result.put("recordsFiltered", paging.getRecordsFiltered());
+	    result.put("pageHTML", new BootStrapPaginationRenderer().renderPagination(paging.getPaginationInfo(), "fnPaging"));
+		return result;
+	}
+	
+	@PutMapping("{semstrNo}/{stuId}")
+	public void updateTuition(TuitionVO tuitionVO) {
+		tuiService.updateTuition(tuitionVO);
+	}
+	
+	@GetMapping("{semstrNo}/{stuId}/invoice")
+	public void selectTuitionInvoicePDF(TuitionVO tuitionVO, HttpServletResponse response) throws DocumentException, IOException {
+		TuitionVO res = tuiService.selectTuition(tuitionVO);
+		
+		response.setContentType("application/pdf");
+	    response.setHeader("Content-Disposition", "inline; filename=\"test.pdf\"");
+		Document doc = new Document();
+		try{
+			PdfWriter.getInstance(doc, response.getOutputStream());
+			doc.open();
+			doc.add(new Paragraph("this is pdf"));
+		}catch(Exception e) {
+			throw e;
+		}finally {
+			doc.close();
+		}
+	}
+	
+	@GetMapping("{semstrNo}/{stuId}/confirm")
+	public void selectTuitionConfirmPDF(TuitionVO tuitionVO) {
+		
+	}
+	
+}

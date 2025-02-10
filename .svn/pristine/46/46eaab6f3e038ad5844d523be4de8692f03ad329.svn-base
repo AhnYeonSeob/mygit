@@ -1,0 +1,151 @@
+/**
+ * 
+ */
+let fnLeesChange;
+let fnLeesValueChange;
+let fnScheduleClick;
+let fnSubmit;
+document.addEventListener('DOMContentLoaded', function(){
+	let $schedule = $('#schedule');
+	
+	// 온오프라인에 따라 강의실, 시간표 선택 폼 가시여부 변경
+	document.querySelector('#lectOnlineYn').addEventListener('change', function(e){
+		if(e.target.value == 'N'){
+			$schedule.show();
+		}else{
+			$schedule.hide();
+		}
+	});
+	
+	// 평가기준 체크박스에 따라 입력 폼 가시여부 변경
+	fnLeesChange = function(input){
+		let classNm = input.value.toLowerCase();
+		let $lees = $(`.${classNm}`);
+		if(input.checked){
+			$lees.show();
+		}else{
+			$lees.hide();
+		}
+		let inputVal = document.querySelector(`.${input.value}`);
+		fnLeesValueChange(inputVal);
+	};
+	
+	// 평가기준 퍼센트 입력시 합계 수정 로직
+	fnLeesValueChange = function(input){
+		let sum = 0;
+		$('.leesNumber:visible').each((i,v)=>{
+			sum += Number(v.value);
+		});
+		if(sum > 100){
+			let minus = sum - 100;
+			sum = 100;
+			input.value = Number(input.value) - minus;
+		}
+		document.querySelector('#leesSum').textContent = `${sum} %`;
+	};
+	
+	fnLeesValueChange();
+	
+	document.querySelectorAll('.dropdown-menu').forEach(v=>{
+		v.addEventListener('click', function(e){
+			e.stopPropagation();
+		});
+	});
+	
+	// 시간표 저장
+	let scheduleObj = {};
+	document.querySelectorAll('.scId').forEach(v=>{
+		scheduleObj[v.value] = {
+			etime: v.dataset['etime']
+			, dotw: v.dataset['dotw']
+		};
+	});
+	let $scheduleOut = $('.scheduleOut');
+	fnScheduleClick = function(td){
+		let scId = `${td.dataset['etime']}${td.dataset['dotw']}`;
+		if(scId in scheduleObj){
+			delete scheduleObj[scId];
+			td.style.background = '';
+			$(`.${scId}`).remove();
+		}else{
+			scheduleObj[scId] = {
+				etime: td.dataset['etime']
+				, dotw: td.dataset['dotw']
+			};
+			td.style.background = 'darkBlue';
+			let $p = $('<span>', {'class': `${scId} badge rounded-pill text-bg-secondary m-1 fs-6`});
+			$p.text(td.dataset['output']);
+			$scheduleOut.append($p);
+		}
+	};
+	
+	// 등록 버튼 클릭
+	fnSubmit = function(lectNo){
+		// 기본 정보
+		let lectureObj = {};
+		for(let [k, v] of new FormData(document.forms['lecture']).entries()){
+			lectureObj[k] = v;
+		}
+		lectureObj['profeId'] = id.value;
+		
+		// 시간표(오프라인 수업)
+		if(lectureObj.lectOnlineYn == 'N'){
+			let scheduleList = [];
+			for(k in scheduleObj){
+				let v = scheduleObj[k];
+				scheduleList.push({
+					croomCd: lectureObj.croomCd
+					, dateCd: v.dotw
+					, edcTimeCd: v.etime
+				});
+			}
+			lectureObj.scheduleVO = scheduleList;
+		}
+		
+		// 강의평가기준
+		let lectEvalStanList = [];
+		$('.leesNumber:visible').each((i,v)=>{
+			lectEvalStanList.push({
+				evlStdrCd: v.dataset['cocoCd']
+				, rate: v.value
+			})
+		});
+		lectureObj.lesVo = lectEvalStanList;
+		
+		// 주차별 계획
+		let weekLecturePlanList = [];
+		document.querySelectorAll('.week-lecture-plan').forEach(v=>{
+			weekLecturePlanList.push({
+				weekCd: v.dataset['weekCd']
+				, lectPlan: v.value
+			});
+		});
+		lectureObj.weekVO = weekLecturePlanList;
+		
+		if(lectNo){
+			axios.put(`${cp.value}/lecture/request/${lectNo}/edit`, lectureObj)
+			.then(({data})=>{
+				location.href = `${cp.value}/lecture/request/${data.lectNo}`;
+			}).catch(err=>{
+				swal({
+					title: "수정실패",
+					text: err.response.data.message,
+					icon: "error",
+					button: "확인"
+				});
+			});
+		}else{
+			axios.post(`${cp.value}/lecture/request/new`, lectureObj)
+			.then(({data})=>{
+				location.href = `${cp.value}/lecture/request/${data.lectNo}`;
+			}).catch(err=>{
+				swal({
+					title: "추가실패",
+					text: err.response.data.message,
+					icon: "error",
+					button: "확인"
+				});
+			});
+		}
+	};
+})

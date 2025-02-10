@@ -1,0 +1,502 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", async () => {
+	const url = "../yguniv/lectureCart"
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+
+	await getLectureCartList(contextPath);
+})
+
+
+async function getLectureCartList(url) {
+	const getUrl = `${url}/lectureCart`; // 요청 URL
+	const $dummyTable = $("#parentTable"); // table
+	const $studentTable = $("#studentTable"); // table
+	const $attendeeTable = $("#attendeeTable"); // table
+
+	$.ajax({
+		url: getUrl,
+		type: "GET",
+		success: function(data) {
+			const cleanData = removeNullProperties(data);
+			const lectureList = cleanData.lectureList;
+			const studentLectureList = cleanData.studentLectureList;
+			const attendeeStudentLectureList = cleanData.attendeeStudentLectureList;
+			const studentLectNos = new Set(cleanData.studentLectureList.map(lecture => lecture.lectNo));
+			const attendeeStudentLectNos = new Set(cleanData.attendeeStudentLectureList.map(lecture => lecture.lectNo));
+			
+			
+			// $dummyTable 데이터테이블 초기화
+			var table = $dummyTable.DataTable({
+				  language: {
+        emptyTable: "조회 가능한 강의가 없습니다",
+        lengthMenu: "페이지당 _MENU_ 개씩 보기",
+        info: "총 _TOTAL_ 건의 강의 중 _START_ ~ _END_ 표시",
+        infoEmpty: "강의 없음",
+        infoFiltered: "(전체 _MAX_ 건 중 검색결과)"
+    },ordering: false,
+				data: lectureList,
+				dom: 'lrtip', // 기본 검색창 제거
+				searching: true,
+				// 기존 옵션들...
+				classes: {
+					header: 'fw-bold',  // 헤더 텍스트 굵게
+					sInfo: 'text-primary mb-2', // 정보 텍스트 스타일
+					sPageButton: 'btn btn-outline-primary' // 페이지네이션 버튼 스타일
+				},
+				rowCallback: function(row, data) {
+					$(row).addClass('text-center align-middle'); // 행 내용 수직 중앙 정렬
+				},
+				columns: [
+					{ data: 'lectNm', name: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', name: 'subjectVO.subFicdCd', title: '구분' },
+					{ data: 'professorVO.nm', name: 'professorVO.nm', title: '교수명' },
+					{ data: 'subjectVO.departmentVO.deptNm', name: 'subjectVO.departmentVO.deptNm', title: '학과' },
+					{ data: 'subjectVO.gradeCd', name: 'subjectVO.gradeCd', title: '학년' },
+					{ data: 'lectScore', title: '학점' },
+					{
+						data: null,
+						title: '정원',
+						render: function(data, type, row) {
+							return `${row.lectEnNope} / ${row.lectAttenNope}`;
+						}
+					},
+					{
+    data: 'joinSchedule',
+    title: '시간',
+    render: function(data, type, row) {
+        if (row.lectOnlineYn === 'Y') {
+            return '온라인';
+        }
+        return row.joinSchedule || '';
+    }
+},
+					{
+						data: 'scheduleVO[0].classRoomVO.croomPstn',
+						title: '강의실',
+						render: function(data, type, row) {
+							return (row.scheduleVO && row.scheduleVO[0] && row.scheduleVO[0].classRoomVO && row.scheduleVO[0].classRoomVO.croomPstn) || '온라인';
+						}
+					},
+					{
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					},
+					{
+						data: null,
+						title: '신청',
+						render: function(data, type, row) {
+							if (studentLectNos.has(row.lectNo)||attendeeStudentLectNos.has(row.lectNo)) {
+								return `<button class="btn btn-warning">신청완료</button>`;
+							} else {
+								return `<button class="btn btn-primary" onclick="updateLectureOneBtn('${row.lectNo}')">신청</button>`;
+							}
+						}
+					}
+				]
+			});
+
+			$('#resetButton').on('click', function() {
+
+				// 검색 입력 필드 초기화
+				$('#searchInput').val('');
+
+				// 데이터테이블의 모든 검색 필터 제거 및 다시 그리기
+				table.search('').columns().search('').draw();
+			});
+
+
+			// 검색 기능 추가
+			$('#searchButton').on('click', function() {
+				var searchColumn = $('#searchColumn').val(); // 선택된 검색 조건
+				var searchTerm = $('#searchInput').val(); // 입력된 검색어
+					//console.log(searchColumn)
+					//console.log(searchTerm)
+				// 선택된 열에서 검색 수행
+				table.column(`${searchColumn}:name`).search(searchTerm).draw();
+			});
+			
+
+			// $studentTable 데이터테이블 초기화
+			$studentTable.DataTable({
+				 language: {
+        emptyTable: "장바구니가 비었습니다."
+    },
+				data: studentLectureList,
+				classes: {
+					header: 'fw-bold',  // 헤더 텍스트 굵게
+					sInfo: 'text-primary mb-2', // 정보 텍스트 스타일
+					sPageButton: 'btn btn-outline-primary' // 페이지네이션 버튼 스타일
+				},ordering: false,
+				rowCallback: function(row, data) {
+					$(row).addClass('text-center align-middle'); // 행 내용 수직 중앙 정렬
+				},
+				columns: [
+					{
+						data: null,
+						title: '신청',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="deleteCart('${row.lectNo}')">취소</button>`;
+						}
+					},
+					{ data: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', title: '구분' },
+					{ data: 'professorVO.nm', title: '교수명' },
+					{ data: 'lectScore', title: '학점' },
+					{
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					}
+				],
+				// 기본 UI 요소 비활성화
+				searching: false, // 검색창 제거
+				paging: false,     // 페이징 비활성화
+				info: false,       // 테이블 정보 제거
+				lengthChange: false, // 출력 갯수 선택 제거
+				pageLength: -1     // 모든 데이터를 한 페이지에 출력
+			});
+			
+			$attendeeTable.DataTable({
+				 language: {
+        emptyTable: "신청한 강의가 없습니다"
+    },ordering: false,
+				data: attendeeStudentLectureList,
+				classes: {
+					header: 'fw-bold',  // 헤더 텍스트 굵게
+					sInfo: 'text-primary mb-2', // 정보 텍스트 스타일
+					sPageButton: 'btn btn-outline-primary' // 페이지네이션 버튼 스타일
+				},
+				rowCallback: function(row, data) {
+					$(row).addClass('text-center align-middle'); // 행 내용 수직 중앙 정렬
+				},
+				columns: [
+					{
+						data: null,
+						title: '신청',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="deleteCart('${row.lectNo}')">취소</button>`;
+						}
+					},
+					{ data: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', title: '구분' },
+					{ data: 'professorVO.nm', title: '교수명' },
+					{ data: 'lectScore', title: '학점' },
+					{
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					}
+				],
+				// 기본 UI 요소 비활성화
+				searching: false, // 검색창 제거
+				paging: false,     // 페이징 비활성화
+				info: false,       // 테이블 정보 제거
+				lengthChange: false, // 출력 갯수 선택 제거
+				pageLength: -1     // 모든 데이터를 한 페이지에 출력
+			});
+		},
+		error: function(request, status, error) {
+			console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+		}
+	});
+}
+
+
+
+// null 값을 제거하는 재귀 함수
+function removeNullProperties(obj) {
+	if (typeof obj !== 'object' || obj === null) {
+		return obj; // 객체가 아니거나 null인 경우 그대로 반환
+	}
+
+	// 객체를 복제하면서 null이 아닌 값만 유지
+	if (Array.isArray(obj)) {
+		return obj.map(item => removeNullProperties(item)).filter(item => item !== null);
+	}
+
+	const result = {};
+	for (const key in obj) {
+		if (obj[key] !== null) {
+			result[key] = removeNullProperties(obj[key]);
+		}
+	}
+	return result;
+}
+
+async function insertCart(lectNo) {
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const url = `${contextPath}/lectureCart`;
+    const stuId = document.getElementById("stuId").value;
+
+    try {
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                lectNo: lectNo,
+                stuId: stuId
+            })
+        });
+
+        if (!resp.ok) {
+            const errorData = await resp.json();
+            throw new Error(errorData.message || "Unknown error occurred");
+        }
+
+        const data = await resp.json();
+        
+        // 기존 테이블 제거
+        $('#parentTable').DataTable().destroy();
+        $('#studentTable').DataTable().destroy();
+        $('#attendeeTable').DataTable().destroy();
+        
+        // 데이터 다시 불러오기
+        await getLectureCartList(contextPath);
+
+        swal({
+            title: "수강신청 성공",
+            text: "수강신청 성공",
+            icon: "success",
+            button: "확인"
+        });
+    } catch (err) {
+        swal({
+            title: "처리 실패",
+            text: err.message,
+            icon: "error",
+            button: "확인"
+        });
+    }
+}
+
+async function deleteCart(lectNo) {
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const url = `${contextPath}/lectureCart`;
+    const stuId = document.getElementById("stuId").value;
+    
+    try {
+        const resp = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                lectNo: lectNo,
+                stuId: stuId
+            })
+        });
+
+        if (!resp.ok) {
+            const errorData = await resp.json();
+            throw new Error(errorData.message || "Unknown error occurred");
+        }
+
+        const data = await resp.json();
+        
+        // 기존 테이블 제거
+        $('#parentTable').DataTable().destroy();
+        $('#studentTable').DataTable().destroy();
+        $('#attendeeTable').DataTable().destroy();
+        
+        // 데이터 다시 불러오기
+        await getLectureCartList(contextPath);
+
+        swal({
+            title: "수강신청 취소",
+            text: "수강신청 취소 성공",
+            icon: "success",
+            button: "확인"
+        });
+    } catch (err) {
+        swal({
+            title: "처리 실패",
+            text: err.message,
+            icon: "error",
+            button: "확인"
+        });
+    }
+}
+
+
+async function showLecturePaper(lectNo) {
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+	const url = `${contextPath}/lectureCart/lecturePaper/${lectNo}`;
+	console.log(lectNo)
+
+	window.open(url,
+		"testPopup",
+		"width=700,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no");
+
+
+}
+async function updateLectureCartBtn() {
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const stuId = document.getElementById("stuId").value;
+    
+    // studentTable의 DataTable 인스턴스 가져오기
+    const studentTable = $('#studentTable').DataTable();
+    
+    // 테이블의 모든 데이터를 배열로 변환
+    const lectureData = studentTable.rows().data().toArray();
+
+    // LectureCartVO 형식에 맞게 데이터 변환
+    const cartList = lectureData.map(row => ({
+        stuId: stuId,
+        lectNo: row.lectNo
+    }));
+	
+	console.log(cartList)
+	if(cartList==0||cartList==null){
+		swal({
+            title: "강의가 없습니다!",
+            icon: "error",
+            button: "확인"
+        });
+return;
+	}
+    
+    try {
+        const response = await fetch(`${contextPath}/lectureCart`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cartList)
+        });
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const result = await response.json();
+
+        $('#parentTable').DataTable().destroy();
+        $('#studentTable').DataTable().destroy();
+        $('#attendeeTable').DataTable().destroy();
+        
+        // 데이터 다시 불러오기
+        await getLectureCartList(contextPath);
+
+	    const successCount = result.result || 0;
+			console.log(successCount)
+		if(successCount!=0){
+			 swal({
+            title: "등록 성공",
+            text: `총 ${cartList.length}건 중 ${successCount}건이 수강신청 완료되었습니다`,
+            icon: "success",
+            button: "확인"
+        })
+		}else{
+			 swal({
+            title: "등록 실패",
+            text: `수강 신청 실패`,
+            icon: "warning",
+            button: "확인"
+        })
+		}
+
+    } catch (error) {
+        swal({
+            title: "등록 실패",
+            text: error.message,
+            icon: "error",
+            button: "확인"
+        });
+    }
+}
+async function updateLectureOneBtn(lectNo) {
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const stuId = document.getElementById("stuId").value;
+
+    // 단일 데이터를 길이 1인 배열로 변환
+    const cartList = {
+        stuId: stuId,
+        lectNo: lectNo
+    };
+    
+console.log(cartList)
+
+    try {
+        const response = await fetch(`${contextPath}/lectureCart/one`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(cartList)
+        });
+
+        if (!response.ok) {
+            throw new Error('서버 응답 오류');
+        }
+
+        const result = await response.json();
+
+        $('#parentTable').DataTable().destroy();
+        $('#studentTable').DataTable().destroy();
+        $('#attendeeTable').DataTable().destroy();
+        
+        // 데이터 다시 불러오기
+        await getLectureCartList(contextPath);
+
+	    const successCount = result.result || 0;
+			console.log(successCount)
+		if(successCount!=0){
+			 swal({
+            title: "등록 성공",
+            text: `수강신청이 완료되었습니다`,
+            icon: "success",
+            button: "확인"
+        })
+		}else{
+			 swal({
+            title: "등록 실패",
+            text: `수강 신청 실패`,
+            icon: "warning",
+            button: "확인"
+        })
+		}
+
+
+       
+
+    } catch (error) {
+        swal({
+            title: "등록 실패",
+            text: error.message,
+            icon: "error",
+            button: "확인"
+        });
+    }
+}
+
+async function enterKeyEvent(){
+	const $dummyTable = $("#parentTable"); // table
+	var table = $dummyTable.DataTable();
+	
+				var searchColumn = $('#searchColumn').val(); // 선택된 검색 조건
+				var searchTerm = $('#searchInput').val(); // 입력된 검색어
+				// 선택된 열에서 검색 수행
+				table.column(`${searchColumn}:name`).search(searchTerm).draw();
+	
+}
+
+
+
+

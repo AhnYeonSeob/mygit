@@ -1,0 +1,17 @@
+package kr.or.ddit.yguniv.eventregistrant.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.EventRegistrantVO;
+
+@Mapper
+public interface EventRegistrantMapper {
+
+	/**
+	 * 행사 신청 학생 등록
+	 * @param eventRegistrant
+	 * @return
+	 */
+	public int insertEventRegistrant(EventRegistrantVO eventRegistrant);
+		
+	}

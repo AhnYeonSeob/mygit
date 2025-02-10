@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.mypage.dao.MypageMapper">
+
+<select id="selectMyPage" resultType="PersonVO">
+
+SELECT  
+
+	  ID,
+    PSWD,
+    NM,
+    BRDT,
+    SEXDSTN_CD,
+    ZIP,
+    RDNMADR,
+    DADDR,
+    MBTLNUM,
+    EML,
+    EML_RCPTN_AGRE_YN,
+    SMS_RCPTN_AGRE_YN,
+    CRTFC_MN_CD,
+    LAST_CONECT_DE,
+    PSWD_FAILR_CO,
+    PERSON_YN,
+    PROFL_PHOTO
+
+FROM PERSON 
+WHERE ID = #{id, jdbcType=VARCHAR}
+</select>
+
+<update id="updateMyPage" parameterType="PersonVO">
+UPDATE PERSON
+SET NM = #{nm, jdbcType= VARCHAR},
+    PSWD = #{pswd, jdbcType= VARCHAR},
+    BRDT = #{brdt, jdbcType= VARCHAR},
+    ZIP = #{zip, jdbcType= VARCHAR},
+    RDNMADR = #{rdnmadr, jdbcType= VARCHAR},
+    DADDR = #{daddr, jdbcType= VARCHAR},
+    EML = #{eml, jdbcType= VARCHAR},
+    EML_RCPTN_AGRE_YN = #{emlRcptnAgreYn, jdbcType= CHAR},
+    SMS_RCPTN_AGRE_YN = #{smsRcptnAgreYn, jdbcType= CHAR},
+    PROFL_PHOTO = #{proflPhoto, jdbcType= CLOB}
+    
+WHERE ID = #{id, jdbcType= VARCHAR}
+
+
+</update>
+
+
+
+
+
+</mapper>

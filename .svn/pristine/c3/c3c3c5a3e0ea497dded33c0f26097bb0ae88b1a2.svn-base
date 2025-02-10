@@ -1,0 +1,50 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<input id="cp" type="hidden" value="${pageContext.request.contextPath }"/>
+<input id="lectNo" type="hidden" value="${lectureMaterialsList[0].lectNo }"/>
+<table class="table table-primary align-middle table-bordered">
+	<thead>
+		<tr class="text-center">
+			<th>강의명</th>
+			<th>학습시작일</th>
+			<th>학습종료일</th>
+			<th>이수인정시간</th>
+			<th style="width: 110px;">수정</th>
+			<th style="width: 110px;">삭제</th>
+			<!-- 수강생일 경우 : 강의명 | 학습기간(시작일~종료일) | 이수인정시간 | 이수시간 | 완료여부 | 강의입장 -->
+		</tr>
+	</thead>
+	<tbody class="table-group-divider">
+		<c:forEach items="${lectureMaterialsList }" var="week">
+			<tr class="table-light" data-week-cd="${week.weekCd }">
+				<td colspan="4" class="fw-bold">${week.leweNm }</td>
+				<td class="text-center">
+					<button class="btn btn-primary week-update-btn">주차수정</button>
+					<button class="btn btn-success week-update-save-btn" style="display: none;">저장</button>
+				</td>
+				<td class="text-center">
+					<button class="btn btn-danger week-delete-btn">주차삭제</button>
+					<button class="btn btn-secondary week-update-cancel-btn" style="display: none;">취소</button>
+				</td>
+			</tr>
+			<c:forEach items="${week.orderLectureDataList }" var="data">
+				<tr class="table-secondary">
+					<td>${data.sectNm }</td>
+					<td class="text-center">${fn:substring(data.sectDt,0,4) }/${fn:substring(data.sectDt,4,6) }/${fn:substring(data.sectDt,6,8) }</td>
+					<td class="text-center">${fn:substring(data.sectEt,0,4) }/${fn:substring(data.sectEt,4,6) }/${fn:substring(data.sectEt,6,8) }</td>
+					<td class="text-center">${fn:substring(data.sectIdnty,0,2) }:${fn:substring(data.sectIdnty,2,4) }</td>
+					<td class="text-center"><button class="btn btn-outline-primary data-update-btn">차시수정</button></td>
+					<td class="text-center"><button class="btn btn-outline-danger data-delete-btn">차시삭제</button></td>
+				</tr>
+			</c:forEach>
+			<tr class="table-secondary">
+				<td colspan="6"><button class="btn btn-outline-success data-insert-btn float-end">차시추가</button></td>
+			</tr>
+		</c:forEach>
+	</tbody>
+</table>
+<button class="btn btn-success data-insert-btn float-end me-1">주차추가</button>
+<script src="${pageContext.request.contextPath }/resources/js/lecture/lectureMaterialsList.js"></script>
+

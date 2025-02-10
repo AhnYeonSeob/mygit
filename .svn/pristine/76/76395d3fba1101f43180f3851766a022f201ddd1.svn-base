@@ -1,0 +1,99 @@
+/**
+ * 입력폼 js
+ */
+
+var contextPath = document.querySelector('#form-table').dataset['path'];
+
+var editorInstance;
+	
+	import {
+		ClassicEditor,
+		SimpleUploadAdapter,
+		Bold,
+		Italic,
+		Underline,
+		BlockQuote,
+		Essentials,
+		Heading,
+		Image,
+		ImageUpload,
+		Link,
+		List,
+		MediaEmbed,
+		Table,
+		TableToolbar,
+		FontSize,
+		FontFamily,
+		FontColor,
+		Undo
+	
+	} from '../../../resources/js/ckeditor5/ckeditor5.js';
+	
+	const csrfMetaTag = document.querySelector('meta[name="csrf-token"]');
+	const csrfToken = csrfMetaTag ? csrfMetaTag.getAttribute('content') : null;
+	
+	ClassicEditor.create( document.querySelector('#editor'),{
+		licenseKey: 'GPL'
+		,  plugins: [
+            Essentials, Bold, Italic, Underline, Link, Image, ImageUpload,
+            List, BlockQuote, Heading, MediaEmbed, Table, TableToolbar, 
+            FontSize, FontFamily, FontColor, Undo, SimpleUploadAdapter
+        ],
+        toolbar: [
+            'undo', 'redo', '|', 'bold', 'italic', 'underline', '|', 'link', 'imageUpload', '|',
+            'bulletedList', 'numberedList', '|', 'blockquote', 'insertTable', '|',
+            'fontSize', 'fontFamily', 'fontColor', '|', 'mediaEmbed'
+        ],language: 'ko' // 한국어 설정
+		, simpleUpload: { 
+					uploadUrl: `${contextPath}/imageUpload`
+					, headers:  csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {}
+					
+			}
+	})
+	
+	 .then(editor => {
+        editorInstance = editor;
+    })
+    .catch(error => {
+        console.error(error);
+
+	})//create에디터 끝
+
+document.addEventListener("DOMContentLoaded",()=>{
+	const cForm = document.querySelector('#createForm');
+	cForm.addEventListener("submit",async function(e){
+		e.preventDefault();
+		const data = editorInstance.getData(); // CKEditor 데이터 가져오기 
+		const formData = new FormData(cForm);
+		const url = `${contextPath}/yguniv/noticeboard`;
+		
+		console.log("data=>",data);
+		console.log("FormData Entries:", [...formData.entries()]);
+		//create처리
+		try{
+			const resp = await fetch(url,{
+				method: "POST"
+				,body: formData 
+			});
+			if(!resp.ok){
+				throw new Error(`응답이오지않음 status : ${resp.status} `)
+			}
+			const res = await resp.json();
+			alert("게시글이 성공적으로 생성되었습니다.");
+			window.location.href = `${contextPath}/yguniv/noticeboard/${result.ntcCd}`;
+			
+		}catch(error){
+			console.error("에러발생!:",error);
+		}//catch끝
+		
+		
+		
+	});
+	
+	
+});
+
+
+
+
+

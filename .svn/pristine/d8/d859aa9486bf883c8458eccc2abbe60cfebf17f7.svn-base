@@ -1,0 +1,32 @@
+package kr.or.ddit.yguniv.projectteam.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.ProjectTeamVO;
+
+@Mapper
+public interface ProjectTeamMapper {
+	/**팀생성
+	 * @return
+	 */
+	public int insertProjectTeam(ProjectTeamVO team);
+	/**팀단건조회
+	 * @return
+	 */
+	public ProjectTeamVO selectProjectTeam(int teamCd);
+	/**팀전체조회
+	 * @return
+	 */
+	public List<ProjectTeamVO> selectProjectTeamlist();
+	/**팀수정
+	 * @return
+	 */
+	public int updateProjectTeam(ProjectTeamVO team);
+	/**팀삭제
+	 * @return
+	 */
+	public int deleteProjectTeam(int teamCd);
+	
+}

@@ -1,0 +1,52 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.builder.ToStringExclude;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "assigNo")
+public class AssignmentVO {
+	@Size(max= 10)
+	@NotBlank
+	private String assigNo;
+	@Size(max= 10)
+	@NotBlank
+	private String lectNo;
+	@Size(max= 200)
+	@NotBlank
+	private String assigNm;
+	@Size(max= 3000)
+	@NotBlank
+	private String assigNotes;
+	@Size(max= 500)
+	@Nullable
+	private String assigFile;
+	@Max(100)
+	@Nullable
+	private Long assigScore;
+	@DateTimeFormat(iso = ISO.DATE)
+	@NotBlank
+	private LocalDate assigDate;
+	
+	@Nullable
+	private Long atchFileId;
+	
+	//has many -->AssignmentSubmissionVO
+	@ToStringExclude
+	private List<AssignmentSubmissionVO> assignmentsubmissionList;
+	
+	
+}

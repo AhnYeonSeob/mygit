@@ -1,0 +1,88 @@
+package kr.or.ddit.yguniv.graduationpaper.controller;
+
+import java.security.Principal;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.yguniv.graduationpaper.service.GraduationPaperService;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.paging.SimpleCondition;
+import kr.or.ddit.yguniv.security.conf.PersonVoWrapper;
+import kr.or.ddit.yguniv.vo.GraduationPaperVO;
+
+@Controller
+@RequestMapping("/graduationpaper")
+public class GraduationPaperController {
+	
+	public static final String MODELNAME = "graudationPaper";
+	
+	@Autowired
+	private GraduationPaperService service;
+	
+	@ModelAttribute(MODELNAME)
+	public GraduationPaperVO graduationpaper() {
+		return new GraduationPaperVO();
+	}
+	
+	// 논문 제출 form으로 보냄
+	@GetMapping("new")
+	public String createForm(Authentication auth, Model model) {
+		model.addAttribute("auth", auth);
+		return "graduationPaper/graduationPaperForm";
+	}
+	
+	//논문 메인
+	@GetMapping
+	public String main(Principal principal, Model model) {
+		model.addAttribute("principal", principal.getName());
+		return "graduationPaper/graduationPaperMain";
+	}
+
+	// 학생 자기 논문 전체조회
+	@GetMapping("list/{stuId}")
+	public String selectlist(@PathVariable String stuId
+			, Model model
+			) {
+		List<GraduationPaperVO>list = service.getGraduationPapers(stuId);
+		model.addAttribute("list", list);
+		return "graduationPaper/graduationPaperList";
+	}
+
+	// 생성
+	@PostMapping()
+	public String create() {
+		return "graduationPaper/graduationPaperDetail";
+	}
+
+	// 상세조회
+	@GetMapping("{gpaCd}")
+	public String select(@PathVariable() String gpaCd) {
+
+		return "graduationPaper/graduationPaperDetail";
+	}
+
+	// 수정
+	@PutMapping("{gpaCd}")
+	public String update(@PathVariable() String gpaCd) {
+		return "graduationPaper/graduationPaperDetail";
+	}
+
+	// 삭제
+	@DeleteMapping("{gpaCd}")
+	public String delete(@PathVariable() String gpaCd) {
+		return "graduationPaper/grad uationPaperList";
+	}
+}
+

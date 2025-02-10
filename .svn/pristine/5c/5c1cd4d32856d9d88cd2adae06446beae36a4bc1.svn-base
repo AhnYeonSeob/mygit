@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.lecture.dao.LectureMapper">
+	<select id="myLectureList" resultType="LectureVO">
+			SELECT L.LECT_NO, L.LECT_NM
+			FROM LECTURE L
+			INNER JOIN ATTENDEE A ON(L.LECT_NO = A.LECT_NO AND A.STU_ID = #{id, jdbcType=VARCHAR})
+			WHERE L.LECT_STATUS_CD IN ('L03', 'L04')
+		UNION
+			SELECT L.LECT_NO, L.LECT_NM
+			FROM LECTURE L
+			WHERE L.PROFE_ID = #{id, jdbcType=VARCHAR}
+			AND L.LECT_STATUS_CD IN ('L02', 'L03', 'L04')
+	</select>
+
+	<select id="selectLectureRequestList"></select>
+	<select id="selectLectureRequest"></select>
+	<insert id="insertLectureRequest"></insert>
+	<update id="updateLectureRequest"></update>
+	<delete id="deleteLectureRequest"></delete>
+	
+	<update id="lectureRequestConsent"></update>
+	<update id="lectureRequestReturn"></update>
+	
+	<select id="selectLectureAbolitionList"></select>
+	<update id="lectureAbolition"></update>
+	<update id="cancelLectureAbolition"></update>
+	
+	<update id="lectureAbolitionConsent"></update>
+	<update id="lectureAbolitionReturn"></update>
+</mapper>

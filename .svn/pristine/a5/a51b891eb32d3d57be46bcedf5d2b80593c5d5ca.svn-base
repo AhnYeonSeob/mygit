@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.projectTask.dao.ProjectTaskMapper">
+<sql id="columns">
+	TASK_NO
+	,LECT_NO
+	,TASK_TITLE
+	,TASK_NOTES
+	,TASK_ET
+	,TASK_YN
+</sql>
+
+
+
+</mapper>

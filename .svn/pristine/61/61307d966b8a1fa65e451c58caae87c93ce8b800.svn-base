@@ -1,0 +1,266 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", async () => {
+	const url = "../yguniv/lectureCart"
+
+
+	await getLectureCartList(url);
+})
+
+
+async function getLectureCartList(url) {
+	const getUrl = `${url}/get` //요청 url
+	const $dummyTable = $("#parentTable"); // table
+	const $studentTable = $("#studentTable"); // table
+	//	await dataTableFunction(getDummyUrl, $dummyTable); //데이터 테이블은 jquery객체를 넘겨야함
+
+	$.ajax({
+		url: getUrl,
+		type: "GET",
+		success: function(data) {
+			console.log(data)
+			const cleanData = removeNullProperties(data)
+			console.log(cleanData)
+			const lectureList = cleanData.lectureList;
+			const studentLectureList = cleanData.studentLectureList;
+			console.log(lectureList)
+			console.log(studentLectureList)
+			const studentLectNos = new Set(cleanData.studentLectureList.map(lecture => lecture.lectNo));
+
+			$dummyTable.dataTable({
+				data: lectureList,
+				columns: [ 		//VO가 has 관계를 지녀 그 안의 데이터를 가져올 경우에는 . 닷노테이션 접근
+
+					{ data: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', title: '구분	' },
+					{ data: 'professorVO.nm', title: '교수명' },
+					{ data: 'lectScore', title: '학점' },
+					{
+						data: null, // 특정 필드에 종속되지 않도록 null 설정
+						title: '정원',
+						render: function(data, type, row) {
+							// row 객체에서 'lectEnNope'와 'lectAttenNope' 값을 가져와 HTML로 반환
+							return `<td>${row.lectEnNope} / ${row.lectAttenNope}</td>`;
+						}
+					},
+					{
+						data: 'joinSchedule',
+						title: '시간',
+						render: function(data, type, row) {
+							// row.joinSchedule이 null이면 '온라인'을 반환하고, 그렇지 않으면 joinSchedule 값을 반환
+							return row.joinSchedule == null ? '<td>온라인</td>' : row.joinSchedule;
+						}
+					}, {
+						data: 'scheduleVO[0].classRoomVO.croomPstn',
+						title: '강의실',
+						render: function(data, type, row) {
+							// scheduleVO[0].classRoomVO.croomPstn이 null이면 '온라인'을 반환하고, 그렇지 않으면 값을 반환
+							return row.scheduleVO && row.scheduleVO[0] && row.scheduleVO[0].classRoomVO && row.scheduleVO[0].classRoomVO.croomPstn == null ? '<p>온라인</p>' : row.scheduleVO && row.scheduleVO[0] && row.scheduleVO[0].classRoomVO ? row.scheduleVO[0].classRoomVO.croomPstn : '<p>온라인</p>';
+						}
+					}, {
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							// 버튼 클릭 시 row 데이터 전달
+							return `<button class="btn btn-primary" 
+                                onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					},
+					{
+						data: null,
+						title: '신청',
+						render: function(data, type, row) {
+							// 강의 번호가 studentLectNos에 포함되어 있는지 확인
+							if (studentLectNos.has(row.lectNo)) {
+								return `<button class="btn btn-warning">신청완료</button>`;
+							} else {
+								return `<button class="btn btn-primary" onclick="insertCart('${row.lectNo}')">신청</button>`;
+							}
+						}
+					},   // 강의번호
+				]
+			});
+
+			$studentTable.dataTable({
+				data: studentLectureList,
+				dom: 'Qlfrtip',
+    searchBuilder: {
+        preDefined: {
+            criteria: [{
+                condition: 'contains',
+                data: 'lectNm',
+                value: ['프로그래밍']
+            }]
+        }
+    }, // SearchBuilder 옵션 활성화
+				columns: [ 		//VO가 has 관계를 지녀 그 안의 데이터를 가져올 경우에는 . 닷노테이션 접근
+					{
+						data: null,
+						title: '신청',
+						render: function(data, type, row) {
+							// 강의 번호가 studentLectNos에 포함되어 있는지 확인
+							return `<button class="btn btn-primary" onclick="deleteCart('${row.lectNo}')">취소</button>`;
+						}
+					},   // 강의번호
+					{ data: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', title: '구분	' },
+					{ data: 'professorVO.nm', title: '교수명' },
+					{ data: 'lectScore', title: '학점' },
+
+					{
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							// 버튼 클릭 시 row 데이터 전달
+							return `<button class="btn btn-primary" 
+                                onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					}
+				],
+
+			});
+
+
+		}, error: function(request, status, error) {
+			console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+		}
+	}); //ajax끝
+
+
+
+
+}
+
+
+// null 값을 제거하는 재귀 함수
+function removeNullProperties(obj) {
+	if (typeof obj !== 'object' || obj === null) {
+		return obj; // 객체가 아니거나 null인 경우 그대로 반환
+	}
+
+	// 객체를 복제하면서 null이 아닌 값만 유지
+	if (Array.isArray(obj)) {
+		return obj.map(item => removeNullProperties(item)).filter(item => item !== null);
+	}
+
+	const result = {};
+	for (const key in obj) {
+		if (obj[key] !== null) {
+			result[key] = removeNullProperties(obj[key]);
+		}
+	}
+	return result;
+}
+
+async function insertCart(lectNo) {
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+	const url = `${contextPath}/lectureCart`;
+	const stuId = document.getElementById("stuId").value;
+	console.log(lectNo)
+	console.log(stuId)
+
+	fetch(url, {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			lectNo: lectNo,
+			stuId: stuId
+		})
+	})
+		.then(resp => {
+			if (!resp.ok) {
+				// 상태 코드가 OK(200~299)가 아니면 오류 처리
+				return resp.json().then(errorData => {
+					throw new Error(errorData.message || "Unknown error occurred");
+				});
+			}
+			return resp.json(); // 정상 응답 처리
+		})
+		.then(data => {
+			swal({
+				title: "수강신청 성공",
+				text: "수강신청 성공",
+				icon: "success",
+				button: "확인"
+			}).then(() => location.reload()); //리로드 하지말고 삭제했다가 다시 생성하기?
+		})
+		.catch(err => {
+			swal({
+				title: "처리 실패",
+				text: err.message,
+				icon: "error",
+				button: "확인"
+			});
+		});
+
+
+
+}
+async function deleteCart(lectNo) {
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+	const url = `${contextPath}/lectureCart`;
+	const stuId = document.getElementById("stuId").value;
+	console.log(lectNo)
+	console.log(stuId)
+
+	fetch(url, {
+		method: 'DELETE',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({
+			lectNo: lectNo,
+			stuId: stuId
+		})
+	})
+		.then(resp => {
+			if (!resp.ok) {
+				// 상태 코드가 OK(200~299)가 아니면 오류 처리
+				return resp.json().then(errorData => {
+					throw new Error(errorData.message || "Unknown error occurred");
+				});
+			}
+			return resp.json(); // 정상 응답 처리
+		})
+		.then(data => {
+			swal({
+				title: "수강신청 취소",
+				text: "수강신청 취소 성공",
+				icon: "success",
+				button: "확인"
+			}).then(() => location.reload());
+		})
+		.catch(err => {
+			swal({
+				title: "처리 실패",
+				text: err.message,
+				icon: "error",
+				button: "확인"
+			});
+		});
+
+
+
+}
+
+async function showLecturePaper(lectNo) {
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+	const url = `${contextPath}/lectureCart/lecturePaper/${lectNo}`;
+	console.log(lectNo)
+
+	window.open(url,
+		"testPopup",
+		"width=700,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no");
+
+
+}
+
+
+
+
+
+
+
+

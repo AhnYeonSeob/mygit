@@ -1,0 +1,14 @@
+package kr.or.ddit.yguniv.vo;
+
+import lombok.Data;
+import lombok.ToString;
+
+@Data
+public class ModuleVO {
+	private String modId;
+	private Integer width;
+	private Integer height;
+	@ToString.Exclude
+	private String html;
+	private String modNm;
+}

@@ -1,0 +1,67 @@
+package kr.or.ddit.yguniv.projectduty.controller;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/duty")
+public class ProjectDutyController {
+		//프로젝트일감일감 목록조회
+	
+		@GetMapping()
+		public String selectList() {
+			
+			return "duty/dutyList";
+		}
+		
+		//프로젝트일감 상세조회
+		@GetMapping("{dutyCd}")
+		public String select(@PathVariable()int dutyCd) {
+			
+			return "duty/dutyDetail";
+		}
+		//프로젝트일감 생성폼 이동
+		@GetMapping("{dutyCd}/new")
+		public String createForm() {
+			
+			return "duty/dutyForm";
+		}
+		
+		
+		//프로젝트일감 생성
+		@PostMapping("{dutyCd}")
+		public String create(@PathVariable()int dutyCd) {
+			
+			return "duty/?";
+		}
+		
+		//프로젝트일감 수정폼이동
+		@GetMapping("{dutyCd}/edit")
+		public String updateForm(@PathVariable()int dutyCd) {
+			
+			
+			return "duty/dutyEditForm";
+		}
+		
+		//프로젝트일감 수정
+		@PutMapping("{dutyCd}")
+		public String update(@PathVariable()int dutyCd) {
+			
+			
+			return "duty/?";
+		}
+		
+		//프로젝트일감 삭제
+		@DeleteMapping("{dutyCd}")
+		public String delete(@PathVariable()int dutyCd) {
+			
+			
+			return "duty/dutyList";
+		}
+		
+		
+	}

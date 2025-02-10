@@ -1,0 +1,146 @@
+package kr.or.ddit.yguniv.attendeetest.controller;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.yguniv.attendeetest.service.AttendeeTestService;
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.test.service.TestService;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.QuestionAnswerVO;
+import kr.or.ddit.yguniv.vo.QuestionVO;
+import kr.or.ddit.yguniv.vo.TestVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/attendeeTest/{lectNo}")
+public class AttendeeTestController {
+	
+	public static final String MODELNAME = "newQuestion";
+		//교수 개인의 강의 리스트 조회
+	//추후에 로그인 한 교수의 교번을 가져와야함!
+	@Autowired
+	private LectureMaterialsServiceImpl lectMateService;
+
+	@Autowired
+	private AttendeeTestService service;
+	@Autowired
+	private TestService testService;
+	   
+	
+	   @ModelAttribute
+	   public void addLecture(@PathVariable String lectNo, Model model){
+	
+	      LectureVO lectureVO = lectMateService.selectLecture(lectNo);
+	      if(lectureVO == null) {
+	         throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+	      }
+	      model.addAttribute("lecture", lectureVO);
+	   }
+
+	   @ModelAttribute(MODELNAME)
+	   public QuestionVO testBox(@PathVariable String lectNo, Model model){
+		   return new QuestionVO();
+	   }
+	   
+	/*
+	 * 학생이 강의페이지로 이동
+	 * 시험 버튼 클릭
+	 * 등록된 시험 링크 클릭
+	 * 시험 대기화면 이동
+	 * 응시버튼 클릭
+	 * 문제 풀기
+	 * 푼 이후 제출 버튼 클릭
+	 * 전송 완료 하고 다시 밖으로 나옴
+	 */
+	
+	
+	//학생이 강의페이지에서 시험조회 페이지로 이동
+	@GetMapping()
+	public String getTestPage(@PathVariable String lectNo, Model model) {
+		List<TestVO> attendeeTestList = service.getTestPage(lectNo);
+		
+		model.addAttribute("attendeeTestList", attendeeTestList);
+		
+		return "lecture/materials/attendTest/attendeeTest";
+	}
+	//학생이 시험페이지로 이동
+	@GetMapping("attendeeTest/{testNo}")
+	public String getTest(@PathVariable String lectNo,@PathVariable String testNo, Model model) {
+		
+		//추후에 수정하기
+		testNo="TEST011";
+//		log.info("＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠{}",testNo);
+		//로그인 한 계정의 아이디를 가져와야함
+		String stuId = "2024100001";
+		String lvn = "";
+		
+		//새로고침 한번에 기록 한번이라 주석으로 묶어둠
+//		Integer newRecord=service.createRecord(testNo, stuId);
+//		if(!(newRecord==null)||!(newRecord==0)) {
+//			TestVO studentTestVo = testService.selectTestOne(testNo);
+//
+//			//		log.info("♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣♣{}",studentTestVo);
+//			QuestionVO questionForm = new QuestionVO();
+//			model.addAttribute("studentTestVo", studentTestVo);
+//			model.addAttribute("newQuestion", questionForm); // 폼 바인딩용
+//			
+//			lvn = "/attendTest/attendeeTestForm"; //성공하면 새 시험 폼 출력
+//		}else {
+//			
+//			lvn = ""; //실패시 보낼 곳 
+//		}
+
+		lvn = "/attendTest/attendeeTestForm"; //성공하면 새 시험 폼 출력
+		TestVO studentTestVo = testService.selectTestOne(testNo);
+		studentTestVo.setLectNo(lectNo);
+		QuestionVO questionForm = new QuestionVO();
+		
+		model.addAttribute("studentTestVo", studentTestVo);
+		model.addAttribute("newQuestion", questionForm); // 폼 바인딩용
+		
+		return lvn;
+		
+	}
+	//문제 채점하기
+//	action="/yguniv/attendeeTest/L004/attendeeTest/TEST004"
+	@PostMapping("attendeeTest/{testNo}")
+	public String scoreCheck(@PathVariable String testNo ,@PathVariable String lectNo
+			,@RequestBody List<QuestionAnswerVO> QuestionAnswerVO) {
+		// 입력한 답가져온후 내보내기
+		//학생이 제출을 누르면 테스트 번호에 등록된 정답과 비교한다. - service에서 처리하기
+		//로그인 한 계정의 아이디를 가져와야함
+		String stuId = "2024100001";
+		
+		QuestionAnswerVO.forEach(que->{
+					que.setLectNo(lectNo);
+					que.setStuId(stuId);
+					que.setTestNo(testNo);
+				});
+		
+		log.info("{}","전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송"+testNo+"됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨");
+		log.info("{}","전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송"+QuestionAnswerVO+"됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨");
+//		log.info("{}","전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송"+qVo+"됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨");
+		
+		log.info("{}","전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송"+QuestionAnswerVO+"됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨전송됨");
+		service.questionScoreCheck(testNo, QuestionAnswerVO);
+		
+		
+		return "attendTest/attendeeTest";
+	}
+	
+	
+}

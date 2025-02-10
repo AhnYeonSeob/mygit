@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.board.systemBoard.dao.SystemBoardMapper">
+
+
+<!-- 검색  -->
+
+	<sql id="searchFrag">
+			<trim prefix="WHERE" prefixOverrides="and">
+			<!-- and 지우고 앞에 where을 붙임  -->
+				<if test="paging neq null and paging.detailCodition neq null">
+					<if test= "@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCodition.snbNo)">
+						 AND SNB_NO = #{paging.detailCodition.snbNo}
+					</if>
+					<if test= "@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCodition.snbTtl)">
+					AND	INSTR(SNB_TTL, #{paging.detailCondition.snbTtl})>0
+					</if>
+					<if test= "@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCodition.snbCn)">
+						 AND INSTR(SNB_CN, #{paging.detailCondition.snbCn})>0
+					
+					</if>
+				
+				</if>
+			
+			</trim>
+	</sql>
+	
+	<select id="selectTotalRecord" resultType="int">
+		SELECT COUNT(*)
+		FROM system_notice_board
+	</select>
+
+<!-- 공지사항 게시판 게시글 목록 조회   -->
+<select id="selectSystemBoardList" resultType="SystemNoticeBoardVO">
+
+SELECT
+    SNB_NO,
+    ADMIN_ID,
+    ATCH_FILE_ID,
+    SNB_TTL,
+    SNB_CN, 
+    SNB_DT,
+    SNB_COUNT
+       
+ 
+FROM system_notice_board
+ <include refid="searchFrag" />
+
+
+</select>
+
+<!-- 공지사항 게시판 게시글 상세 조회 -->
+<select id="selectSystemBoard" resultType="SystemNoticeBoardVO">
+
+SELECT
+    SNB_NO,
+    ADMIN_ID,
+    ATCH_FILE_ID,
+    SNB_TTL,
+    SNB_CN, 
+    SNB_DT,
+    SNB_COUNT
+  FROM system_notice_board
+  WHERE SNB_NO = #{snbNo}
+
+</select>
+
+<!-- 공지사항 게시판 게시글 작성 -->
+<insert id="insertSystemBoard">
+
+<selectKey keyProperty="atchFileId">
+ 	SELECT SEQ_ATCH_FILE_ID.NEXTVAL FROM DUAL
+</selectKey>
+
+INSERT INTO system_notice_board (
+	snb_no,
+	admin_id,
+    atch_file_id,
+    snb_ttl,
+    snb_cn
+) VALUES (
+SNB_NO_SEQ.NEXTVAL
+,'관리자'
+,#{atchFileId,jdbcType=VARCHAR}
+,#{snbTtl,jdbcType=VARCHAR}
+,#{snbCn,jdbcType=CLOB}
+)
+
+</insert>
+
+<!-- 공지사항 게시판 게시글 수정  -->
+<update id="updateSystemBoard">
+UPDATE system_notice_board
+
+SET 
+
+,#{snbTtl,jdbcType=VARCHAR}
+,#{snbCn,jdbcType=CLOB}
+
+WHERE SNB_NO = #{snbNo}
+
+
+</update>
+
+<!-- 공지사항 게시판 게시글 삭제-->
+<delete id="deleteSystemBoard">
+
+DELETE FROM system_notice_board
+WHERE SNB_NO = #{snbNo}
+
+</delete>
+
+
+</mapper>

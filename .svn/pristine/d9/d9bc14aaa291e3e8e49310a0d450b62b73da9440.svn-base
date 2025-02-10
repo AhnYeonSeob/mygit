@@ -1,0 +1,24 @@
+package kr.or.ddit.yguniv.dissent.dao;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Test;
+
+import kr.or.ddit.yguniv.annotation.RootContextWebConfig;
+
+@RootContextWebConfig
+class DissentMapperTest {
+
+	@Inject
+	DissentMapper dao;
+	
+	@Test
+	void test() {
+		assertDoesNotThrow(()->{
+			dao.selectDissentList();
+		});
+	}
+
+}

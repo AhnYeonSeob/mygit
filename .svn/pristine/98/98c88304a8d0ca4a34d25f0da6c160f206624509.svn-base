@@ -1,0 +1,47 @@
+document.addEventListener("DOMContentLoaded", async function(){
+	let moduleData = await axios.get(`${postScriptCP.value}/module/schedule`)
+								.then(({data})=>data);
+	let dotwList = moduleData.dotwList;
+	let etimeList = moduleData.etimeList;
+	let table = `
+		<table class="table table-bordered table-primary text-center align-middle mb-0">
+			<thead>
+				<tr>
+					<th style="width: 50px;">교시</th>
+	`;
+	for(let dotw of dotwList){
+		if(dotw.cocoCd != 'SUN'){
+			table += `<th>${dotw.cocoStts}</th>`
+		}
+	}
+	table += `
+				</tr>
+			</thead>
+			<tbody>
+	`;
+	for(let etime of etimeList){
+		table += `
+			<tr class="table-light">
+				<th style="font-size: 0.8rem;" class="${etime.edcTimeCd}">
+					${etime.commonCodeVO.cocoStts}<br/>
+				</th>
+		`;
+		for(let dotw of dotwList){
+			if(dotw.cocoCd != 'SUN'){
+				table += `
+					<td data-etime="${etime.edcTimeCd }" data-dotw="${dotw.cocoCd }"
+						data-schedule="${dotw.cocoCd }-${etime.edcTimeCd }"/>
+				`;
+			}
+		}
+		table += `</tr>`
+	}
+	table += `
+		</tbody>
+	</table>
+	`;
+	
+	$('.cj-schedule').each((i,v)=>{
+		v.innerHTML = table;
+	});
+})

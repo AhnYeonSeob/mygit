@@ -1,0 +1,68 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+<h2>자기소개서 첨삭</h2>
+
+<form action="<c:url value='/introduce/edit' />" method="post">
+    <table class="table table-bordered">
+        <tr>
+            <th>항목</th>
+            <th>기존 데이터</th>
+            <th>수정할 데이터</th>
+        </tr>
+        <tr>
+            <td>지원동기</td>
+            <td>${introduce.intQue1}</td>
+            <td>
+                <textarea name="intQue1" rows="5" class="form-control">${introduce.intQue1}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>입사 후 포부</td>
+            <td>${introduce.intQue2}</td>
+            <td>
+                <textarea name="intQue2" rows="5" class="form-control">${introduce.intQue2}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>성격 및 장단점</td>
+            <td>${introduce.intQue3}</td>
+            <td>
+                <textarea name="intQue3" rows="5" class="form-control">${introduce.intQue3}</textarea>
+            </td>
+        </tr>
+    </table>
+
+    <input type="hidden" name="stuId" value="${introduce.stuId}" />
+
+    <div class="btn-area">
+        <button type="submit" id="saveButton" class="btn btn-primary">수정완료</button>
+        <a href="<c:url value='/introduce' />" class="btn btn-secondary">취소</a>
+    </div>
+</form>
+<script>
+document.getElementById('saveButton').addEventListener('click', function () {
+    const stuId = document.querySelector('input[name="stuId"]').value;
+    const intQue1 = document.getElementById('intQue1').value;
+    const intQue2 = document.getElementById('intQue2').value;
+    const intQue3 = document.getElementById('intQue3').value;
+
+    fetch(`/introduce/edit/${stuId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stuId, intQue1, intQue2, intQue3 })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data) {
+            // 수정 완료 후 상세보기 페이지로 이동
+            window.location.href = `/introduce/detail/${stuId}?edited=true`;
+        } else {
+            alert('수정에 실패하였습니다.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+});
+</script>
+

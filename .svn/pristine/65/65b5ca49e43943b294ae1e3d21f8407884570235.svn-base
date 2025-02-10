@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.lecture.dao.LectureInquiryMapper">
+	<select id="selectLectureInquiryBoardList"></select>
+	<select id="selectLectureInquiryBoard"></select>
+	<insert id="insertLectureInquiryBoard"></insert>
+	<update id="updateLectureInquiryBoard"></update>
+	<delete id="deleteLectureInquiryBoard"></delete>
+	
+	<update id="insertLectureInquiryBoardAnswer"></update>
+	<update id="updateLectureInquiryBoardAnswer"></update>
+	<update id="deleteLectureInquiryBoardAnswer"></update>
+</mapper>

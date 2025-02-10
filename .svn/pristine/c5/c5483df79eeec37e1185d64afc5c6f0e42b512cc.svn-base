@@ -1,0 +1,62 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<h2>과제상세보기</h2>
+<table class="table table-bordered" id="form-table" data-path="${pageContext.request.contextPath }" >
+	<tr>
+		<th>강의명</th>
+		<td>${assignment.lectNm }</td>
+	</tr>
+	<tr>
+		<th>과제명</th>
+		<td>${assignment.assigNm }</td>
+	</tr>
+	<tr>
+		<th>내용</th>
+		<td>${assignment.assigNotes }</td>
+	</tr>
+	<tr>
+		<th>배점</th>
+		<td>${assignment.assigScore }점</td>
+	</tr>
+	<tr>
+		<th>제출마감일</th>
+		<td>${fn:substring(assignment.assigEd, 0, 4)}-${fn:substring(assignment.assigEd, 4, 6)}-${fn:substring(assignment.assigEd, 6, 8)}</td>
+	</tr>
+	<tr>
+		<th>첨부파일</th>
+		<td>
+			<c:forEach items="${assignment.atchFile.fileDetails }" var="fd" varStatus="vs">
+			<c:url value='/assignment/${assignment.assigNo}/atch/${fd.atchFileId }/${fd.fileSn }' var="downUrl"/>
+			<a href="${downUrl }">${fd.orignlFileNm }(${fd.fileFancysize })</a>
+				${not vs.last ? '|' : ''}
+			</c:forEach>
+			<c:if test="${empty assignment.atchFile.fileDetails}">
+			    첨부파일없음
+			</c:if>
+
+		</td>
+	</tr>
+	<tr>
+		<td><input type="hidden" name="atchFileId" value="${assignment.atchFileId }"></td>
+	</tr>
+	<tr>
+		<th>피어리뷰여부</th>
+		<td>${assignment.peerYn }</td>
+	</tr>
+		<tr align="right">
+		<td colspan="2">
+			<a href="<c:url value='/lecture/${lectNo}/assignment/${assignment.assigNo }/edit' />" class="btn btn-info">수정</a>
+			<form action="<c:url value='/lecture/${lectNo}/assignment/${assignment.assigNo }/delete' />" method="post" style="display:inline;">
+			    <button type="submit" class="btn btn-danger">삭제</button>
+			</form>
+			<a href="<c:url value='/lecture/${lectNo}/assignment' />" class="btn btn-primary">목록</a>
+		</td>
+	</tr>
+
+</table>
+
+
+
+

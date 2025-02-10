@@ -1,0 +1,78 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>
+
+
+<h2>취업정보게시판 등록 폼 </h2>
+
+<form action="${pageContext.request.contextPath}/jobboard/create" id="createForm" method="post" enctype="multipart/form-data" >
+	<table id="form-table" data-path="${pageContext.request.contextPath }">
+		
+	<security:authentication property="principal" var="person"/>	
+		<tr>
+<!-- 		작성자 -->
+			<td><input type="hidden" name="id" value="${person.username }" 
+					class="form-control"  />
+		</tr>		
+	   
+		<tr>
+			<th>제목</th>
+			<td><input type="text" name="jobNm" 
+					class="form-control" />
+		</tr>
+		<tr>
+			<th>카테고리</th>
+			<td>
+			    <select class="form-select" name="jobCate" id="jobCate">
+			        <option value="">카테고리 유형을 선택하세요</option>
+			        <option value="채용공고">채용공고</option>
+			        <option value="채용설명회">채용설명회</option>
+			    </select>
+			</td>
+		</tr>
+		<tr>
+			<th>공고 시작 일자</th>
+			<td><input type="date" name="jobDt"
+					class="form-control" />
+		</tr>
+		<tr>
+		<tr>
+			<th>공고 마감 일자</th>
+			<td><input type="date" name="jobEt"
+					class="form-control" />
+		</tr>
+		<tr>
+			<th>제한 인원 수</th>
+			<td><input type="text" name="jobLimit"
+					class="form-control" placeholder="제한 인원 수를 작성해주세요."/>
+		</tr>
+		<tr>
+			<th>첨부파일</th>
+			<td>
+				<input type="file" name="uploadFiles" multiple class="form-control"/>	
+			</td>
+		</tr>
+		<tr>
+			<th>내용 </th>
+			<td>
+				<textarea name="jobContent" class="tinymce-editor" >
+				</textarea> 
+			</td>
+		</tr>  
+		
+		 <tr style="height: 20px;"></tr>
+		
+		<tr>
+		<td colspan="2" style="text-align: right;">
+			<button type="submit" class="btn btn-primary">저장</button>
+			<a href="/yguniv/jobboard/" class="btn btn-secondary">닫기</a>
+
+		</td>
+	</tr>
+	</table>
+</form>
+
+<script src="${pageContext.request.contextPath }/resources/js/jobboard/jobBoardForm.js"></script>
+

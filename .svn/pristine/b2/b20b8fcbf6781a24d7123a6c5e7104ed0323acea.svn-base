@@ -1,0 +1,30 @@
+/**
+ * 
+ */
+
+function showRole(personId) {
+    // 클릭한 personType 가져오기
+    const personType = document.querySelector(`#role[data-id="${personId}"]`).textContent.trim();
+
+    // 모달 창 열기
+    const modal = document.getElementById("roleModal");
+    modal.style.display = "block"; // 모달창을 보이게 설정
+
+    // 체크박스 초기화
+    const checkboxes = document.querySelectorAll("input[name='personType']");
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = false; // 모두 초기화
+    });
+
+    // personType에 따라 체크박스 선택
+    const targetCheckbox = document.querySelector(`input[name='personType'][value="${personType}"]`);
+    if (targetCheckbox) {
+        targetCheckbox.checked = true;
+    }
+}
+
+// 모달 닫기
+function closeModal() {
+    const modal = document.getElementById("roleModal");
+    modal.style.display = "none"; // 모달창을 숨김
+}

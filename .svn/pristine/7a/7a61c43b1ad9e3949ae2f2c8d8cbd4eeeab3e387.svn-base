@@ -1,0 +1,203 @@
+/**
+ * 
+ */
+
+const testInsertBtn = document.querySelector("#testInsertBtn")
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	document.querySelector('input[name="testOnlineYn"][value="Y"]').addEventListener('change', function() {
+		document.querySelector('input[name="croomNm"]').disabled = this.checked;
+	});
+
+	document.querySelector('input[name="testOnlineYn"][value="N"]').addEventListener('change', function() {
+		document.querySelector('input[name="croomNm"]').disabled = false;
+	});
+
+})
+
+async function insertForm() {
+	const url = "../test/new/test";
+	const qurl = "../test/question";
+   const getData=getTestInfoAndDateTime();
+	
+	console.log(getData)
+	
+await fetch(url,{
+		method:'post',
+		headers:{'content-type':'application/json'},
+		body:JSON.stringify(getData)
+		})
+	.then(resp=>resp.json())
+	.then(data=>{
+		console.log(data.testNo)
+		insertQuestion(data.testNo);
+	}).catch(err=>{
+			swal({
+				title: "추가실패",
+				text: err.response.data.message,
+				icon: "error",
+				button: "확인"
+			});
+		});
+	// 성공했을 때 location.href=" @GetMapping("new") " 로 보내기
+}
+
+async function insertQuestion(testNo) {
+	const qurl = "../test/question";
+   const getData=getQuestionData();
+	
+	console.log(getData)
+	
+await fetch(qurl,{
+		method:'post',
+		headers:{'content-type':'application/json'},
+		 body:getData  // testNo를 포함하여 전송
+         })
+		
+	.then(resp=>{
+				console.log("asasdasdasdasddasds")
+
+			swal({
+				title: "추가완료",
+				text: "시험이 성공적으로 추가되었습니다",
+				icon: "success",
+				button: "확인"
+//			}).then(()=>location.reload());
+			}).then(()=>{
+				location.href = '../test/' + testNo;
+	//			location.href = '../' + testNo;
+			});
+		}).catch(err=>{
+			swal({
+				title: "추가실패",
+				text: err.response.data.message,
+				icon: "error",
+				button: "확인"
+			});
+		});
+	// 성공했을 때 location.href=" @GetMapping("new") " 로 보내기
+}
+
+function getTestInfoAndDateTime() {
+	const testInfo = {
+		classroom: document.querySelector('input[name="croomNm"]')?.value,
+		testSe: document.querySelector('select[name="testSe"]').value,
+		testOnlineYn: document.querySelector('input[name="testOnlineYn"]:checked')?.value,
+		testSchdl: document.querySelector('#dateDiv input[type="date"]').value,
+		testDt: document.querySelector('.date-time-section input[type="time"]:first-of-type').value,
+		testEt: document.querySelector('.date-time-section input[type="time"]:last-of-type').value
+	};
+//	console.log(testInfo)
+
+	return testInfo;
+}
+
+function autoResize(textarea) {
+	textarea.style.height = 'auto';
+	textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+document.querySelectorAll('.option textarea').forEach(textarea => {
+	textarea.addEventListener('input', function() {
+		autoResize(this);
+	});
+});
+/**
+ * 
+window.revFam = function(pBtn) {
+    // 가장 바깥쪽의 div.question-section을 찾아서 삭제
+    const questionBox = pBtn.closest('.question-header');
+    if (questionBox) {
+        // 요소를 DOM에서 완전히 제거
+        questionBox.parentNode.removeChild(questionBox);
+        // 또는 아래 방법도 가능
+        // questionBox.remove();
+    }
+};
+ */
+window.revFam = function(pBtn) {
+    // 가장 바깥쪽의 draggable-question div를 찾아서 삭제
+    const questionBox = pBtn.closest('.draggable-question');
+    if (questionBox) {
+        questionBox.remove();
+        updateQuestionNumbers(); // 문제 번호 다시 매기기
+    }
+};
+
+
+function getQuestionData() {
+    const questions = document.querySelectorAll('.options');
+    const questionsData = [];
+
+    questions.forEach((question, index) => {
+        // 기본 question 데이터 생성
+        const questionData = {
+            queNo: `Q${(index + 1).toString().padStart(3, '0')}`, // 문제 번호
+            queDescr: question.querySelector('#queDescr').value, // 문제 설명
+            queScore: question.querySelector('#scorebox').value, // 문제 배점
+            queAnswer: question.querySelector('input[placeholder="정답"]')?.value, // 정답
+            queType: getQuestionType(question) // 문제 유형
+        };
+
+        // 객관식 또는 주관식일 경우에만 answerVO 생성
+        if (questionData.queType === '객관식') {
+            questionData.answerVO = Array.from(question.querySelectorAll('textarea')).map((textarea, idx) => ({
+                anchNo: `A${(1).toString().padStart(3, '0')}`,
+                anchDescr: textarea.value, // 답변 내용
+            }));
+
+            // 정답 표시된 경우 isCorrect 업데이트
+            const correctAnswerIndex = parseInt(questionData.queAnswer, 10) - 1;
+            if (!isNaN(correctAnswerIndex) && questionData.answerVO[correctAnswerIndex]) {
+      //          questionData.answerVO[correctAnswerIndex].isCorrect = true;
+            }
+        } else if (questionData.queType === '주관식') {
+            questionData.answerVO = [
+                {
+                    anchNo: `A${(1).toString().padStart(3, '0')}`,
+                    anchDescr: question.querySelector('input[name="q1"]').value // 주관식 답변 필드
+                }
+            ];
+        } else{
+	questionData.answerVO = [
+                {
+                    anchNo: `A${(1).toString().padStart(3, '0')}`,
+                    anchDescr: question.querySelector('input[name="q1"]').value // 주관식 답변 필드
+                }
+            ];
+	}
+
+        // 서술형은 answerVO를 추가하지 않음
+        questionsData.push(questionData);
+    });
+
+    console.log(JSON.stringify(questionsData, null, 2));
+    return JSON.stringify(questionsData, null, 2);
+}
+
+function getQuestionType(question) {
+    if (question.querySelectorAll('textarea').length > 0) {
+        return '객관식';
+    } else if (question.querySelector('input[name="q1"]')) {
+        return '주관식';
+    } else {
+        return '서술형';
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

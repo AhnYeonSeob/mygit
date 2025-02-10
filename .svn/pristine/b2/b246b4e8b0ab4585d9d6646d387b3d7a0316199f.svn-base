@@ -1,0 +1,14 @@
+package kr.or.ddit.yguniv.vo;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "dutyNo")
+public class DutyVO {
+	private Long dutyNo;
+	private String teamCd;
+	private String dutyCn;
+	private Long dutyPrgsRtprgs;
+	private String dutyPerson;
+}

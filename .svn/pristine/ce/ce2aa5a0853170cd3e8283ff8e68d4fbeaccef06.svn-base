@@ -1,0 +1,108 @@
+package kr.or.ddit.yguniv.lecture.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureInquiryServiceImpl;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.paging.SimpleCondition;
+import kr.or.ddit.yguniv.paging.renderer.BootStrapPaginationRenderer;
+import kr.or.ddit.yguniv.paging.renderer.PaginationRenderer;
+import kr.or.ddit.yguniv.vo.LectureInquiryBoardVO;
+import kr.or.ddit.yguniv.vo.LectureVO;
+
+@Controller
+@RequestMapping("/lecture/{lectNo}/inquiry")
+public class LectureInquiryController {
+	@Autowired
+	LectureInquiryServiceImpl service;
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureMaterialsService;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureMaterialsService.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+	}
+	
+	@GetMapping
+	public String selectLectureInquiryBoardList(
+		@PathVariable String lectNo
+		, @RequestParam(required = false, defaultValue = "1") int page
+		, @ModelAttribute("condition") SimpleCondition simpleCondition
+		, Model model
+	) {
+		PaginationInfo<LectureInquiryBoardVO> paging = new PaginationInfo<>();
+		paging.setCurrentPage(page);
+		paging.setSimpleCondition(simpleCondition);
+		model.addAttribute("libList", service.selectLectureInquiryBoardList(lectNo, paging));
+		PaginationRenderer renderer = new BootStrapPaginationRenderer();
+		model.addAttribute("pagingHTML", renderer.renderPagination(paging, "fnPaging"));
+		return "lecture/materials/lecture/lectureInquiryBoardList";
+	}
+	
+	@GetMapping("{libNo}")
+	public String selectLectureInquiryBoard(
+		@PathVariable String lectNo
+		, @PathVariable Long libNo
+		, Model model
+	) {
+		model.addAttribute("lib", service.selectLectureInquiryBoard(libNo));
+		return "lecture/materials/lecture/lectureInquiryBoardDetail";
+	}
+	
+	@GetMapping("new")
+	public String lectureInquiryBoardForm(@PathVariable String lectNo) {
+		return "lecture/lectureInquiryBoardForm";
+	}
+	
+	@PostMapping("new")
+	public void insertLectureInquiryBoard() {
+		
+	}
+	
+	@GetMapping("{cibCd}/edit")
+	public String lectureInquiryBoardEdit(@PathVariable String lectNo, @PathVariable String cibCd) {
+		return "lecture/lectureInquiryBoardEdit";
+	}
+	
+	@PostMapping("{cibCd}/edit")
+	public void updateLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@DeleteMapping("{cibCd}")
+	public void deleteLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@PostMapping("{cibCd}/answer")
+	public void insertLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@PutMapping("{cibCd}/answer")
+	public void updateLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@DeleteMapping("{cibCd}/answer")
+	public void deleteLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+}

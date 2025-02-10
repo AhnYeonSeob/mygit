@@ -1,0 +1,144 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<h1>이석 테스트 디테일</h1>
+
+<c:if test="${not empty detailTest}">
+
+
+
+	<table class="table table-bordered">
+		<thead>
+			<tr>
+				<th>시험등록번호</th>
+				<th>시험구분</th>
+				<th>강의명</th>
+				<th>교수명</th>
+				<th>상태</th>
+			</tr>
+			<c:if test="${not empty detailTestList}" var="hasTests">
+				<c:forEach items="${detailTestList}" var="test">
+					<c:if test="${test.testNo eq detailTest.testNo}">
+						<!-- 여기에 test 정보를 표시하는 코드 추가 -->
+							<input type="hidden" id="testNo" name="testNo" value="${test.testNo }">
+						<tr>
+							<td>${test.testNo }</td>
+							<c:if test="${test.testSe eq 'PR'}">
+								<td>중간고사</td>
+							</c:if>
+							<c:if test="${test.testSe eq 'FT'}">
+								<td>기말고사</td>
+							</c:if>
+							<td>${test.lectVO.lectNm }</td>
+							<td>${test.lectVO.professorVO.person.nm }</td>
+							<%-- 					<td> <a href="javascript:void();" class="btn btn-primary">${test.commonVO.cocoStts }	 </a> --%>
+							<td><div id="test-status">
+									<button  class="btn btn-primary" id="waiting-button" onclick="showApprovalButtons()">시험
+										대기</button>
+									<div id="approval-buttons" style="display: none;">
+										<button class="btn btn-primary" onclick="change('ok')">시험 승인</button>
+										<button class="btn btn-warning" onclick="change('no')">시험 반려</button>
+									</div>
+								</div>
+</td>
+
+
+
+						</tr>
+					</c:if>
+				</c:forEach>
+			</c:if>
+		</thead>
+
+		<tbody>
+			<c:if test="${not empty detailTest.questionVO}">
+				<tr>
+					<th>문제번호</th>
+					<th>문제설명</th>
+					<th>문제유형</th>
+					<th>배점</th>
+					<th>정답</th>
+				</tr>
+				<c:forEach items="${detailTest.questionVO }" var="que"
+					varStatus="qn">
+					<tr>
+						<td><input type="hidden" name="queNum" value="${que.queNo }">${qn.count } 번</td>
+						<td>${que.queDescr } </td>
+						<td>${que.queType }</td>
+						<td>${que.queScore } 점</td>
+						<td>정답 : ${que.queAnswer }</td>
+					</tr>
+					<tr>
+						<th>답안</th>
+						<td colspan="4"><c:forEach items="${detailTest.questionVO}"
+								var="question">
+								<c:forEach items="${question.answerVO}" var="answer"
+									varStatus="cn">
+									<c:if test="${answer.queNo eq que.queNo }">
+										<c:if test="${que.queType eq '주관식' }">
+											<p>${answer.anchDescr}</p>
+										</c:if>
+										<c:if test="${que.queType ne '주관식' }">
+										</c:if>
+										<c:if test="${que.queType eq '객관식' }">
+											<p>${cn.count}번: ${answer.anchDescr}</p>
+										</c:if>
+										<c:if test="${que.queType ne '객관식' }"></c:if>
+										<c:if test="${que.queType eq '서술형' }">
+											<p>서술형 답안 입니다.</p>
+										</c:if>
+										<c:if test="${que.queType ne '서술형' }"></c:if>
+									</c:if>
+
+								</c:forEach>
+							</c:forEach></td>
+					</tr>
+
+				</c:forEach>
+			</c:if>
+		</tbody>
+
+
+
+	</table>
+</c:if>
+
+
+<script	src="${pageContext.request.contextPath }/resources/js/test/testScript.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

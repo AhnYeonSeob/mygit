@@ -1,0 +1,105 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<style>
+	#button1{
+		text-align : right;
+	}
+	.search-area-container {
+        text-align: right; /* 자식 요소를 가로 중앙 정렬 */
+        margin: 20px 0; /* 위아래 여백 추가 */
+    }
+</style>
+<h4>취업정보게시판 리스트</h4>
+		<div class="search-area-container">
+		<div class="search-area" data-pg-target="#searchForm" data-pg-fn-name="fnPaging">
+				<select name="condition.searchType" class="form-select" style="width: auto; display: inline-block;">
+					<option value="" label="전체" />
+					<option value="title" label="제목" />
+					<option value="category" label="카테고리" />
+					</select>
+					<input name="condition.searchWord" class="form-control" placeholder="검색어를 입력하세요" style="width: 200px; display: inline-block; margin: 0 5px;"/>
+					<button id="search-btn" class="btn btn-primary">검색</button>
+ 		</div>
+ 	</div>
+
+
+
+<table class="table table-bordered">
+
+	<thead>
+		<tr>
+			<th>게시글번호</th>
+			<th>유형</th>
+			<th>작성일자</th>
+			<th>게시글제목</th>
+			<th>시작일시</th>
+			<th>마감일시</th>
+			<th>조회수</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:if test="${not empty list }">
+			<c:forEach items="${list }" var="job">
+			<tr>
+				<td>${job.sn }</td>
+				<td>${job.jobCate }</td>
+				<td>${job.jobDate }</td>
+				<td>
+					<c:url value="/jobboard/${job.jobNo }" var="detailUrl"/>
+					<a href="${detailUrl }">${job.jobNm }</a>
+				</td>
+				<td>${job.jobDt }</td>
+				<td>${job.jobEt }</td>
+				<td>${job.jobCnt }</td>
+			</tr>
+			</c:forEach>
+		</c:if>
+		<c:if test="${empty list }">
+			<tr>
+				<td colspan="5">등록된 글이 없습니다.</td>
+			</tr>
+		</c:if>
+	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan="7">
+				<div class="paging-area">
+				${pagingHTML }
+				
+				</div>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+
+<div id="button1">
+    <button id="insert-btn" class="btn btn-primary">등록</button>
+</div>
+
+<form id="searchForm">
+	<input name="condition.searchType" placeholder="searchType" />
+	<input name="condition.searchWord" placeholder="searchWord"/>
+	<input type="text" name="page" placeholder="page"/>
+</form>
+<script
+	src="${pageContext.request.contextPath }/resources/js/utils/paging.js"></script>
+
+<script src="${pageContext.request.contextPath }/resources/js/jobboard/jobBoardList.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,363 @@
+
+
+
+let attendanceChanges = {};
+let updates = [];
+
+let filterLectNo = null;  // 필터링된 강의 번호
+let filterWeekCd = null;  // 필터링된 weekCd
+let filterLectOrder = null;  // 필터링된 lectOrder
+
+
+
+
+document.querySelector('.fetch-attendance-btn').addEventListener('click', function() {
+    // 여기서 서버 요청을 통해 데이터를 받아와서 테이블을 채울 수 있습니다.
+    // 데이터를 받아오는 로직이 끝난 후 해당 tbody를 표시합니다.
+
+    // 예시: 데이터가 성공적으로 로드된 경우
+    document.getElementById('attendanceTableBody').style.display = 'table-row-group';  // <tbody>를 표시
+});
+
+
+// 일자 강의차수 교시 보여주는 테이블
+// 모든 "조회" 버튼에 클릭 이벤트 리스너를 추가합니다.
+document.querySelectorAll('.fetch-attendance-btn').forEach(button => {
+	
+    button.addEventListener('click', function(event) {
+        // 기본 버튼 동작을 막습니다.
+        event.preventDefault();
+
+        // 클릭된 버튼에서 data-* 속성 값 가져오기
+        const sectDt = this.getAttribute('data-sect-dt');  // 일자
+        const lectOrder = this.getAttribute('data-lect-order');  // 강의차수
+        const cocoStts = this.getAttribute('data-coco-stts');  // 교시
+
+        // 값을 업데이트하는 함수 호출
+        updateTargetRow(sectDt, lectOrder, cocoStts);
+    });
+});
+
+// targetRow를 업데이트하는 함수
+function updateTargetRow(sectDt, lectOrder, cocoStts) {
+    // targetRow의 각 셀을 찾아서 값 업데이트
+    document.getElementById('sectDtCell').textContent = sectDt;
+    document.getElementById('lectOrderCell').textContent = lectOrder;
+    document.getElementById('cocoSttsCell').textContent = cocoStts;
+}
+
+
+
+
+
+// "조회" 버튼을 클릭했을때 발생하는 이벤트
+document.querySelectorAll('.fetch-attendance-btn').forEach(button => {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();  // 기본 동작 막기
+
+        // 클릭된 버튼의 data-* 속성 값 가져오기
+        const filterLectNo = this.getAttribute('data-lect-no');  // 강의번호
+        const filterWeekCd = this.getAttribute('data-week-cd');  // 주차 코드
+        const filterLectOrder = this.getAttribute('data-lect-order');  // 강의차수
+
+        /*console.log('조회버튼 클릭 이벤트');
+        console.log('lectNo:', filterLectNo);
+        console.log('weekCd:', filterWeekCd);
+        console.log('lectOrder:', filterLectOrder);*/
+
+        // 필터링된 조건을 저장
+        this.filterLectNo = filterLectNo;
+        this.filterWeekCd = filterWeekCd;
+        this.filterLectOrder = filterLectOrder;
+
+        // 모든 출결 데이터 행을 가져옵니다.
+        const rows = document.querySelectorAll('#attendanceTableBody .attendanceRow');
+
+        // 모든 행을 숨기고, 필터링된 조건에 맞는 행만 표시합니다.
+        rows.forEach(row => {
+            const rowLectNo = row.dataset.lectNo;
+            const rowWeekCd = row.dataset.weekCd;
+            const rowLectOrder = row.dataset.lectOrder;
+
+            // 필터링된 조건에 맞는 행만 표시
+            if ((filterLectNo ? rowLectNo === filterLectNo : true) &&
+                (filterWeekCd ? rowWeekCd === filterWeekCd : true) &&
+                (filterLectOrder ? rowLectOrder === filterLectOrder : true)) {
+                row.style.display = '';  // 조건에 맞으면 행을 표시
+            } else {
+                row.style.display = 'none';  // 조건에 맞지 않으면 숨깁니다.
+            }
+        });
+    });
+});
+
+
+
+
+
+
+// 출결 상태 버튼을 클릭했을때 이벤트
+function setAttendanceStatus(button, stuId, weekCd, lectOrder, lectNo) {
+
+	// 해당 학생의 모든 버튼을 가져옵니다 (stuId, weekCd, lectOrder로 구분)
+    const buttons = document.querySelectorAll(`button[data-student-id="${stuId}"][data-week-cd="${weekCd}"][data-lect-order="${lectOrder}"]`);
+
+    // 클릭한 버튼의 출석 상태
+    const selectedStatus = button.getAttribute('data-status');  
+
+    // 출석 상태에 따른 ATND_CD와 출석 인정 여부 (atndRcognYn)
+    let atndCd = '';
+    let cocoSttsClass = '';  // 버튼의 색상을 위한 클래스 변수
+
+    // 상태에 따른 처리
+    switch (selectedStatus) {
+        case '출석':
+            atndCd = 'ATN1';
+            cocoSttsClass = 'attendance-btn-blue';
+            break;
+        case '지각':
+            atndCd = 'ATN2';
+            cocoSttsClass = 'attendance-btn-green';
+            break;
+        case '결석':
+            atndCd = 'ATN3';
+            cocoSttsClass = 'attendance-btn-yellow';
+            break;
+        case '조퇴':
+            atndCd = 'ATN4';
+            cocoSttsClass = 'attendance-btn-red';
+            break;
+        default:
+            atndCd = '';
+            cocoSttsClass = '';
+    }
+	// [{lectNo, lectOrder, stuId, atndCd}]
+	
+	/*console.log('출결 상태 버튼 클릭 이벤트');
+	console.log("111111111111", stuId);
+	console.log("111111111111", weekCd);
+	console.log("111111111111", lectOrder);
+	console.log("111111111111", lectNo);
+	console.log("111111111111", atndCd);*/
+
+    // 해당 학생의 모든 버튼에서 'selected' 클래스 제거
+    buttons.forEach(btn => btn.classList.remove('selected', 'attendance-btn-blue', 'attendance-btn-green', 'attendance-btn-yellow', 'attendance-btn-red'));
+
+    // 선택된 버튼에 'selected' 클래스 및 색상 클래스 추가
+    button.classList.add('selected', cocoSttsClass);
+
+
+    // 상태 변경 후 서버로 업데이트 요청
+    updateAttendanceStatus(stuId, weekCd, lectOrder, lectNo, atndCd);
+}
+
+
+
+
+
+
+// 출결 상태 기록용, 버튼누를때마다 저장되고 중복은 처리안됨
+function updateAttendanceStatus(stuId, weekCd, lectOrder, lectNo, atndCd) {
+    // updates 배열에서 동일한 stuId, weekCd, lectOrder, lectNo가 존재하는지 체크
+    const index = updates.findIndex(update => 
+        update.stuId === stuId &&
+        update.weekCd === weekCd &&
+        update.lectOrder === lectOrder &&
+        update.lectNo === lectNo
+    );
+
+    if (index !== -1) {
+        // 중복이 있으면 해당 항목을 업데이트
+        updates[index].atndCd = atndCd;
+    } else {
+        // 중복이 없으면 새로 추가
+        updates.push({
+            stuId: stuId,
+            weekCd: weekCd,
+            lectOrder: lectOrder,
+            lectNo: lectNo,
+            atndCd: atndCd
+        });
+    }
+
+    /*console.log("현재 updates 배열:", updates);*/
+}
+
+
+
+
+
+
+
+// 전부 출석 버튼 클릭 시 처리
+document.getElementById('markAllPresentButton').addEventListener('click', function() {
+    if (filterWeekCd && filterLectOrder) {  // 필터링된 주차와 회차가 있는 경우
+        // 필터링된 주차와 회차에 해당하는 출석 행들만 처리
+        const rows = document.querySelectorAll('#attendanceTableBody .attendanceRow');
+
+        rows.forEach(row => {
+            const rowWeekCd = row.dataset.weekCd;
+            const rowLectOrder = row.dataset.lectOrder;
+
+            // 필터링된 조건에 맞는 행만 처리
+            if (rowWeekCd === filterWeekCd && rowLectOrder === filterLectOrder) {
+                // 해당 학생의 모든 버튼을 가져와 '출석' 상태로 변경
+                const buttons = row.querySelectorAll('button');
+
+                buttons.forEach(button => {
+                    const currentStatus = button.getAttribute('data-status');
+                    
+                    // '출석' 버튼만 파란색으로 변경, 다른 버튼들은 그대로 둠
+                    if (currentStatus === '출석') {
+                        // '출석' 버튼을 선택 상태로 변경
+                        button.classList.remove('attendance-btn-green', 'attendance-btn-yellow', 'attendance-btn-red');
+                        button.classList.add('attendance-btn-blue');
+                        button.setAttribute('data-status', '출석');  // 출석 상태로 설정
+                        button.classList.add('selected');
+                    } else {
+                        // '출석' 상태가 아닌 버튼은 아무 변화 없음
+                        button.classList.remove('selected');  // '출석'이 아닌 버튼의 selected 상태 제거
+                    }
+                });
+
+                // 출석 상태 변경 사항을 updates 배열에 추가
+                storeAttendanceChangeInUpdates(row, 'ATN1'); // 출석 상태 코드 "ATN1"로 저장
+            }
+        });
+    } else {
+        alert('조회된 데이터가 없습니다. 먼저 조회를 해주세요.');
+    }
+});
+
+// updates 배열에 상태 저장 (중복 체크 추가)
+function storeAttendanceChangeInUpdates(row, atndCd) {
+    const stuId = row.querySelector('td').textContent;  // 첫 번째 칼럼에 학생 ID 있음
+    const weekCd = row.dataset.weekCd;
+    const lectOrder = row.dataset.lectOrder;
+    const lectNo = filterLectNo; // 필터링된 강의 번호 (혹은 다른 방법으로 처리해야 할 수 있음)
+
+    // 중복 체크: updates 배열에서 동일한 학생, 주차, 회차, 강의 번호가 존재하는지 확인
+    const existingEntryIndex = updates.findIndex(update => 
+        update.stuId === stuId &&
+        update.weekCd === weekCd &&
+        update.lectOrder === lectOrder &&
+        update.lectNo === lectNo
+    );
+
+    if (existingEntryIndex === -1) {  // 중복이 없는 경우에만 추가
+        // updates 배열에 출석 상태 추가
+        updates.push({
+            stuId: stuId,
+            weekCd: weekCd,
+            lectOrder: lectOrder,
+            lectNo: lectNo,
+            atndCd: atndCd  // status를 atndCd로 저장
+        });
+
+        console.log('출석 상태 변경 후 updates 배열:', updates);
+    } else {
+        // 동일한 학생, 주차, 회차, 강의 번호가 있을 경우, 상태가 다른 경우만 추가
+        const existingEntry = updates[existingEntryIndex];
+        
+        if (existingEntry.atndCd !== atndCd) {
+            // 상태가 다르면 업데이트
+            updates[existingEntryIndex].atndCd = atndCd;
+            console.log('출석 상태가 변경되었습니다:', updates[existingEntryIndex]);
+        } else {
+            console.log('출석 상태가 이미 동일합니다. 업데이트하지 않음.');
+        }
+    }
+}
+
+
+
+
+
+
+
+// 저장 버튼 클릭 시 처리하는 이벤트
+document.getElementById('saveAttendanceButton').addEventListener('click', function() {
+    if (updates.length > 0) {  // 업데이트된 출석 상태가 있는 경우
+        saveAttendanceStatus();
+    } else {
+        alert('변경된 출석 상태가 없습니다.');
+    }
+});
+
+// 조회 버튼 클릭 시 필터링 값 저장
+document.querySelectorAll('.fetch-attendance-btn').forEach(button => {
+    button.addEventListener('click', function(event) {
+        event.preventDefault();  // 기본 동작 막기
+
+        // 클릭된 버튼의 data-* 속성 값 가져오기
+        filterLectNo = this.getAttribute('data-lect-no');  // 강의번호
+        filterWeekCd = this.getAttribute('data-week-cd');  // 주차 코드
+        filterLectOrder = this.getAttribute('data-lect-order');  // 강의차수
+
+        /*console.log('조회버튼 클릭 이벤트');
+        console.log('lectNo:', filterLectNo);
+        console.log('weekCd:', filterWeekCd);
+        console.log('lectOrder:', filterLectOrder);*/
+
+        // 여기에 필터링 로직을 추가할 수 있습니다.
+    });
+});
+
+// 출석 상태 저장 함수에서 필터링된 값 사용
+function saveAttendanceStatus() {
+    if (!filterLectNo) {
+        alert('강의 번호가 지정되지 않았습니다.');
+        return;
+    }
+
+    // 출석 상태 저장 로직
+    /*console.log('저장된 강의 번호:', filterLectNo);*/
+    
+    // 서버로 출석 상태 전송 코드 추가
+    fetch(`${contextPath.value}/lecture/${filterLectNo}/attendan/edit`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)  // updates 배열을 JSON 형식으로 전송
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.text().then(text => {
+                throw new Error(`서버 오류: ${response.status} - ${text}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('출석 상태 업데이트 성공:', data);
+        alert('출석 상태가 성공적으로 저장되었습니다.');
+        updates = [];  // 상태 저장 후 업데이트 배열 초기화
+    })
+    .catch(error => {
+        console.error('출석 상태 업데이트 실패:', error);
+        alert('출석 상태 저장에 실패했습니다. 오류: ' + error.message);
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

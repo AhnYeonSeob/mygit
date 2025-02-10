@@ -1,0 +1,59 @@
+package kr.or.ddit.yguniv.student.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.student.service.StudentServiceImpl;
+import kr.or.ddit.yguniv.vo.StudentVO;
+
+@Controller
+@RequestMapping("/student")
+public class StudentController {
+	
+	@Autowired
+	StudentServiceImpl service;
+	
+	// 전체조회
+	@GetMapping()
+	public String selectlist(Model model) {
+		
+		List<StudentVO> stuList = service.StudentList();
+		model.addAttribute("stuList", stuList);
+		
+		return "student/studentList";
+	}
+
+	// 상세조회
+	@GetMapping("{stuId}")
+	public String select(@PathVariable() String stuId) {
+
+		return "student/studentDetail";
+	}
+
+	// 수정
+	@PutMapping("{stuId}")
+	public String update(@PathVariable() String stuId) {
+		return "student/studentDetail";
+	}
+
+	// 삭제
+	@DeleteMapping("{stuId}")
+	public String delete(@PathVariable() String stuId) {
+		return "student/studentList";
+	}
+}
+
+
+
+
+
+

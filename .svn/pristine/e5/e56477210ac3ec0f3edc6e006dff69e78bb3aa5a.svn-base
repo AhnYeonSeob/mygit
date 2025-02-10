@@ -1,0 +1,31 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+
+@Data
+public class ProjectTaskVO implements Serializable {
+	@NotBlank
+	@Size(max = 10)
+	private String taskNo;
+	@NotBlank
+	@Size(max = 10)
+	private String lectNo;
+	@NotBlank
+	@Size(max = 100)
+	private String taskTitle;
+	@NotBlank
+	@Size(max = 3000)
+	private String taskNotes;
+	
+	@NotBlank
+	@Size(max = 8)
+	private String taskEt;
+	
+	@Size(max=1)
+	private String taskYn;
+}

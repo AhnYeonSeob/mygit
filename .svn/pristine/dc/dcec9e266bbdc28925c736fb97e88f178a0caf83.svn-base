@@ -1,0 +1,211 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<style>
+table {
+	width: 100%;
+	border: 1px solid #ddd;
+	border-collapse: collapse;
+	font-family: Arial, sans-serif;
+}
+
+tr {
+	border-bottom: 1px solid #ddd;
+}
+
+td {
+	padding: 10px;
+	color: #333;
+}
+
+.badge {
+	background-color: #e0ebff;
+	padding: 3px 6px;
+	border-radius: 4px;
+	font-size: 12px;
+}
+
+.title {
+	font-size: 18px;
+}
+
+.info {
+	color: #777;
+	font-size: 18px;
+}
+
+.content {
+	padding: 15px;
+	font-size: 18px;
+	color: #333;
+	height: 200px;
+	width: 200px;
+}
+
+.right-align {
+	text-align: right;
+}
+
+#cjName {
+	width: 300px;
+	height: 100px;
+}
+</style>
+
+<h4>문의 게시글</h4>
+<table class="table table-bordered">
+
+
+
+	<!-- 상단 회원 정보 -->
+	<tr>
+		<td colspan="1"><span class="title">${board.sibSttsYn} </span></td>
+	</tr>
+	<tr>
+		<td colspan="1" style="height: 50px;"><span class="title">${board.sibTtl}
+		</span></td>
+
+	</tr>
+	<!-- 작성자, 날짜, 이메일 -->
+	<tr style="width: 500px; height: 50px;">
+
+		<td colspan="2" class="info right-align">작성일시
+			:${fn:split(board.sibDt, 'T')[0] } ${fn:split(board.sibDt, 'T')[1] }
+			&nbsp; 작성자 :${board.userId}</td>
+	</tr>
+	<!-- 본문 내용 -->
+	<tr>
+		<td colspan="2" class="content">${board.sibCn}</td>
+
+	</tr>
+	
+	 <tr>
+            <td>
+                <label for="adminReply">관리자 답변 :</label>
+                <br>
+                <!-- 관리자가 입력할 수 있는 textarea -->
+                <textarea id="adminReply" name="adminReply"
+                    style="width: 1100px; height: 100px; 
+                           padding: 10px; line-height: 1.2; 
+                           text-align: left; resize: none; 
+                           box-sizing: border-box; overflow-y: auto;"></textarea>
+                <!-- 등록 버튼 -->
+                <button type="button" onclick="submitReply()" 
+                        style="margin-top: 10px; padding: 5px 10px; 
+                               background-color: #007bff; color: white; 
+                               border: none; cursor: pointer;">
+                    답변 등록
+                </button>
+            </td>
+        </tr>
+	
+<%--
+관리자로 나눌 때에 
+
+
+ <c:choose>
+    <!-- 작성된 답변이 없고 관리자인 경우 -->
+    <c:when test="${empty board.sibAns && isAdmin}">
+        <tr>
+            <td>
+                <label for="adminReply">관리자 답변 :</label>
+                <br>
+                <!-- 관리자가 입력할 수 있는 textarea -->
+                <textarea id="adminReply" name="adminReply"
+                    style="width: 1100px; height: 100px; 
+                           padding: 10px; line-height: 1.2; 
+                           text-align: left; resize: none; 
+                           box-sizing: border-box; overflow-y: auto;">
+                </textarea>
+                <!-- 등록 버튼 -->
+                <button type="button" onclick="submitReply()" 
+                        style="margin-top: 10px; padding: 5px 10px; 
+                               background-color: #007bff; color: white; 
+                               border: none; cursor: pointer;">
+                    답변 등록
+                </button>
+            </td>
+        </tr>
+    </c:when>
+    
+    <!-- 작성된 답변이 없고 일반 사용자일 경우 -->
+    <c:when test="${empty board.sibAns && !isAdmin}">
+        <tr>
+            <td>
+                <label for="adminReply">관리자 답변 :</label><br>
+                <textarea 
+                    style="width: 1100px; height: 100px; 
+                           padding: 10px; margin: 0;                  
+                           line-height: 1.2; text-align: left; 
+                           resize: none; box-sizing: border-box;           
+                           overflow-y: auto;" readonly="readonly">
+작성된 글이 없습니다.
+                </textarea>
+            </td>
+        </tr>
+    </c:when>
+    
+    <!-- 작성된 답변이 있는 경우 (모든 사용자에게 보여짐) -->
+    <c:otherwise>
+        <tr>
+            <td>
+                <label for="adminReply">관리자 답변 :</label><br>
+                <textarea 
+                    style="width: 1100px; height: 100px; 
+                           padding: 10px; margin: 0; 
+                           line-height: 1.2; text-align: left; 
+                           resize: none; box-sizing: border-box; 
+                           overflow-y: auto;" readonly="readonly">
+${board.sibAns}
+                </textarea>
+            </td>
+        </tr>
+    </c:otherwise>
+</c:choose> --%>
+
+
+
+	
+	<tr>
+		<td colspan="2" align="right">
+		<a href="<c:url value='/answer'/>" class="btn btn-primary">목록</a>
+
+			<button type="button" onclick="deletePost('${sibNo}')"
+				class="btn btn-danger">삭제</button> <a
+			href="<c:url value='/answer/${sibNo}/edit' />" class="btn btn-info">수정</a>
+		</td>
+
+
+
+	</tr> 
+	
+	<%-- 
+	
+	관리자 일 떄에 
+	<tr>
+    <td colspan="2" class="btn-container">
+        <a href="<c:url value='/answer'/>" class="btn btn-primary">목록</a>
+        <c:if test="${isAdmin}">
+            <button type="button" onclick="deletePost('${board.sibNo}')"
+                    class="btn btn-danger">삭제</button>
+            <a href="<c:url value='/answer/${board.sibNo}/edit' />" class="btn btn-info">수정</a>
+        </c:if>
+    </td>
+</tr> --%>
+
+
+
+
+
+</table>
+
+<script src="${pageContext.request.contextPath }/resources/js/board/reply.js"></script>
+
+
+
+
+
+

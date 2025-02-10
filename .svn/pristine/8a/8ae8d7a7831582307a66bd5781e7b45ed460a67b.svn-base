@@ -1,0 +1,27 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@ToString
+@Data
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class ProfessorVO extends PersonVO implements Serializable{
+	
+	public String getProfeId() {
+		return getId();
+	}
+	
+	@NotBlank
+	private String deptNo;
+	private String profeType;
+	
+	
+	private DepartmentVO departmentVO;
+}

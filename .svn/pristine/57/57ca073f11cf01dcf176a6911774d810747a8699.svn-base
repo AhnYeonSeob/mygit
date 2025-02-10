@@ -1,0 +1,100 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+<style>
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+/* 현재 프로젝트 섹션 */
+.current-project {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    margin: 10px 0;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+#project-select {
+    padding: 5px 10px;
+    font-size: 16px;
+}
+
+.auto-assign, .manual-assign {
+    padding: 5px 10px;
+    margin-left: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.auto-assign:hover, .manual-assign:hover {
+    background-color: #0056b3;
+}
+
+/* 팀 그리드 섹션 */
+.team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    padding: 15px;
+}
+
+.team-box {
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #fff;
+    text-align: center;
+    font-size: 18px;
+    border-radius: 5px;
+}
+
+</style>
+
+
+프로젝트팀리스트
+<div class="menu-bar">
+  	<!-- 상단 메뉴 -->
+	<nav class="py-2 bg-light border-bottom">
+	    <div class="container d-flex flex-wrap">
+	           <ul class="nav me-auto">
+	               <li class="nav-item">
+	                   <a class="nav-link link-dark px-3 fs-5 active" href="${pageContext.request.contextPath }/lecture/${lectNo}/projectTask">과제관리</a>
+	               </li> 
+	              
+	               <li class="nav-item">
+	                   <a class="nav-link link-dark px-3 fw-bold fs-5 active" href="${pageContext.request.contextPath }/lecture/${lectNo}/projectTeam">팀관리</a>
+	               </li>
+	           </ul>
+	           <ul class="nav">
+	       		<li><span class="total-students">총 수강생: <span id="studentCount">명</span></span></li>
+	    	</ul>
+	    </div>
+	</nav>
+</div>
+
+<div class="current-project">
+        <select id="project-select">
+            <option value="project1">프로젝트 1</option>
+            <option value="project2">프로젝트 2</option>
+        </select>
+        <span class="text-end">
+	        <button class="auto-assign">자동배정</button>
+	        <button class="manual-assign">수동배정</button>
+        </span>
+    </div>
+    <div class="team-grid">
+        <div class="team-box">1팀</div>
+        <div class="team-box">2팀</div>
+        <div class="team-box">3팀</div>
+        <div class="team-box">4팀</div>
+    </div>
+</div>

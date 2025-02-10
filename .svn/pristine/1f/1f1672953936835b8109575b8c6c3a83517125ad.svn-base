@@ -1,0 +1,41 @@
+package kr.or.ddit.yguniv.absencecertificatereceipt.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.absencecertificatereceipt.dao.AbsenceCertificateReceiptMapper;
+import kr.or.ddit.yguniv.vo.AbsenceCertificateReceiptVO;
+
+@Service
+public class AbsenceCertificateReceiptServiceImpl {
+	
+	@Autowired
+	private AbsenceCertificateReceiptMapper mapper;
+	
+	/**
+	 * 단건조회
+	 */
+	public AbsenceCertificateReceiptVO selectAbsenceCertificateReceipt(String stuId) {
+		return mapper.selectAbsenceCertificateReceipt(stuId);
+	}
+	
+	public List<AbsenceCertificateReceiptVO> selectAbsenceCertificateReceiptList(){
+		return mapper.selectAbsenceCertificateReceiptList();
+	}
+	
+	public boolean insertAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.insertAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+	
+	public boolean updateAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.updateAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+	public boolean deleteAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.deleteAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+}

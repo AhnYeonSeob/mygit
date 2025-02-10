@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.absencecertificatereceipt.dao.AbsenceCertificateReceiptMapper">
+
+<resultMap type="AbsenceCertificateReceiptVO" id="absenceMap" autoMapping="true">
+	<association property="attendanceVO" javaType="AttendanceVO" autoMapping="true">
+		<association property="attendeeVO" javaType="AttendeeVO" autoMapping="true">
+			<association property="studentVO" javaType="StudentVO">
+				<association property="personVO" javaType="PersonVO">
+				</association>			
+			</association>
+		</association>
+		<association property="orderLectureDataVO" javaType="OrderLectureDataVO">
+			<association property="lectureWeekVO" javaType="LectureWeekVO">
+				<association property="lectureVO" javaType="LectureVO">
+				</association>
+			</association>
+			<association property="commonCodeVO" javaType="CommonCodeVO">
+			</association>
+		</association>
+	</association>
+</resultMap>
+
+
+
+<!-- 뷰를 만들어라, 어소시에이션 다른 VO 추가하기 -->
+
+	<!-- 한 학생의 공결인정서 조회 -->
+	<select id="selectAbsenceCertificateReceipt" resultMap="absenceMap">
+		SELECT DISTINCT
+		    Z.ATCH_FILE_ID, 
+		    A.NM, 
+		    Z.STU_ID, 
+		    Z.LECT_NO, 
+		    D.ATND_CD, 
+		    G.LECT_ORDER, 
+		    G.SECT_NM, 
+		    G.SECT_IDNTY, 
+		    I.COCO_STTS, 
+		    I.PAR_COCO_CD, 
+		    I.COCO_CD,
+		    (SELECT 
+		    	F.LECT_NM 
+		    FROM 
+		    	LECTURE F 
+		    WHERE F.LECT_NO = Z.LECT_NO) AS LECT_NM
+		FROM 
+		    ABSENCE_CERTIFICATE_RECEIPT Z
+		    INNER JOIN PERSON A ON Z.STU_ID = A.ID
+		    INNER JOIN STUDENT B ON A.ID = B.STU_ID
+		    INNER JOIN ATTENDEE C ON B.STU_ID = C.STU_ID
+		    INNER JOIN ATTENDANCE D ON C.STU_ID = D.STU_ID
+		    INNER JOIN ABSENCE_CERTIFICATE_RECEIPT E ON D.STU_ID = E.STU_ID
+		    INNER JOIN ORDER_LECTURE_DATA G ON D.LECT_ORDER = G.LECT_ORDER
+		    INNER JOIN LECTURE_WEEK H ON G.WEEK_CD = H.WEEK_CD
+		    INNER JOIN COMMON_CODE I ON G.WEEK_CD = I.COCO_CD
+		    INNER JOIN ATCH_FILE J ON G.ATCH_FILE_ID = J.ATCH_FILE_ID
+		    INNER JOIN ATCH_FILE_DETAIL K ON J.ATCH_FILE_ID = K.ATCH_FILE_ID
+		WHERE 
+		    D.ATND_CD != 'ATN1' AND NM =#{nm}
+	</select> 
+	
+	
+	<!-- 모든 공결인정서 조회  -->
+	<select id="selectAbsenceCertificateReceiptList" resultMap="absenceMap">
+		SELECT DISTINCT
+		    Z.ATCH_FILE_ID, 
+		    A.NM, 
+		    Z.STU_ID, 
+		    Z.LECT_NO, 
+		    D.ATND_CD, 
+		    G.LECT_ORDER, 
+		    G.SECT_NM, 
+		    G.SECT_IDNTY, 
+		    I.COCO_STTS, 
+		    I.PAR_COCO_CD, 
+		    I.COCO_CD,
+		    (SELECT F.LECT_NM FROM LECTURE F WHERE F.LECT_NO = Z.LECT_NO) AS LECT_NM
+		FROM 
+		    ABSENCE_CERTIFICATE_RECEIPT Z
+		    INNER JOIN PERSON A ON Z.STU_ID = A.ID
+		    INNER JOIN STUDENT B ON A.ID = B.STU_ID
+		    INNER JOIN ATTENDEE C ON B.STU_ID = C.STU_ID
+		    INNER JOIN ATTENDANCE D ON C.STU_ID = D.STU_ID
+		    INNER JOIN ABSENCE_CERTIFICATE_RECEIPT E ON D.STU_ID = E.STU_ID
+		    INNER JOIN ORDER_LECTURE_DATA G ON D.LECT_ORDER = G.LECT_ORDER
+		    INNER JOIN LECTURE_WEEK H ON G.WEEK_CD = H.WEEK_CD
+		    INNER JOIN COMMON_CODE I ON G.WEEK_CD = I.COCO_CD
+		    INNER JOIN ATCH_FILE J ON G.ATCH_FILE_ID = J.ATCH_FILE_ID
+		    INNER JOIN ATCH_FILE_DETAIL K ON J.ATCH_FILE_ID = K.ATCH_FILE_ID
+		WHERE 
+		    D.ATND_CD != 'ATN1'
+	</select>
+	
+	<!-- 공결인정서 신규 등록 -->
+	<insert id="insertAbsenceCertificateReceipt">
+		INSERT INTO ABSENCE_CERTIFICATE_RECEIPT
+		(STU_ID, LECT_ORDER, LECT_NO, ABSENCE_RESN, ATCH_FILE_ID, WEEK_CD, COCO_CD)
+		VALUES
+		(#{stuId}, #{lectOrder}, #{lectNo}, #{absenceResn}, #{atchFileId}, #{weekCd}, #{cocoCd})
+	</insert>
+	
+	<!-- 하나의 공결인정서 상태 수정   -->
+	<update id="updateAbsenceCertificateReceipt">
+		UPDATE ABSENCE_CERTIFICATE_RECEIPT
+		SET COCO_CD = #{cocoCd}
+		WHERE ATCH_FILE_ID = #{atchFileId}
+	</update>
+
+	<!-- 하나의 공결인정서 상태 삭제   -->
+	<delete id="deleteAbsenceCertificateReceipt">
+		DELETE
+		FROM ABSENCE_CERTIFICATE_RECEIPT
+		WHERE ATCH_FILE_ID = #{atchFileId}
+	</delete>
+
+
+
+</mapper>

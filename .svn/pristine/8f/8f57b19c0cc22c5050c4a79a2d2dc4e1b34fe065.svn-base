@@ -1,0 +1,43 @@
+package kr.or.ddit.yguniv.lecture.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.LectureInquiryBoardVO;
+
+@Mapper
+public interface LectureInquiryMapper {
+	/**
+	 * R-강의문의게시판 게시글 목록 조회
+	 */
+	public List<LectureInquiryBoardVO> selectLectureInquiryBoardList();
+	/**
+	 * R-강의문의게시판 게시글 상세조회
+	 */
+	public LectureInquiryBoardVO selectLectureInquiryBoard(LectureInquiryBoardVO lectureInquiryBoardVO);
+	/**
+	 * C-강의문의게시판 게시글 추가
+	 */
+	public int insertLectureInquiryBoard(LectureInquiryBoardVO lectureInquiryBoardVO);
+	/**
+	 * U-강의문의게시판 게시글 수정
+	 */
+	public int updateLectureInquiryBoard(LectureInquiryBoardVO lectureInquiryBoardVO);
+	/**
+	 * D-강의문의게시판 게시글 삭제
+	 */
+	public int deleteLectureInquiryBoard(LectureInquiryBoardVO lectureInquiryBoardVO);
+	/**
+	 * U-강의문의게시판 게시글 답변 추가
+	 */
+	public int insertLectureInquiryBoardAnswer(LectureInquiryBoardVO lectureInquiryBoardVO);
+	/**
+	 * U-강의문의게시판 게시글 답변 수정
+	 */
+	public int updateLectureInquiryBoardAnswer(LectureInquiryBoardVO lectureInquiryBoardVO);
+	/**
+	 * U-강의문의게시판 게시글 답변 삭제
+	 */
+	public int deleteLectureInquiryBoardAnswer(LectureInquiryBoardVO lectureInquiryBoardVO);
+}

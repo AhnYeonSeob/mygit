@@ -1,0 +1,221 @@
+package kr.or.ddit.yguniv.test.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.paging.SimpleCondition;
+import kr.or.ddit.yguniv.paging.renderer.BootStrapPaginationRenderer;
+import kr.or.ddit.yguniv.paging.renderer.PaginationRenderer;
+import kr.or.ddit.yguniv.test.service.TestService;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.ProfessorVO;
+import kr.or.ddit.yguniv.vo.QuestionVO;
+import kr.or.ddit.yguniv.vo.ScoreFormalObjectionVO;
+import kr.or.ddit.yguniv.vo.TestVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/test")
+@RequiredArgsConstructor
+public class TestController {
+	
+	public static final String MODELNAME = "newTest";
+	
+	private final TestService service;
+
+	//교수 개인의 강의 리스트 조회
+	//추후에 로그인 한 교수의 교번을 가져와야함!
+	public static final String PROFESSOR="2024300001";
+
+	@ModelAttribute(MODELNAME)
+	public TestVO newModel() {
+		return new TestVO();
+	}
+	
+	// 교직원이 등록된 시험을 조회
+	// 교수는 자신이 등록한 리스트를 조회
+	// 교직원의 아이디와 교수의 아이디 - 인증 객체에서 아이디를 가져와서 202420 인지 30인지 비교하기
+	@GetMapping()
+	public String selectList(Model model
+			,@RequestParam(required = false,defaultValue = "1") int page
+			,@ModelAttribute("condition") TestVO detailCondition
+		
+			) {
+		
+		
+		PaginationInfo<TestVO> paging = new PaginationInfo<TestVO>();
+		paging.setDetailCondition(detailCondition);
+//		paging.setSimpleCondition();
+		paging.setCurrentPage(page);
+		
+		PaginationRenderer renderer = new BootStrapPaginationRenderer();
+		String pagingHTML = renderer.renderPagination(paging, "testPaging");
+	
+		
+		List<TestVO> list = service.selectTestList(PROFESSOR,paging);
+//		log.info("§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§{}",list);
+
+
+		model.addAttribute("pagingHTML", pagingHTML);
+		model.addAttribute("testList",list);
+		
+		return "test/testList";
+	}
+
+	// 단건조회
+	@GetMapping("{testNo}")
+	public String selectTest(@PathVariable String testNo, Model model) {
+		
+//		log.info("{}",testNo);
+//		log.info("□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□□{}",testNo);
+		List<TestVO> list = service.selectTestOneList(PROFESSOR);
+		
+		model.addAttribute("detailTestList",list);
+		model.addAttribute("detailTest",service.selectTestOne(testNo));
+		
+		return "test/testDetail";
+	}
+	// 단건조회 학생용
+	@GetMapping("{testNo}/{stuId}")
+	public String selectAttendTest() {
+		
+		return "test/testDetail";
+	}
+
+	// form으로 전송 
+	//교수가 시험을 만드는 폼으로
+	@GetMapping("{lectNo}/new")
+	public String sendTestForm(@PathVariable String lectNo, Model model) {
+			model.addAttribute("lectNo",lectNo);
+		
+		
+		return "test/testForm";
+	}
+	
+	//시험 등록
+	@PostMapping("new/test")
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> createTest(@RequestBody TestVO testVo , BindingResult error,Model model) {
+		log.info("{}",testVo);
+		
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		
+		//추후 수정하기
+		testVo.setLectNo("L003");
+		
+		Integer num = service.insertTest(testVo);
+//		log.info("＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠{}",num);
+		
+		if(num>0) {
+			map.put("on", "ok");
+			map.put("testNo", testVo.getTestNo());
+		}else {
+			map.put("no", "no");			
+		}		
+		
+		 return ResponseEntity.ok(map);
+		
+	}
+	@PostMapping("question")
+	public ResponseEntity<Object> createQuestion(@RequestBody List<QuestionVO> queVoList, BindingResult error) {
+		
+		log.info("{}",queVoList);
+		Map<String, Object> map = new HashMap<String, Object>();
+		
+		HttpStatus status = HttpStatus.OK;
+		Map<String, String> body = new HashMap<>();
+		if (!error.hasErrors()) {
+			Integer num = service.insertQuestionAndQuestionAnswer(queVoList);
+			
+		}else {
+	    	status = HttpStatus.BAD_REQUEST;
+	    	String errorMessage = error.getFieldErrors().stream()
+	    			.map(FieldError :: getDefaultMessage)
+	    			.collect(Collectors.joining("\r\n"));
+	    	body.put("message", errorMessage);
+	    }
+		return ResponseEntity.status(status).body(body);
+	}
+	
+
+	// edit으로 전송 교수가 시험 수정폼으로 이동
+	@GetMapping("{testNo}/edit")
+	public String sendTestEdit() {
+
+		return "test/testEdit";
+	}
+
+	
+	//등록과 반려
+	@GetMapping("profe/{testNo}/{check}")
+	public  ResponseEntity<Object> checkTest(@PathVariable String testNo , @PathVariable String check ) {
+		 Map<String, Object> resp = new HashMap<>();
+		
+		 log.info("＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠＠시험번호 : {} on? no? : {}" , testNo,check);
+		 
+		 String testCd = "";
+		 if("ok".equals(check)) {
+			 testCd="OPEN";
+		 }else {
+			 testCd="PEND";			 
+		 }
+			HttpStatus status = HttpStatus.OK;
+			Map<String, String> body = new HashMap<>();
+		
+			resp.put("ok", "ok");
+			 service.checkTest(testNo, testCd);
+			
+			return ResponseEntity.status(status).body(body);
+
+		 
+	}
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

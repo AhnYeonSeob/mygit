@@ -1,0 +1,250 @@
+// 모달이 열릴 때마다 해당 데이터를 채워넣고, absenceCd 값을 가져오는 함수
+var myModal = document.getElementById('staticBackdrop');
+
+
+myModal.addEventListener('show.bs.modal', function (event) {
+    // 버튼을 클릭했을 때 전달된 데이터를 가져오기
+    var button = event.relatedTarget; // 버튼을 클릭한 요소
+    var lectOrder = button.getAttribute('data-lectOrder');
+    var studentName = button.getAttribute('data-studentName');
+    var studentId = button.getAttribute('data-studentId');
+    var absenceReason = button.getAttribute('data-absenceReason');
+    var absenceStatus = button.getAttribute('data-absenceStatus');
+    var lectNo = button.getAttribute('data-lectNo'); // data-lectNo 
+    var absenceCd = button.getAttribute('data-absenceCd'); // data-absenceCd 
+    var weekCd = button.getAttribute('data-weekCd'); // weekCd 값 
+
+    // 모달에 해당 데이터 채우기
+    document.getElementById('lectOrder').textContent = lectOrder;
+    document.getElementById('studentName').textContent = studentName;
+    document.getElementById('studentId').textContent = studentId;
+    document.getElementById('absenceReason').textContent = absenceReason;
+    document.getElementById('absenceStatus').textContent = absenceStatus;
+
+	console.log('모달 승인버튼 : ',absenceCd, lectNo, lectOrder, studentId, weekCd)
+	console.log('모달 반려버튼 : ',absenceCd)
+
+
+     // 모달 -> 승인 버튼
+    document.getElementById('approveButton').addEventListener('click', function() {
+        // 승인 처리 시 absenceStatus를 'CO02'로 설정
+        document.getElementById('absenceStatus').textContent = 'CO02';
+        handleAbsenceRequest(true, absenceCd, lectNo, lectOrder, studentId, weekCd, 'ATN1'); // 승인 처리
+    });	
+
+    // 모달 -> 반려 버튼
+    document.getElementById('rejectButton').addEventListener('click', function() {
+        // 반려 처리 시 absenceStatus를 'CO03'으로 설정
+        document.getElementById('absenceStatus').textContent = 'CO03';
+        handleAbsenceRequest(false, absenceCd, lectNo, lectOrder, studentId, weekCd, null); // 반려 처리
+    });
+});
+
+function removeNullProperties(obj) {
+    if (typeof obj !== 'object' || obj === null) {
+        return obj; // 객체가 아니거나 null인 경우 그대로 반환
+    }
+
+    // 객체를 복제하면서 null이 아닌 값만 유지
+    if (Array.isArray(obj)) {
+        return obj.map(item => removeNullProperties(item)).filter(item => item !== null);
+    }
+
+    const result = {};
+    for (const key in obj) {
+        if (obj[key] !== null) {
+            result[key] = removeNullProperties(obj[key]);
+        }
+    }
+    return result;
+}
+
+function handleAbsenceRequest(isApproved, absenceCd, lectNo, lectOrder, stuId, weekCd, atndCd) {
+    const absenceStatus = document.getElementById('absenceStatus').innerText;
+    const data = {
+        absenceCd: absenceCd, 
+        cocoCd: absenceStatus,
+        isApproved: isApproved // 승인 여부
+    };
+
+    // 승인 처리일 때만 attendanceVO를 포함
+    if (isApproved) {
+        data.attendanceVO = {
+            lectNo: lectNo,
+            lectOrder: lectOrder,
+            stuId: stuId,
+            weekCd: weekCd,
+            atndCd: atndCd // 출결 상태 정보
+        };
+    } else {
+        // 반려 처리일 때는 attendanceVO를 포함하지 않거나 null로 설정
+        data.attendanceVO = null; // 반려 시에는 출결 상태를 변경하지 않음
+    }
+
+    // removeNullProperties 함수를 호출하여 null 속성 제거
+    const cleanData = removeNullProperties(data);
+
+    console.log('cleanData : ', cleanData);
+
+    const url = `${contextPath.value}/lecture/${lectNo}/absence/edit`;
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(cleanData) // null이 제거된 데이터를 서버로 전송
+    })
+    .then(response => response.json())
+    .then(data => {
+    // 응답에 상관 없이 성공 처리 후 페이지 새로 고침
+    alert(isApproved ? "공결 인증서 승인 처리 완료!" : "공결 인증서 반려 처리 완료!");
+    location.reload(); // 페이지 새로고침
+	})
+    .catch(error => {
+        console.error('Error:', error);
+        alert("서버와의 통신 오류가 발생했습니다.");
+    });
+}
+
+// 수정 작업
+document.addEventListener("DOMContentLoaded", function() {
+    // 버튼 클릭 시
+    $('#staticBackdropEdit').on('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // 버튼을 클릭한 요소
+	    var lectOrder = button.getAttribute('data-lectOrder');
+	    var studentName = button.getAttribute('data-studentName');
+	    var studentId = button.getAttribute('data-studentId');
+	    var absenceReason = button.getAttribute('data-absenceReason');
+	    var absenceStatus = button.getAttribute('data-absenceStatus');
+	    var lectNo = button.getAttribute('data-lectNo'); // data-lectNo 
+	    var absenceCd = button.getAttribute('data-absenceCd'); // data-absenceCd 
+	    var weekCd = button.getAttribute('data-weekCd'); // weekCd 값
+
+        // 모달에 데이터 채우기
+        document.getElementById('lectOrder').textContent = lectOrder;
+	    document.getElementById('studentName').textContent = studentName;
+	    document.getElementById('studentId').textContent = studentId;
+	    document.getElementById('editAbsenceReason').textContent = absenceReason;
+	    document.getElementById('absenceStatus').textContent = absenceStatus;
+        
+ 		// 기존 클릭 이벤트 리스너 제거
+        $('#saveEditButton').off('click'); 
+		
+		// 수정 버튼 클릭 시 fetch로 데이터 업데이트
+        $('#saveEditButton').on('click', function() {
+            const updatedAbsenceReason = document.getElementById('editAbsenceReason').value; // 수정된 사유
+			//const absenceCd = document.getElementById('absenceCd').value;
+			
+			console.log('Request Body:', {
+		        absenceCd: absenceCd,
+		        absenceResn: updatedAbsenceReason
+		    });
+			
+			console.log(`${contextPath.value}`);
+			console.log(`${lectNo}`);
+			
+            // fetch로 서버에 업데이트 요청
+            fetch(`${contextPath.value}/lecture/${lectNo}/absence/edit/reason`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    absenceCd: absenceCd, 
+                    absenceResn: updatedAbsenceReason // 수정된 사유만 보냄
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('성공:', data);
+                alert('사유가 성공적으로 수정되었습니다.');
+                $('#staticBackdropEdit').modal('hide'); // 모달 닫기
+				window.location.reload(); // 페이지 새로고침
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('수정 중 오류가 발생했습니다.');
+            });
+        });
+    });
+});
+
+
+// 공결 인증서 삭제 처리
+document.addEventListener('DOMContentLoaded', function() {
+    // 'absenceDeleteBtn' 클래스를 가진 모든 버튼을 선택
+    const deleteButtons = document.querySelectorAll('.absenceDeleteBtn');
+
+    // 각 버튼에 클릭 이벤트 추가
+    deleteButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            // 버튼에서 data-absenceCd와 data-cocoCd 값을 가져옴
+            const absenceCd = button.getAttribute('data-absenceCd');
+            const cocoCd = button.getAttribute('data-cocoCd');
+			const lectNo = button.getAttribute('data-lectNo');
+            
+
+			// fetch로 서버에 업데이트 요청
+            fetch(`${contextPath.value}/lecture/${lectNo}/absence/drop`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    absenceCd: absenceCd, 
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('성공:', data);
+                alert('공결 신청이 성공적으로 삭제되었습니다.');
+                $('#staticBackdropEdit').modal('hide'); // 모달 닫기
+				window.location.reload(); // 페이지 새로고침
+            })
+            .catch(error => {
+                console.error('에러 발생:', error);
+                alert('삭제 중 오류가 발생했습니다.');
+            });
+
+
+        });
+    });
+});
+
+
+// 사유 내용 글자수 제한하기
+document.querySelectorAll('.absenceResn').forEach(function(td) {
+    const text = td.textContent.trim();  // 기존 텍스트 가져오기
+    if (text.length > 20) {
+        td.textContent = text.substring(0, 20) + '...';  // 20자 이상일 경우 '...' 추가
+    }
+});
+
+/*
+// 셀렉트 박스
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('statusFilter').addEventListener('change', function() {
+    var selectedStatus = this.value; // 셀렉트박스에서 선택된 값
+    console.log("선택된 값: " + selectedStatus); // 디버깅용 로그
+
+    var rows = document.querySelectorAll('.absenceRow'); // 모든 행을 선택
+
+    rows.forEach(function(row) {
+      var status = row.getAttribute('data-absence-status'); // 각 행의 상태 값 (absence.PRST)
+      console.log("행의 상태 값: " + status); // 디버깅용 로그
+
+      // "전체조회"가 선택되면 모든 행을 표시
+      if (selectedStatus === '전체') {
+        row.style.display = ''; // 모든 행을 보이도록 설정
+      } else if (status === selectedStatus) {
+        // 그 외에는 선택된 상태와 일치하는 행만 표시
+        row.style.display = ''; // 상태가 일치하는 행은 보이도록 설정
+      } else {
+        row.style.display = 'none'; // 그 외의 행은 숨기기
+      }
+    });
+  });
+});
+*/
+

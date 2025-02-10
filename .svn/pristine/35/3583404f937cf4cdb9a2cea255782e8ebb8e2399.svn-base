@@ -1,0 +1,68 @@
+package kr.or.ddit.yguniv.projectteam.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/projectTeam")
+public class ProjectTeamController {
+
+	//프로젝트팀 목록조회
+	@GetMapping()
+	public String selectList() {
+		
+		return "projectTeam/projectTeamList";
+	}
+	
+	//프로젝트팀 상세조회
+	@GetMapping("{teamCd}")
+	public String select(@PathVariable()int teamCd) {
+		
+		return "projectTeam/projectTeamDetail";
+	}
+	//프로젝트팀 생성폼 이동
+	@GetMapping("{teamCd}/new")
+	public String createForm() {
+		
+		return "projectTeam/projectTeamForm";
+	}
+	
+	
+	//프로젝트팀 생성
+	@PostMapping("{teamCd}")
+	public String create(@PathVariable()int teamCd) {
+		
+		return "projectTeam/?";
+	}
+	
+	//프로젝트팀 수정폼이동
+	@GetMapping("{teamCd}/edit")
+	public String updateForm(@PathVariable()int teamCd) {
+		
+		
+		return "projectTeam/projectTeamEditForm";
+	}
+	
+	//프로젝트팀 수정
+	@PutMapping("{teamCd}")
+	public String update(@PathVariable()int teamCd) {
+		
+		
+		return "projectTeam/?";
+	}
+	
+	//프로젝트팀 삭제
+	@DeleteMapping("{teamCd}")
+	public String delete(@PathVariable()int teamCd) {
+		
+		
+		return "projectTeam/projectTeamList";
+	}
+
+	
+}

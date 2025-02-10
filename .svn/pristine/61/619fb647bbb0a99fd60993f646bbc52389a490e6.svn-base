@@ -1,0 +1,75 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+
+
+<input type="hidden" id="stuId" name="stuId" value="${stuId }">
+<div id="contextData" data-context-path="${pageContext.request.contextPath}"></div>
+
+<h1>예비 수강신청 페이지 </h1>
+초<input type="number" id="second" name="second"> 
+개<input type="number" id="token" name="token">
+<button id="bucketBtn" onclick="bucket()">트래픽 재설정</button>
+<input type="hidden" id="cp" value="${pageContext.request.contextPath }">
+<div class="d-flex">
+    <!-- 왼쪽 영역 (60%) -->
+    <div id="parentDiv" class="flex-grow-1 pe-4 border-end me-4 col-8">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div class="d-flex align-items-center"></div>
+            <div id="searchContainer">
+                <select id="searchColumn" class="form-select d-inline-block w-auto me-2">
+                    <option value="lectNm">강의명</option>
+                    <option value="subjectVO.subFicdCd">구분</option>
+                    <option value="professorVO.nm">교수명</option>
+                </select>
+                <input type="search" id="searchInput" class="form-control d-inline-block w-auto me-2" placeholder="검색어 입력...">
+                <button id="searchButton" class="btn btn-primary me-2">검색</button>
+                <button id="resetButton" class="btn btn-secondary">전체 보기</button>
+            </div>
+        </div>
+        <table id="parentTable" class="table table-hover table-striped table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center align-middle">강의명</th>
+                    <th class="text-center align-middle">구분</th>
+                    <th class="text-center align-middle">교수명</th>
+                    <th class="text-center align-middle">학과</th>
+                    <th class="text-center align-middle">학년</th>
+                    <th class="text-center align-middle">학점</th>
+                    <th class="text-center align-middle">정원</th>
+                    <th class="text-center align-middle">시간</th>
+                    <th class="text-center align-middle">강의실</th>
+                    <th class="text-center align-middle">강의계획서</th>
+                    <th class="text-center align-middle">장바구니</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+
+    <!-- 오른쪽 영역 (40%) -->
+    <div class="d-flex flex-column ps-4 col-4">
+        <div id="scheduleDiv">
+            시간표 및 학점 출력 박스
+        </div>
+        <div id="cartDiv">
+            <table id="studentTable" class="table table-hover table-striped table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center align-middle">신청</th>
+                        <th class="text-center align-middle">강의명</th>
+                        <th class="text-center align-middle">구분</th>
+                        <th class="text-center align-middle">교수명</th>
+                        <th class="text-center align-middle">학점</th>
+                        <th class="text-center align-middle">강의계획서</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script  src="${pageContext.request.contextPath }/resources/js/lecturecart/lectureCartScript.js"></script>

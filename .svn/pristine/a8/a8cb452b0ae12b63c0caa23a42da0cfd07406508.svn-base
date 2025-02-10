@@ -1,0 +1,49 @@
+package kr.or.ddit.yguniv.test.service;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.test.dao.TestMapper;
+import kr.or.ddit.yguniv.vo.TestVO;
+
+@Service
+public class TestServiceImpl implements TestService {
+
+	@Inject
+	TestMapper dao;
+	
+	@Override
+	public List<TestVO> selectTestList(String id) {
+		// TODO Auto-generated method stub
+		return dao.selectTestList(id);
+	}
+
+	@Override
+	public TestVO selectTestOne(String testNo) {
+		// TODO Auto-generated method stub
+		return dao.selectTestOne(testNo);
+	}
+
+	@Override
+	public int insertTest() {
+		// TODO Auto-generated method stub
+		return dao.insertTest();
+	}
+
+	@Override
+	public int updateTest() {
+		// TODO Auto-generated method stub
+		return dao.updateTest();
+	}
+
+	@Override
+	public int deleteTest() {
+		// TODO Auto-generated method stub
+		return dao.deleteTest();
+	}
+
+}

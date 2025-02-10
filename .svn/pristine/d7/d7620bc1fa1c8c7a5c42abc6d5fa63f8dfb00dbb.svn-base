@@ -1,0 +1,60 @@
+package kr.or.ddit.yguniv.award.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/askAward")
+public class AskAwardController {
+	
+	// 장학금 신청서 목록 조회 
+	@GetMapping
+	public String selectAskAward(){
+		return "awardAsk/AwardAskList";
+	}
+	
+	/*
+	 * 
+	 * // 장학금 신청서 상세조회
+	 * 
+	 * @GetMapping("{awardCd}") public String
+	 * selectAskAwardDetail(@PathVariable()String awardCd){ return
+	 * "awardAsk/AwardAskDetail"; }
+	 * 
+	 * // 장학금 신청서 추가/ 작성
+	 * 
+	 * @GetMapping("/createAward") public String createAwardAsk(){ return
+	 * "awardAsk/AwardAskForm"; }
+	 * 
+	 * @PostMapping 
+	 * public String create(){ 
+	 * return "awardAsk/AwardAskDetail"; 
+	 * }
+	 * 
+	 * 
+	 * // 수정
+	 * @PutMapping("{awardCd}") 
+	 * public String updateAward(@PathVariable()String awardCd){
+          return "awardAsk/AwardAskDetail"; 
+          }
+	 * 
+	 * // 삭제
+	 * @DeleteMapping("{awardCd}") 
+	 * public String DeleteAward(@PathVariable()String awardCd){ 
+	 * return "awardAsk/AwardAskDetail"; 
+	 * } 
+	 * 
+	 * // 접수 승인 
+	 * @PutMapping("{awardCd}") 
+	 * public String SelectAwardAskOk(@PathVariable()String awardCd){
+	 * return "awardAsk/AwardAskDetail"; 
+	 * }
+	 * 
+	 * // 접수 반려
+	 * @PutMapping("{awardCd}") 
+	 * public String SelectAwardAskNo(@PathVariable()String awardCd){ 
+	 * return "awardAsk/AwardAskDetail"; }
+	 */
+
+}

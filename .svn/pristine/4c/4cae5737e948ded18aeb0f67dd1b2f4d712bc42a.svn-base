@@ -1,0 +1,22 @@
+package kr.or.ddit.yguniv.vo;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@Data
+@ToString
+@EqualsAndHashCode(of="adminId")
+public class AdminVO {
+	
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String adminId;
+
+	
+	@ToString.Exclude
+	private PersonVO person;
+}

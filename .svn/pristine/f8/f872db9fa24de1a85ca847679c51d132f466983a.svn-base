@@ -1,0 +1,64 @@
+package kr.or.ddit.yguniv.lecture.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/lecture")
+public class LectureInquiryController {
+	
+	@GetMapping("{lectNo}/inquiry")
+	public String selectLectureInquiryBoardList(@PathVariable String lectNo) {
+		return "lecture/lectureInquiryBoardList";
+	}
+	
+	@GetMapping("{lectNo}/inquiry/{cibCd}")
+	public String selectLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		return "lecture/lectureInquiryBoardDetail";
+	}
+	
+	@GetMapping("{lectNo}/inquiry/new")
+	public String lectureInquiryBoardForm(@PathVariable String lectNo) {
+		return "lecture/lectureInquiryBoardForm";
+	}
+	
+	@PostMapping("{lectNo}/inquiry/new")
+	public void insertLectureInquiryBoard() {
+		
+	}
+	
+	@GetMapping("{lectNo}/inquiry/{cibCd}/edit")
+	public String lectureInquiryBoardEdit(@PathVariable String lectNo, @PathVariable String cibCd) {
+		return "lecture/lectureInquiryBoardEdit";
+	}
+	
+	@PostMapping("{lectNo}/inquiry/{cibCd}/edit")
+	public void updateLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@DeleteMapping("{lectNo}/inquiry/{cibCd}")
+	public void deleteLectureInquiryBoard(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@PostMapping("{lectNo}/inquiry/{cibCd}/answer")
+	public void insertLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@PutMapping("{lectNo}/inquiry/{cibCd}/answer")
+	public void updateLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+	
+	@DeleteMapping("{lectNo}/inquiry/{cibCd}/answer")
+	public void deleteLectureInquiryBoardAnswer(@PathVariable String lectNo, @PathVariable String cibCd) {
+		
+	}
+}

@@ -1,0 +1,34 @@
+/**
+ * 
+ */
+let fnDelLecture;
+document.addEventListener('DOMContentLoaded', function(){
+	fnDelLecture = function(lectNo){
+		swal({
+			title: "정말로 삭제하시겠습니까?",
+			text: "강의를 삭제하면 다시 복구할 수 없습니다",
+			icon: "warning",
+			buttons: ["취소", "삭제"],
+			dangerMode: true,
+		}).then(btnVal=>{
+			if(btnVal){
+				axios.delete(`${cp.value}/lecture/request/${lectNo}`)
+				.then(resp=>{
+					swal({
+						title: "삭제완료",
+						text: "강의가 성공적으로 삭제되었습니다",
+						icon: "success",
+						button: "확인"
+					}).then(()=>location.href=`${cp.value}/lecture`)
+				}).catch(err=>{
+					swal({
+						title: "삭제실패",
+						text: err.response.data.message,
+						icon: "error",
+						button: "확인"
+					});
+				})
+			}
+		});
+	};
+});

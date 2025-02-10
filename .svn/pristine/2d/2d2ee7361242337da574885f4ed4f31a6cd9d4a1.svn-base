@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.student.dao.StudentMapper">
+
+	<select id="StudentList" resultType="StudentVO">
+SELECT
+			STU_ID
+            , (select nm from person where id = stu_id) as nm
+			, FN_COCO_STTS(GRADE_CD) as GRADE_CD
+			, FN_COCO_STTS(STRE_CATE_CD) as STRE_CATE_CD
+			, (select dept_nm from department where dept_no = student.dept_cd) as dept_cd
+			, (select nm from person where id = profe_id ) as profe_id
+			, DORMANT_DATE
+		FROM
+			STUDENT
+	</select>
+	<select id="SelectStudent"></select>
+	<update id="UpdateStudent"></update>
+	<delete id="DeleteStudent"></delete>
+</mapper>

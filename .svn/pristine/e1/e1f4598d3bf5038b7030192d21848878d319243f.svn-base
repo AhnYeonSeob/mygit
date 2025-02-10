@@ -1,0 +1,76 @@
+package kr.or.ddit.yguniv.absencecertificatereceipt.service;
+
+import java.util.List;
+
+import javax.management.RuntimeErrorException;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.absencecertificatereceipt.dao.AbsenceCertificateReceiptMapper;
+import kr.or.ddit.yguniv.attendance.dao.AttendanceMapper;
+import kr.or.ddit.yguniv.vo.AbsenceCertificateReceiptVO;
+import kr.or.ddit.yguniv.vo.AttendanceVO;
+
+@Service
+public class AbsenceCertificateReceiptServiceImpl {
+	
+	@Autowired
+	private AbsenceCertificateReceiptMapper mapper;
+	
+	@Autowired
+	private AttendanceMapper attendanceMapper;
+	
+	/**
+	 * 단건조회
+	 */
+	public AbsenceCertificateReceiptVO selectAbsenceCertificateReceipt(String stuId) {
+		return mapper.selectAbsenceCertificateReceipt(stuId);
+	}
+	
+	public List<AbsenceCertificateReceiptVO> selectAbsenceCertificateReceiptList(AbsenceCertificateReceiptVO absenceCertificateReceiptVO){
+		return mapper.selectAbsenceCertificateReceiptList(absenceCertificateReceiptVO);
+	}
+	
+	public boolean insertAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.insertAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+	public boolean updateAbsence(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.updateAbsence(absenceCertificateReceiptVO) > 0;
+	}
+	
+	
+	// 공결인증서'만' 업데이트하는 서비스
+	public boolean updateAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+	    return mapper.updateAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+	@Transactional // 둘중 하나라도 안되면 에러처리
+	// 공결인정서 상태와 출결 상태를 동시에 업데이트
+	public boolean updateAbsenceAndAttendance(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		
+//		System.out.println("업데이트 서비스 여기까지는 들어온다.");
+//		System.out.println("absenceCertificateReceiptVO.getAttendanceVO()");
+		
+		int result1 = attendanceMapper.updateAttendance(absenceCertificateReceiptVO.getAttendanceVO());
+		int result2 = mapper.updateAbsenceAndAttendance(absenceCertificateReceiptVO);
+		
+		if(result1 * result2 != 1) {
+			throw new RuntimeException(); // 커스텀 에러처리 해도된다.
+			// 트라이캐치를 사용해야함
+		}
+		
+//	    return  mapper.updateAbsenceAndAttendance(absenceCertificateReceiptVO) > 0;
+	    return true;
+		
+	}
+
+	
+	
+	public boolean deleteAbsenceCertificateReceipt(AbsenceCertificateReceiptVO absenceCertificateReceiptVO) {
+		return mapper.deleteAbsenceCertificateReceipt(absenceCertificateReceiptVO) > 0;
+	}
+	
+}

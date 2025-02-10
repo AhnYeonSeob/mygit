@@ -1,0 +1,81 @@
+package kr.or.ddit.yguniv.notification.service;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import kr.or.ddit.yguniv.notification.dao.NotificationMapper;
+import kr.or.ddit.yguniv.vo.NotificationVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class NotificationService{
+	  private final NotificationMapper dao;
+	  private final Map<String, SseEmitter> emitters = new ConcurrentHashMap<>();
+
+	  //첫 연결 수립.
+	    public SseEmitter createEmitter(String userId) {
+	        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+	        emitters.put(userId, emitter);
+
+	        emitter.onCompletion(() -> emitters.remove(userId));
+	        emitter.onTimeout(() -> emitters.remove(userId));
+
+	        // 연결 즉시 더미 이벤트 전송
+	        sendNotification(userId, "SSE 연결이 설정되었습니다.");
+	        
+	        return emitter;
+	    }
+	    // 첫 연결 수립 후 데이터 전송. - 기존 알림
+	    public void sendNotification(String userId, String message) {
+	        SseEmitter emitter = emitters.get(userId);
+	        if (emitter != null) {
+	            try {
+	            	Map<String, Object> data = new HashMap<>();
+	            	List<NotificationVO> notiList = dao.selectNotificationList(userId);
+	            	log.info("{}",notiList);
+	            	data.put("message", message);
+	            	data.put("timestamp", System.currentTimeMillis());
+	            	data.put("list", notiList);
+	            	emitter.send(SseEmitter.event().data(data));
+	            } catch (IOException e) {
+	                emitters.remove(userId);
+	            }
+	        }
+	    }
+	    
+	    // 새로운 알림 생성 및 전송
+	    public void createAndSendNotification(String userId, String message, String notiCd) {
+	        // 1. 새 알림 생성
+	        NotificationVO newNotification = new NotificationVO();
+	        newNotification.setId(userId);
+	        newNotification.setNotiCn(message);
+	        newNotification.setNotiCd(notiCd);
+	        newNotification.setNotiDate(new SimpleDateFormat("yyyyMMdd").format(new Date()));
+	        newNotification.setNotiYn("N");
+
+	        // 2. 새 알림 저장
+	        dao.insertNotification(newNotification);
+
+	        // 3. 최신 알림 목록 조회 및 전송
+	        sendNotification(userId, "새로운 알림이 도착했습니다.");
+	    }
+
+	    
+}
+
+
+
+
+
+

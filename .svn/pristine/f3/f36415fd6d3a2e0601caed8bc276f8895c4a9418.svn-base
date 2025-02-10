@@ -1,0 +1,56 @@
+package kr.or.ddit.yguniv.student.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.student.dao.StudentRecordsMapper;
+import kr.or.ddit.yguniv.vo.AcademicProbationVO;
+import kr.or.ddit.yguniv.vo.StudentRecordsVO;
+
+@Service
+public class StudentRecordsServiceImpl {
+	@Autowired
+	StudentRecordsMapper srMapper;
+	
+	/**
+	 * R-학적 변동 신청 목록 조회
+	 * @param paging 
+	 */
+	public List<StudentRecordsVO> selectStudentRecordsList(PaginationInfo<StudentRecordsVO> paging){
+		paging.setTotalRecord(srMapper.selectTotalRecord(paging));
+		return srMapper.selectStudentRecordsList(paging);
+	}
+	/**
+	 * R-학적 변동 신청 상세 조회
+	 */
+	public StudentRecordsVO selectStudentRecords(StudentRecordsVO studentRecordsVO){
+		return srMapper.selectStudentRecords(studentRecordsVO);
+	}
+	/**
+	 * C-학생 학사경고 추가
+	 */
+	public int insertAcademicProbation(AcademicProbationVO academicProbationVO){
+		return 0;
+	}
+	/**
+	 * C-학적 변동 신청
+	 */
+	public int insertStudentRecords(StudentRecordsVO studentRecordsVO){
+		return 0;
+	}
+	/**
+	 * U-학적 변동 서류 승인
+	 */
+	public int consentStudentRecords(StudentRecordsVO studentRecordsVO){
+		return 0;
+	}
+	/**
+	 * U-학적 변동 서류 반려
+	 */
+	public int returnStudentRecords(StudentRecordsVO studentRecordsVO){
+		return 0;
+	}
+}

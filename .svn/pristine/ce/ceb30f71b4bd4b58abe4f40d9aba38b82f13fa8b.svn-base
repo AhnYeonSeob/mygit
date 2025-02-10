@@ -1,0 +1,147 @@
+function showPersonDetail(personId) {
+    axios.get(`../person/detail/${personId}`)
+        .then(resp => {
+            const person = resp.data; // 서버 응답 데이터
+            const personDetailModal = new bootstrap.Modal(document.getElementById('personDetailModal'));
+            personDetailModal.show();
+			for(key in person){
+				console.log(key);
+				$(`#detail-${key}`).text(person[key]);
+			}
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보실패");
+        });
+}
+
+
+
+function showPersonUpdate(personId) {
+    axios.get(`../person/edit/${personId}`) 
+        .then(resp => {
+            console.log(resp.data);
+            const person = resp.data; 
+            const personUpdateModal = new bootstrap.Modal(document.getElementById('personUpdateModal'));
+            personUpdateModal.show();
+
+            //매핑
+            for (const key in person) {
+                const element = document.getElementById(`update-${key}`);
+                if (element) {
+                    //console.log(`매핑된 요소: #update-${key}, 값: ${person[key]}`);
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.value = person[key]; // input, textarea에 값 설정
+                    } else {
+                        element.textContent = person[key]; // 일반 텍스트 요소에 값 설정
+                    }
+                } else {
+                    console.log(`없어`);
+                }
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보를 불러오는 데 실패했습니다.");
+        });
+}
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const insertBtn = document.querySelector("#singleinsert-btn");
+
+	insertBtn.addEventListener("click", () => {
+		$.ajax({
+			url: '../person/new', //여기로보내
+			type: 'GET',  // GET 방식
+			success: function() {
+
+				window.location.href = "../person/new";
+			},
+			error: function() {
+				alert("조회 실패");
+			}
+		});
+	});
+	
+});
+
+
+document.getElementById("saveUpdateBtn").addEventListener("click", function () {
+    const updatedData = {
+        id: document.getElementById("update-id").textContent,
+        nm: document.getElementById("update-nm").textContent,
+        brdt: document.getElementById("update-brdt").textContent,
+        sexdstnCd: document.getElementById("update-sexdstnCd").textContent,
+        mbtlnum: document.getElementById("update-mbtlnum").value,
+        eml: document.getElementById("update-eml").value,
+        pswdFailrCo: document.getElementById("update-pswdFailrCo").textContent,
+    };
+
+    console.log("수정 데이터:", updatedData); // 데이터 확인용
+
+    axios
+        .put("../person/update", updatedData) // 수정 API 호출
+        .then((response) => {
+            console.log("수정 성공:", response.data);
+
+            // 상세정보 갱신
+            const personId = updatedData.id;
+            axios
+                .get(`../person/edit/${personId}`) // 상세정보 다시 가져오기
+                .then((resp) => {
+                    const personDetail = resp.data;
+                    const personDetailModal = new bootstrap.Modal(
+                        document.getElementById("personDetailModal")
+                    );
+
+                    // 상세정보 모달에 값 채우기
+                    for (const key in personDetail) {
+                        const detailElement = document.getElementById(
+                            `detail-${key}`
+                        );
+                        if (detailElement) {
+                            detailElement.textContent = personDetail[key];
+                        }
+                    }
+
+                    // 상세정보 모달 표시
+                    personDetailModal.show();
+                })
+                .catch((err) => {
+                    console.error("상세정보 불러오기 실패:", err);
+                    alert("상세정보 갱신에 실패했습니다.");
+                });
+        })
+        .catch((err) => {
+            console.error("수정 실패:", err);
+            alert("수정 요청에 실패했습니다.");
+        });
+});
+
+
+/*
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	const updateBtn = document.querySelector("#update-Btn");
+	updateBtn.addEventListener("click", () => {
+		const personId = document.querySelector("#personId").value;
+		$.ajax({
+			url: '../person/edit/' + personId, //여기로보내
+			type: 'PUT',  
+			success: function() {
+				window.location.href = "../person/list";
+			},
+			error: function() {
+				alert("수정 실패");
+			}
+		});
+	});
+});
+
+*/
+
+

@@ -1,0 +1,20 @@
+package kr.or.ddit.yguniv.notification.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/notification")
+public class NotificationController {
+
+	//알람
+	//알람 코드 (10-19 : 교내 관련 20~29 : 학과 관련?)
+	//보낼 대상을 받아서??
+		@GetMapping()
+		public String sendNotification() {
+				
+			return "";
+		}
+}

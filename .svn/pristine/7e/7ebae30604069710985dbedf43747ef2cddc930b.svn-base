@@ -1,0 +1,28 @@
+package kr.or.ddit.yguniv.projectchatmessage.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.ProjectChatMessageVO;
+
+@Mapper
+public interface ProjectChatMessageMapper {
+	
+	/** 메세지 보내기 DB저장
+	 * @param message
+	 * @return
+	 */
+	public int insertProjectChatMessageMapper(ProjectChatMessageVO message);
+	
+	/** 메세지 받기 DB대화내역가져오기(입장)
+	 * @return
+	 */
+	public List<ProjectChatMessageVO> selectProjectChatMessageMapperList();
+	
+	/** 메시지 전송취소(삭제)작성자만 가능해야함.
+	 * @param messageId
+	 * @return
+	 */
+	public int deleteProjectChatMessageMapper(int messageId);
+}

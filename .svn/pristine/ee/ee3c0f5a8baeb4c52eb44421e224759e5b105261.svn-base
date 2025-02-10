@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.notification.dao.NotificationMapper">
+	
+<select id="selectNotificationList" resultType="NotificationVO">
+
+select 
+    id
+    , noti_cd
+    , noti_cn
+    , noti_date
+    , noti_yn
+    , noti_no
+    , noti_url
+from 
+	notification
+where 
+	id=#{userId} 
+	and noti_yn='N'
+
+</select>	
+	
+	<insert id="insertNotification" parameterType="NotificationVO">
+	
+	INSERT INTO notification (
+    id,
+    noti_no,
+    noti_cd,
+    noti_cn,
+    noti_date,
+    noti_yn,
+    noti_url
+) VALUES (
+    #{id,jdbcType=VARCHAR}
+   , #{notiNo,jdbcType=NUMERIC}
+   , #{notiCd,jdbcType=VARCHAR}
+   , #{notiCn,jdbcType=VARCHAR}
+   , #{notiDate,jdbcType=VARCHAR}
+   , #{notiYn,jdbcType=VARCHAR}
+   , #{notiUrl,jdbcType=VARCHAR}
+);
+	</insert>
+	
+	
+	
+</mapper>

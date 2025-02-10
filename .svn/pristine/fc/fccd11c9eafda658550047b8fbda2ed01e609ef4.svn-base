@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.graduationpaper.dao.GraduationPaperMapper">
+	
+<resultMap id="GraduationPaperResultMap" type="GraduationPaperVO" autoMapping="true">
+    <id property="gpaCd" column="GPA_CD"/>
+    <result property="gpaNm" column="GPA_NM"/>
+    <result property="gpaDate" column="GPA_DATE"/>
+    <result property="atchFileId" column="ATCH_FILE_ID"/>
+    <result property="gpaDnm" column="GPA_DNM"/>
+    <result property="gpaSub" column="GPA_SUB"/>
+    
+    <!-- 학생 정보 -->
+    <association property="student" javaType="PersonVO">
+        <id property="id" column="ID"/>
+        <result property="nm" column="NM"/>
+    </association>
+
+    <!-- 교수 정보 -->
+    <association property="professor" javaType="PersonVO">
+        <id property="id" column="ID"/>
+        <result property="nm" column="NM"/>
+    </association>
+</resultMap>
+
+	<!-- 전체 게시글 수 조회 -->
+<select id="selectTotalRecord" resultType="int">
+	    SELECT COUNT(GPA_CD)
+	    FROM GRADUATION_PAPER
+	    <where>
+	        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(simpleCondition.searchWord)">
+	            <choose>
+	                <when test="simpleCondition.searchType eq 'number'">
+	                    INSTR(GPA_CD, #{simpleCondition.searchWord}) > 0
+	                </when>
+	                <when test="simpleCondition.searchType eq 'name'">
+	                    INSTR(GPA_NM, #{simpleCondition.searchWord}) > 0
+	                </when>
+	                <otherwise>
+	                    (INSTR(GPA_CD, #{simpleCondition.searchWord}) > 0
+	                    OR INSTR(GPA_NM, #{simpleCondition.searchWord}) > 0
+	                </otherwise>
+	            </choose>
+	        </if>
+	    </where>
+	</select>
+
+	<select id="getGraduationPapers" resultMap="GraduationPaperResultMap">
+		SELECT
+			ROWNUM AS RNUM
+					, G.GPA_CD
+					, G.STU_ID
+					, G.GPA_NM
+					, TO_CHAR(TO_DATE(G.GPA_DATE, 'YYYYMMDD'), 'YYYY-MM-DD') AS GPA_DATE
+					, G.ATCH_FILE_ID
+					, G.GPA_DNM
+					, G.GPA_SUB
+					, (SELECT COCO_STTS FROM COMMON_CODE C WHERE C.COCO_CD=G.GPA_STATUS) AS GPA_STATUS
+					, S.PROFE_ID AS PROF_ID -- 담당 교수 ID
+					, P.NM AS STUDENT_NM -- 학생 이름
+					, PR.NM AS PROFESSOR_NM -- 교수 이름
+				FROM GRADUATION_PAPER G
+			INNER JOIN STUDENT S ON G.STU_ID = S.STU_ID -- STUDENT와 조인
+			INNER JOIN PERSON P ON P.ID = S.STU_ID -- 학생의 이름 가져오기
+			INNER JOIN PERSON PR ON PR.ID= S.PROFE_ID -- 교수의 이름 가져오기
+			WHERE G.STU_ID = #{stuId, jdbcType=VARCHAR}
+	</select>
+	
+</mapper>

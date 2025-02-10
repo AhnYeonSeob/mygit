@@ -1,0 +1,12 @@
+package kr.or.ddit.yguniv.eventregistrant.service;
+
+import kr.or.ddit.yguniv.vo.EventRegistrantVO;
+
+public interface EventRegistrantService {
+	/**
+	 * 신청학생 insert
+	 * @param eventRegistrant
+	 * @return
+	 */
+	public void insertEventRegistrant(EventRegistrantVO eventRegistrant);
+}

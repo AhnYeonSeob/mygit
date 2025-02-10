@@ -1,0 +1,52 @@
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const contextPath = document.getElementById('contextPath').value;
+	const lectNo = document.getElementById('lectNo').value;
+	//const cnbNo = document.getElementById('cnbNo').value;
+	
+	console.log("contextPath : ", contextPath)
+	console.log("lectNo : ", lectNo)
+
+	document.getElementById("submitBtn").addEventListener("click", function(event) {
+	    // 클릭 시 동작을 처리
+	    event.preventDefault(); // 기본 동작을 막고
+		
+
+		let fileForm = document.forms.fileForm; // 업로드 한 파일
+		let formData = new FormData(fileForm);
+		
+		
+		// 얘는 안들어갈수도 있으니까 직접 넣어줘야함
+		let boardContent = editorInstance[0].getData(); // 게시글 내용
+		formData.set('cnbNotes', boardContent); // 'append'는 중복 데이터가 들어갈수도 있으니까 'set'으로 
+		
+		for(let k of formData){
+			console.log(k, formData[k]);
+		}
+
+
+		console.log(`콘텍스트 페스 : ${contextPath}`)
+		console.log(`렉트 엔오 : ${lectNo}`)
+		 	
+		
+		fetch(`${contextPath}/lecture/${lectNo}/board/insert`, {
+		    method: 'POST',
+		    body: formData
+		})
+		.then(response => response.json())  // JSON 형식으로 파싱
+		.then(data => {
+		    console.log("Success:", data);
+		    swal("성공", "강의 공지사항 등록 완료.", "success")
+		    .then(() => {
+		        //window.location.reload(); 페이지 이동 처리
+		    });
+		})
+		.catch(error => {
+		    console.error('Error:', error);
+		    swal("오류", "데이터 전송 중 문제가 발생했습니다. 다시 시도해주세요.", "error");
+		});
+
+	});
+
+
+}); 

@@ -1,0 +1,362 @@
+/**
+ * 
+ */
+
+// null 값을 제거하는 재귀 함수
+function removeNullProperties(obj) {
+	if (typeof obj !== 'object' || obj === null) {
+		return obj; // 객체가 아니거나 null인 경우 그대로 반환
+	}
+
+	// 객체를 복제하면서 null이 아닌 값만 유지
+	if (Array.isArray(obj)) {
+		return obj.map(item => removeNullProperties(item)).filter(item => item !== null);
+	}
+
+	const result = {};
+	for (const key in obj) {
+		if (obj[key] !== null) {
+			result[key] = removeNullProperties(obj[key]);
+		}
+	}
+	return result;
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+	const testNo = document.getElementById('testNo').value;
+	const lectNo = document.getElementById('lectNo').value;
+
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+
+	const url = `${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}/get`;
+	//location.href=`${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}`
+	console.log('Fetch URL:', url);
+
+	try {
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`HTTP error! Status: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const boxElement = document.getElementById('box');
+
+		console.log(removeNullProperties(data.professorTestList))
+
+		if (!data.professorTestList || data.professorTestList.length === 0) {
+			boxElement.innerHTML = `
+                <div class="card mb-4">
+                    <div class="card-body text-center py-5">
+                        <h5 class="text-muted mb-0">등록된 문항이 없습니다</h5>
+                    </div>
+                </div>
+            `;
+			return;
+		}
+
+		data.professorTestList.forEach(testVO => {
+			var testSe = testVO.testSe == 'PR' ? '중간고사' : '기말고사'
+			let html = `
+               <div class="container mt-4">
+    <!-- 시험 정보 카드 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">시험 정보</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 20%">시험 번호</th>
+                            <td style="width: 30%">${testVO.testNo}</td>
+                            <th class="bg-light" style="width: 20%">교과목 번호</th>
+                            <td style="width: 30%">${testVO.lectNo}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">시험 종류</th>
+                            <td>${testSe}</td>
+                            <th class="bg-light">시험 종료 시간</th>
+                            <td>${testVO.testEt || 'N/A'}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 문제 정보 섹션 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">문제 정보</h5>
+        </div>
+        <div class="card-body">
+            ${testVO.questionVO.map(question => `
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>문제 번호:</strong> ${question.queNo}</p>
+                            <p class="mb-2"><strong>문제 답안:</strong> ${question.queDescr}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p class="mb-2"><strong>문제 타입:</strong> ${question.queType}</p>
+                            <p class="mb-2"><strong>문제 배점:</strong> ${question.queScore}</p>
+                        </div>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+
+    <!-- 응시 기록 섹션 -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">응시 기록</h5>
+        </div>
+        <div class="card-body">
+            ${testVO.examList.map(exam => `
+                <div class="border-bottom pb-3 mb-3">
+                    <h6 class="mb-3">학생 ID: ${exam.stuId}</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>문제 번호</th>
+                                    <th>학생 답안</th>
+                                    <th>점수 입력</th>
+                                    <th>등록</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exam.questionAnswerList.map(qa => `
+                                    <tr>
+                                        <td>${qa.queNo}</td>
+                                        <td>${qa.queAnswer}</td>
+                                        <td>
+                                            <input type="number" 
+                                                   class="form-control" 
+                                                   id="${exam.stuId}-${qa.queNo}" 
+                                                   name="${exam.stuId}-${qa.queNo}"
+                                                   min="0"
+                                                   max="100">
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary btn-sm" 
+                                                    onclick="submitScore('${exam.stuId}', '${qa.queNo}')">
+                                                등록
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+</div>
+
+            `;
+
+			html += `</div><hr>`;
+			boxElement.innerHTML += html;
+		});
+	} catch (error) {
+		console.error('Error fetching data:', error);
+	}
+});
+
+// 점수 제출 함수
+function submitScore(stuId, queNo) {
+	const dataElement = document.getElementById('contextData');
+	const testElement = document.getElementById('testData');
+	const score = document.getElementById(`${stuId}-${queNo}`).value;
+	const contextPath = dataElement.dataset.contextPath;
+	const testNo = document.getElementById('testNo').value;
+	const lectNo = document.getElementById('lectNo').value;
+
+	const url = `${contextPath}/lecture/${lectNo}/attendeeTest/${queNo}/score`;
+
+	if (!score) {
+		swal("실패", "점수를 입력해 주세요.", "error");
+		return;
+	}
+
+	fetch(url, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json'
+		},
+		body: JSON.stringify({
+			testNo: testNo,
+			lectNo: lectNo,
+			stuId: stuId,
+			queNo: queNo,
+			quesScore: score
+		})
+	})
+		.then(response => {
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			return response.json();
+		})
+		.then(data => {
+			if (data.status === 'success') {
+				swal("성공", "점수가 성공적으로 등록되었습니다.", "success")
+					.then(() => {
+						loadProfessorTestList(); // 리스트 새로고침
+					});
+			} else if (data.status === 'fail') {
+				swal("실패", "점수가 배점보다 높게 입력되었습니다.", "error");
+			} else {
+				swal("오류", "알 수 없는 오류가 발생했습니다.", "error");
+			}
+		})
+		.catch(error => {
+			console.error("Error:", error);
+			swal("점수 등록 중 오류가 발생했습니다.", "서버와의 연결을 확인해주세요.", "error");
+		});
+}
+
+async function loadProfessorTestList() {
+	const testNo = document.getElementById('testNo').value;
+	const lectNo = document.getElementById('lectNo').value;
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+	const url = `${contextPath}/lecture/${lectNo}/attendeeTest/professor/${testNo}/get`;
+
+	try {
+		const response = await fetch(url);
+		if (!response.ok) {
+			throw new Error(`HTTP 오류! 상태: ${response.status}`);
+		}
+
+		const data = await response.json();
+		const boxElement = document.getElementById('box');
+
+		boxElement.innerHTML = ''; // 기존 내용 삭제
+
+		if (!data.professorTestList || data.professorTestList.length === 0) {
+			boxElement.innerHTML = `
+                <div class="card mb-4">
+                    <div class="card-body text-center py-5">
+                        <h5 class="text-muted mb-0">등록된 문항이 없습니다</h5>
+                    </div>
+                </div>
+            `;
+			return;
+		}
+
+		// 여기에 기존의 HTML 생성 코드를 넣습니다
+		data.professorTestList.forEach(testVO => {
+			let html = `
+                <div class="container mt-4">
+                    <!-- 시험 정보 카드 -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">시험 정보</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        <tr>
+                                            <th class="bg-light" style="width: 20%">시험 번호</th>
+                                            <td style="width: 30%">${testVO.testNo}</td>
+                                            <th class="bg-light" style="width: 20%">교과목 번호</th>
+                                            <td style="width: 30%">${testVO.lectNo}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="bg-light">시험 종류</th>
+                                            <td>${testVO.testSe}</td>
+                                            <th class="bg-light">시험 종료 시간</th>
+                                            <td>${testVO.testEt || 'N/A'}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 문제 정보 섹션 -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">문제 정보</h5>
+                        </div>
+                        <div class="card-body">
+                            ${testVO.questionVO.map(question => `
+                                <div class="border-bottom pb-3 mb-3">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-2"><strong>문제 번호:</strong> ${question.queNo}</p>
+                                            <p class="mb-2"><strong>문제 답안:</strong> ${question.queDescr}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-2"><strong>문제 타입:</strong> ${question.queType}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- 응시 기록 섹션 -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0">응시 기록</h5>
+                        </div>
+                        <div class="card-body">
+                            ${testVO.examList.map(exam => `
+                                <div class="border-bottom pb-3 mb-3">
+                                    <h6 class="mb-3">학생 ID: ${exam.stuId}</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead class="bg-light">
+                                                <tr>
+                                                    <th>문제 번호</th>
+                                                    <th>학생 답안</th>
+                                                    <th>점수 입력</th>
+                                                    <th>등록</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                ${exam.questionAnswerList.map(qa => `
+                                                    <tr>
+                                                        <td>${qa.queNo}</td>
+                                                        <td>${qa.queAnswer}</td>
+                                                        <td>
+     <input type="number" 
+       class="form-control" 
+       id="${exam.stuId}-${qa.queNo}" 
+       name="${exam.stuId}-${qa.queNo}"
+       min="0"
+       max="${testVO.questionVO.find(q => q.queNo === qa.queNo)?.queScore || 0}">
+<td>
+                                                            <button class="btn btn-primary btn-sm" 
+                                                                    onclick="submitScore('${exam.stuId}', '${qa.queNo}')">
+                                                                등록
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+			// Add the generated HTML to boxElement
+			boxElement.innerHTML += html;
+		});
+
+	} catch (error) {
+		console.error('데이터 로드 중 오류 발생:', error);
+	}
+}

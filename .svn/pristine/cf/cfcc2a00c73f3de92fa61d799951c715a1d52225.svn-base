@@ -1,0 +1,50 @@
+package kr.or.ddit.yguniv.studentCard.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/studentCard")
+public class StudentCardController {
+	
+	//학생증 서류 작서 
+	@GetMapping("/createStudentCard")
+	public String create() {
+		return "studentCard/StudentForm";
+		
+	}
+	@PostMapping
+	public String createList() {
+		return "studentCard/StudentDetail";
+	}
+	
+	
+	
+	
+	// 목록조회
+	@GetMapping
+	public String select() {
+		return "studentCard/studentCardList";
+	}
+	// 상세조회
+	@GetMapping("{StuId}")
+	public String list(@PathVariable()int StuId) {
+		return "studentCard/studentCardDetail";
+	}
+	// 상태변경
+	@PutMapping("{StuId}")
+	public String updateStatus() {
+		return "studnetCard/studentCardList";
+	}
+	// 정보 삭제
+	@DeleteMapping("{StuId}")
+	public String delete() {
+		return "studnetCard/studentCardList";
+	}
+
+}

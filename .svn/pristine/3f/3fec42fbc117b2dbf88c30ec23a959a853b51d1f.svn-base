@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.student.dao.StudentRecordsMapper">
+	<select id="selectTotalRecord" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM STUDENT_RECORDS R
+		INNER JOIN PERSON P ON(R.STU_ID = P.ID)
+		INNER JOIN STUDENT S ON(R.STU_ID = S.STU_ID)
+		<where>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.role)">
+				<if test="detailCondition.role eq 'ROLE_STUDENT'">
+					AND R.STU_ID = #{detailCondition.id, jdbcType=VARCHAR}
+				</if>
+				<if test="detailCondition.role eq 'ROLE_PROFESSOR'">
+					AND S.PROFE_ID = #{detailCondition.id, jdbcType=VARCHAR}
+				</if>
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.stuId)">
+				AND INSTR(R.STU_ID, #{detailCondition.stuId, jdbcType=VARCHAR}) > 0
+			</if>
+			<if test="detailCondition.studentVO != null">
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.studentVO.nm)">
+					AND INSTR(P.NM, #{detailCondition.studentVO.nm, jdbcType=VARCHAR}) > 0
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.studentVO.deptCd)">
+					AND S.DEPT_CD = #{detailCondition.studentVO.deptCd, jdbcType=VARCHAR}
+				</if>
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.semstrNo)">
+				AND R.SEMSTR_NO = #{detailCondition.semstrNo, jdbcType=VARCHAR}
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.streCateCd)">
+				AND R.STRE_CATE_CD = #{detailCondition.streCateCd, jdbcType=VARCHAR}
+			</if>
+			<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.streStatusCd)">
+				AND R.STRE_STATUS_CD = #{detailCondition.streStatusCd, jdbcType=VARCHAR}
+			</if>
+		</where>
+		ORDER BY R.REQST_DT DESC
+	</select>
+	<resultMap type="StudentRecordsVO" id="stuRec" autoMapping="true">
+		<association property="studentVO" javaType="StudentVO" autoMapping="true">
+			<association property="departmentVO" javaType="DepartmentVO" autoMapping="true"/>
+		</association>
+		<association property="streCateCodeVO" javaType="CommonCodeVO">
+			<result property="cocoStts" column="STRE_CATE_NM"/>
+		</association>
+		<association property="streStatusCodeVO" javaType="CommonCodeVO">
+			<result property="cocoStts" column="STRE_STATUS_NM"/>
+		</association>
+		<association property="semesterVO" javaType="SemesterVO">
+			<id property="semstrNo" column="SEMSTR_NO"/>
+		</association>
+	</resultMap>
+	<select id="selectStudentRecordsList" resultMap="stuRec">
+		SELECT *
+		FROM (
+			SELECT
+				ROWNUM AS RNUM	/* 순번 */
+				, R.STRE_ISSU_NO	/* 서류번호 */
+				, R.STU_ID	/* 학생번호 */
+				, P.NM	/* 이름 */
+				, (SELECT DEPT_NM
+					FROM DEPARTMENT D
+					WHERE D.DEPT_NO = S.DEPT_CD) AS DEPT_NM	/* 학과명 */
+				, R.STRE_CATE_CD	/* 학적상태코드 */
+				, (SELECT FN_COCO_STTS(R.STRE_CATE_CD) FROM DUAL) AS STRE_CATE_NM	/* 학적상태명 */
+				, R.SEMSTR_NO	/* 학기번호 */
+				, R.STRE_STATUS_CD	/* 서류상태코드 */
+				, (SELECT FN_COCO_STTS(R.STRE_STATUS_CD) FROM DUAL) AS STRE_STATUS_NM	/* 서류상태명 */
+			FROM STUDENT_RECORDS R
+			INNER JOIN PERSON P ON(R.STU_ID = P.ID)
+			INNER JOIN STUDENT S ON(R.STU_ID = S.STU_ID)
+			<where>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.role)">
+					<if test="detailCondition.role eq 'ROLE_STUDENT'">
+						AND R.STU_ID = #{detailCondition.id, jdbcType=VARCHAR}
+					</if>
+					<if test="detailCondition.role eq 'ROLE_PROFESSOR'">
+						AND S.PROFE_ID = #{detailCondition.id, jdbcType=VARCHAR}
+					</if>
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.stuId)">
+					AND INSTR(R.STU_ID, #{detailCondition.stuId, jdbcType=VARCHAR}) > 0
+				</if>
+				<if test="detailCondition.studentVO != null">
+					<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.studentVO.nm)">
+						AND INSTR(P.NM, #{detailCondition.studentVO.nm, jdbcType=VARCHAR}) > 0
+					</if>
+					<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.studentVO.deptCd)">
+						AND S.DEPT_CD = #{detailCondition.studentVO.deptCd, jdbcType=VARCHAR}
+					</if>
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.semstrNo)">
+					AND R.SEMSTR_NO = #{detailCondition.semstrNo, jdbcType=VARCHAR}
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.streCateCd)">
+					AND R.STRE_CATE_CD = #{detailCondition.streCateCd, jdbcType=VARCHAR}
+				</if>
+				<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(detailCondition.streStatusCd)">
+					AND R.STRE_STATUS_CD = #{detailCondition.streStatusCd, jdbcType=VARCHAR}
+				</if>
+			</where>
+			ORDER BY R.REQST_DT DESC
+			)
+		<![CDATA[
+		WHERE RNUM >= #{startRow, jdbcType=NUMERIC} AND RNUM <= #{endRow, jdbcType=NUMERIC}
+		]]>
+	</select>
+	<select id="selectStudentRecords" resultMap="stuRec">
+		SELECT
+			R.STRE_ISSU_NO	/* 서류번호 */
+			, R.STU_ID	/* 학생번호 */
+			, P.NM	/* 이름 */
+			, (SELECT DEPT_NM
+				FROM DEPARTMENT D
+				WHERE D.DEPT_NO = S.DEPT_CD) AS DEPT_NM	/* 학과명 */
+			, R.STRE_CATE_CD	/* 학적상태코드 */
+			, (SELECT FN_COCO_STTS(R.STRE_CATE_CD) FROM DUAL) AS STRE_CATE_NM	/* 학적상태명 */
+			, R.REQST_DT	/* 요청일시 */
+			, R.STRE_STATUS_CD	/* 서류상태코드 */
+			, (SELECT FN_COCO_STTS(R.STRE_STATUS_CD) FROM DUAL) AS STRE_STATUS_NM	/* 서류상태명 */
+			, R.CONFM_DE	/* 처리일자 */
+			, R.STRE_RES	/* 신청사유 */
+			, R.RETURN_RSN	/* 반려사유 */
+		FROM STUDENT_RECORDS R
+		INNER JOIN PERSON P ON(R.STU_ID = P.ID)
+		INNER JOIN STUDENT S ON(R.STU_ID = S.STU_ID)
+		WHERE STRE_ISSU_NO = #{streIssuNo, jdbcType=VARCHAR}
+	</select>
+	<insert id="insertAcademicProbation"></insert>
+	<insert id="insertStudentRecords"></insert>
+	<update id="consentStudentRecords"></update>
+	<update id="returnStudentRecords"></update>
+</mapper>

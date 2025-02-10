@@ -1,0 +1,65 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<h2>일감상세보기</h2>
+<!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            	<li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectPersonal">홈</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active fw-bold" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectDuty/${projectMember.projectTeam.teamCd}">일감</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectChatRoom/${projectMember.projectTeam.taskNo}">채팅방</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectTaskSubmission/${projectMember.projectTeam.teamCd}">제출관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectBoard/${projectMember.projectTeam.teamCd}">게시판</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+<table class="table table-bordered" id="form-table" data-path="${pageContext.request.contextPath }" >
+	<tr>
+		<th>제목</th>
+		<td>${projectDuty.dutyTitle}</td>
+	</tr>
+	<tr>
+		<th>상태</th>
+		<c:choose>
+		<c:when test="${projectDuty.dutyPrgsRtprgs eq 100 }">
+		<td>완료</td>
+		</c:when>
+		<c:otherwise>
+		<td>진행중</td>
+		</c:otherwise>
+		</c:choose>
+	<tr>
+		<th>일감진척도</th>
+		<td>${projectDuty.dutyPrgsRtprgs}%</td>
+	</tr>
+	<tr>
+		<th>담당자</th>
+		<td>${projectDuty.projectMember.nm}(${projectDuty.dutyId })</td>
+	</tr>
+	<tr>
+		<th>내용</th>
+		<td>${projectDuty.dutyCn}</td>
+	</tr>
+	
+</table>
+<div class="text-end">
+	<a href="<c:url value='/lecture/${lectNo}/projectDuty/edit/${projectDuty.dutyNo }' />" class="btn btn-primary">수정</a>
+	<form action="<c:url value='/lecture/${lectNo}/projectDuty/delete/${projectDuty.dutyNo }' />" method="post" style="display:inline;">
+	    <input type="hidden" name="dutyTeam" value="${projectDuty.dutyTeam }">
+	    <button type="submit" class="btn btn-danger">삭제</button>
+	</form>
+	<a href="<c:url value='/lecture/${lectNo}/projectDuty/${projectDuty.dutyTeam }' />" class="btn btn-primary">목록</a>
+</div>

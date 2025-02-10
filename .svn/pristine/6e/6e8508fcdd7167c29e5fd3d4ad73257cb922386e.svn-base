@@ -1,0 +1,32 @@
+package kr.or.ddit.yguniv.projectTask.dao;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.ProjectTaskVO;
+
+public interface ProjectTaskMapper {
+	/**프로젝트과제생성
+	 * @param task
+	 * @return
+	 */
+	public int insertProjectTask(ProjectTaskVO task);
+	/**프로젝트단건조회
+	 * @param taskNo
+	 * @return
+	 */
+	public ProjectTaskVO selectProjectTask(int taskNo);
+	/**프로젝트목록조회
+	 * @return
+	 */
+	public List<ProjectTaskVO> selectProjectTasklist();
+	/**프로젝트수정
+	 * @param task
+	 * @return
+	 */
+	public int updateProjectTask(ProjectTaskVO task);
+	/**프로젝트삭제
+	 * @param taskNo
+	 * @return
+	 */
+	public int deleteProjectTask(int taskNo);
+}

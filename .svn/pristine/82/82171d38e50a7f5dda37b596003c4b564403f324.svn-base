@@ -1,0 +1,56 @@
+package kr.or.ddit.yguniv.person.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.commons.enumpkg.ServiceResult;
+import kr.or.ddit.yguniv.vo.EmployeeVO;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import kr.or.ddit.yguniv.vo.ProfessorVO;
+
+
+public interface PersonService {
+
+	/**
+	 * 사용자 추가 
+	 * @param person
+	 * @return PKDUPLICATED, OK, FAIL 
+	 */
+	public ServiceResult createPerson(PersonVO person);
+	/**
+	 * 사용자 상세 조회
+	 * @param Id
+	 * @return
+	 */
+	public PersonVO readPerson(String Id);
+	/**
+	 * 사용자 전체 조회
+	 * @return
+	 */
+	public List<PersonVO> readPersonList();
+	/**
+	 * 사용자 수정
+	 * @param person
+	 * @return
+	 */
+	public ServiceResult modifyPerson(PersonVO person);
+	/**
+	 * 사용자 삭제
+	 * @param person
+	 * @return
+	 */
+	public ServiceResult removePerson(PersonVO person);
+    
+    /**
+     * 교수 정보 삽입
+     * @param professor 교수 정보
+     */
+    public ServiceResult insertProfessor(ProfessorVO professor);
+    
+    /**
+     * 교직원 정보 삽입
+     * @param employee
+     * @return
+     */
+    public ServiceResult insertEmployee(EmployeeVO employee);
+}
+

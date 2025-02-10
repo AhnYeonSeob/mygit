@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
+
+
+<input type="hidden" value="${board.sibNo }" id="sibNo" />
+<script>
+    // 서버의 컨텍스트 경로를 JavaScript 변수에 설정
+    const contextPath = "${pageContext.request.contextPath}/";
+</script>
+
+<h4>문의 게시글</h4>
+<style>
+tr {
+height: 50px;
+
+}
+
+tr,td{
+font-size: 18px;
+
+
+
+}
+</style>
+<table class="table table-bordered">
+	<!-- 상태, 요청 -->
+<tr>
+    <td colspan="1" style="text-align: center; font-weight: bold;">상태</span></td>
+    <td colspan="3" ><span class="info">${board.sibSttsYn}</span></td>
+
+</tr>
+
+<!-- 제목 -->
+<tr>
+        <td style="text-align: center; font-weight: bold;">제목</td>
+        <td colspan="3">${board.sibTtl}</td>
+    </tr>
+
+<!-- 작성일시와 작성자 -->
+<!-- 작성일시 -->
+    <tr>
+        <td style="text-align: center; font-weight: bold;">작성일시</td>
+        <td>${fn:split(board.sibDt, 'T')[0]} ${fn:split(board.sibDt, 'T')[1]}</td>
+        <td style="text-align: center; font-weight: bold;">작성자</td>
+        <td>${board.nm}</td>
+    </tr>
+
+	 <tr>
+        <td colspan="4" style="height: 200px; padding: 10px; text-align: left; vertical-align: top;">
+            ${board.sibCn}
+        </td>
+ 
+             <tr id="replyRow" style="${board.sibAns != null && !board.sibAns.isEmpty() ? '' : 'display: none;'}">
+    <td colspan="4" align="center">
+        <div id="replyContainer" style="position: relative; width: 100%; text-align: left;">
+            <label for="adminReply">답변:</label>
+            <textarea id="adminReply" 
+                      placeholder="답변을 입력하세요" 
+                      style="width: 90%; height: 100px; resize: none;" 
+                      ${board.sibAns != null && !board.sibAns.isEmpty() ? 'disabled' : ''}></textarea>
+                        <!-- 답변 시간 -->
+            <div id="replyTime" style="margin-top: 10px; font-size: 14px; color: #555;">
+                <c:if test="${board.sibTime != null}">
+                    답변 시간: ${fn:split(board.sibTime, 'T')[0]} ${fn:split(board.sibTime, 'T')[1]}
+                </c:if>
+            </div>
+            <!-- 등록 버튼 -->
+            <button id="submitButton" 
+                    style="${board.sibAns != null && !board.sibAns.isEmpty() ? 'display: none;' : ''}" 
+                    onclick="submitReply()" class="btn btn-primary">등록</button>
+            <!-- 수정 버튼 -->
+            <button id="editButton" 
+                    style="${board.sibAns != null && !board.sibAns.isEmpty() ? '' : 'display: none;'}" 
+                    onclick="enableEditing()" class="btn btn-info">수정</button>
+            <!-- 삭제 버튼 -->
+            <button id="deleteButton" 
+                    style="${board.sibAns != null && !board.sibAns.isEmpty() ? '' : 'display: none;'}" 
+                    onclick="deleteReply(${board.sibNo})" class="btn btn-danger">삭제</button>
+            <!-- 취소 버튼 -->
+            <button id="reseyButton" 
+                    style="${board.sibAns != null && !board.sibAns.isEmpty() ? '' : 'display: none;'}" 
+                    onclick="deleteReply(${board.sibNo})" class="btn btn-danger">삭제</button>
+        </div>
+    </td>
+</tr>
+
+
+
+
+
+
+
+		
+			</td>
+	</tr>
+
+
+	<tr>
+		<td colspan="4" align="right">
+		
+		<a href="<c:url value='/answer/${sibNo}/edit' />" class="btn btn-info"  >수정</a>
+		
+		<form action="<c:url value='/answer/delete/${sibNo}' />" method="post" style="display:inline;">
+   
+    			<button type="submit" class="btn btn-danger">삭제</button>
+			</form>
+		<a href="<c:url value='/answer'/>" class="btn btn-primary">목록</a> 
+		
+		 <security:authorize access="hasRole('ADMIN')">
+		
+			<button id="showReplyFormButton" class="btn btn-success">
+               답변
+            </button>
+            
+       </security:authorize>
+
+	</tr>
+
+</table>
+<script src="${pageContext.request.contextPath }/resources/js/board/reply.js"></script>
+
+
+<script src="${pageContext.request.contextPath }/resources/js/board/answerDelete.js"></script>
+<%--  <script src="${pageContext.request.contextPath }/resources/js/board/answerEdit.js"></script> --%>
+<%-- <script src="${pageContext.request.contextPath }/resources/js/board/answerReplyDelete.js"></script>
+ --%>

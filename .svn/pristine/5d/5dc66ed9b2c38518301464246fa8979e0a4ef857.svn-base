@@ -1,0 +1,123 @@
+package kr.or.ddit.yguniv.person.controller;
+
+import java.util.List;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.yguniv.commons.enumpkg.ServiceResult;
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.person.service.PersonService;
+import kr.or.ddit.yguniv.validate.UpdateGroup;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import lombok.RequiredArgsConstructor;
+
+
+@RequestMapping("/yguniv/person")
+@Controller
+@RequiredArgsConstructor
+public class personController {
+	
+	private final PersonService service;
+	
+	public static final String MODELNAME = "person";
+	
+	@ModelAttribute(MODELNAME)
+	public PersonVO member() {
+		return new PersonVO();
+	}
+	
+	//form으로 보냄
+	@GetMapping("new")
+	public String createForm() {
+		return "person/personForm";
+	}
+	
+	
+	//전체조회(검색어 있는지 없는지)
+	@GetMapping()
+	public String selectlist(Model model) {
+		List<PersonVO>personList = service.readPersonList();
+		model.addAttribute("list", personList);
+		
+		return "person/personList";
+	}
+	
+	//생성
+	@PostMapping()
+	public String create() {
+		return "person/personDetail";
+	}
+	
+	
+	
+	@GetMapping("/detail/{personId}")
+	@ResponseBody
+	public String select(@PathVariable String personId) {
+	    PersonVO person = service.readPerson(personId);
+
+	    if (person == null) {
+	        throw new PKNotFoundException("사용자를 찾을 수 없습니다.");
+	    }
+
+	    return personDetail(person);
+	}
+
+	private String personDetail(PersonVO person) {
+	    StringBuilder html = new StringBuilder();
+	    html.append("<h5>아이디: ").append(person.getId()).append("</h5>");
+	    html.append("<p>이름: ").append(person.getNm()).append("</p>");
+	    html.append("<p>생년월일: ").append(person.getBrdt()).append("</p>");
+	    html.append("<p>성별: ").append(person.getSexdstnCd()).append("</p>");
+	    html.append("<p>우편번호: ").append(person.getZip()).append("</p>");
+	    html.append("<p>도로명주소: ").append(person.getRdnmadr()).append("</p>");
+	    html.append("<p>상세주소: ").append(person.getDaddr()).append("</p>");
+	    html.append("<p>핸드폰번호: ").append(person.getMbtlnum()).append("</p>");
+	    html.append("<p>이메일: ").append(person.getEml()).append("</p>");
+//	    html.append("<p>이메일 수신 동의 여부: ").append(person.getEmlRcptnAgreYn()).append("</p>");
+//	    html.append("<p>SMS 수신 동의 여부: ").append(person.getSmsRcptnAgreYn()).append("</p>");
+//	    html.append("<p>인증수단코드: ").append(person.getCrtfcMnCd()).append("</p>");
+//	    html.append("<p>마지막 접속 일시: ").append(person.getLastConectDe()).append("</p>");
+//	    html.append("<p>비밀번호 실패 횟수: ").append(person.getPswdFailrCo()).append("</p>");
+//	    html.append("<p>프로필 사진: <img src='").append(person.getProflPhoto()).append("' alt='프로필 사진'></p>");
+	    return html.toString();
+	}
+
+	
+	//수정
+	@GetMapping("/edit/{personId}")
+	public String updateForm(@PathVariable("personId") String personId, Model model) {
+		PersonVO person = service.readPerson(personId);
+		
+		if(person == null) {
+			throw new PKNotFoundException();
+		}
+		model.addAttribute(MODELNAME, person);
+		
+		return "person/personUpdate";
+	
+	}
+		
+	//삭제
+	@DeleteMapping("{personId}")
+	public String delete(@PathVariable()int personId) {
+		return "person/personList";
+	}
+}
+
+
+
+
+
+

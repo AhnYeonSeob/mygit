@@ -1,0 +1,73 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const statusSelect = document.getElementById("statusSelect");
+    const approvalDateInput = document.getElementById("approvalDateInput");
+    const rejectReasonModal = document.getElementById("rejectReasonModal");
+    const saveRejectReasonButton = document.getElementById("saveRejectReasonButton");
+    const rejectReasonInput = document.getElementById("rejectReason");
+    const form = document.getElementById("updateStatusForm");
+
+    if (!statusSelect || !approvalDateInput || !rejectReasonModal || !saveRejectReasonButton || !rejectReasonInput || !form) {
+        console.error("Required elements not found in the DOM.");
+        return;
+    }
+
+    // 상태 변경 시 이벤트 핸들러
+    statusSelect.addEventListener("change", function () {
+        const selectedStatus = statusSelect.value;
+
+        console.log("Selected status:", selectedStatus);
+
+        if (!selectedStatus) {
+            alert("상태를 선택하세요.");
+            return;
+        }
+
+        // 승인(A03)일 경우 승인일자 설정
+        if (selectedStatus === "A03") {
+            const currentDate = new Date().toISOString().slice(0, 19).replace("T", " ");
+            approvalDateInput.value = currentDate;
+            console.log("Approval date set to:", currentDate);
+            submitForm(); // 폼 제출
+        }
+        // 반려(A04)일 경우 모달창 표시
+        else if (selectedStatus === "A04") {
+            $(rejectReasonModal).modal('show'); // 모달창 열기
+        } else {
+            approvalDateInput.value = ""; // 승인 외 상태에서는 승인일자 초기화
+            console.log("Approval date cleared.");
+            submitForm(); // 폼 제출
+        }
+    });
+
+    // "저장" 버튼 클릭 이벤트 (반려 사유 처리)
+    saveRejectReasonButton.addEventListener("click", function () {
+        const rejectReason = rejectReasonInput.value.trim();
+
+        if (!rejectReason) {
+            alert("반려 사유를 입력해주세요.");
+            return;
+        }
+
+        // 반려 사유를 Hidden Input으로 추가
+        let hiddenInput = document.getElementById("rejectReasonHiddenInput");
+        if (!hiddenInput) {
+            hiddenInput = document.createElement("input");
+            hiddenInput.type = "hidden";
+            hiddenInput.name = "shapNoReason";
+            hiddenInput.id = "rejectReasonHiddenInput";
+            form.appendChild(hiddenInput);
+        }
+        hiddenInput.value = rejectReason;
+
+        console.log("Reject reason saved:", rejectReason);
+
+        $(rejectReasonModal).modal('hide'); // 모달 닫기
+        submitForm(); // 폼 제출
+    });
+
+    // 폼 제출 함수
+    function submitForm() {
+        console.log("Form submitted.");
+        form.submit(); // 폼 제출
+    }
+});

@@ -1,0 +1,47 @@
+package kr.or.ddit.yguniv.board.answerBoard.controller;
+
+import org.apache.ibatis.annotations.DeleteProvider;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+// 시스템 문의 게시판 
+@Controller
+@RequestMapping("/yguniv/answer")
+public class AnswerBoardController {
+	
+	@GetMapping // 목록 조회 
+	public String selectanswerList() {
+		return "answerBoard/answerBoardList";
+		
+	}
+	@GetMapping("{userId}")// 상세보기 
+	public String selectanswerDetail(@PathVariable()String userId) {
+		return "answerBoard/answerBoardDetail";
+		
+	}
+	
+	@GetMapping("/yguniv/createAnswerBoard")
+	public String createAnswer() {
+		return "systemBoard/answerBoardForm";
+	}
+	@PostMapping
+	public String create() {
+		return "systemBoard/answerBoardDetail";
+	}
+	
+	@PutMapping("{userId}") //수정
+	public String updateAnswer(@PathVariable()String userId) {
+		return "answerBoard/answerBoardDetail";
+		
+	}
+	
+	@DeleteMapping("{userId}") //삭제
+	public String deleteAnswer(@PathVariable()String userId) {
+		return "answerBoard/answerBoardList";
+		
+	}
+}

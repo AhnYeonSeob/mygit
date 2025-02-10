@@ -1,0 +1,58 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="jobNo")
+//@ToString(exclude= {"atchFileId"})
+public class JobBoardVO implements Serializable{
+	@NotNull
+    @Size(max = 20)
+	private String jobNo; //게시글 번호
+	
+	@NotNull
+    @Size(max = 200)
+	private String jobNm;//게시글 제목
+	
+	@NotNull
+	@DateTimeFormat(iso=ISO.DATE)
+	private LocalDate jobDate; //작성 일시
+	
+    @Size(max = 4)
+	private String jobCateCd; //게시글유형코드
+	
+	private Long  jobCnt;//조회수
+	
+	@NotNull
+	@DateTimeFormat(iso=ISO.DATE)
+	private LocalDate jobDt; //행사시작일시
+	
+	@NotNull
+	@DateTimeFormat(iso=ISO.DATE)
+	private LocalDate jobEt; //행사종료일시
+	
+	@NotNull
+	private Long  jobLimit; //행사모집인원
+	
+	@NotNull
+	private Long  atchFileId; //파일그룹번호 
+	
+	//has many 관계 행사신청학생
+	private List<EventRegistrantVO> eventRegistrants;
+	
+	
+	//공통 코드 
+	//private commoncodeVO comoncode;
+	
+}

@@ -1,0 +1,78 @@
+package kr.or.ddit.yguniv.lecture.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.server.ResponseStatusException;
+
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.validate.UpdateGroup;
+import kr.or.ddit.yguniv.vo.LectureWeekVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/lecture")
+public class LectureMaterialsController {
+	@Autowired
+	private LectureMaterialsServiceImpl service;
+	
+	@GetMapping("{lectNo}/materials")
+	public String selectLectureMaterialsList(@PathVariable String lectNo, Model model) {
+		model.addAttribute("lectureMaterialsList", service.selectOrderLectureDataList(lectNo));
+		return "lecture/materials/lecture/lectureMaterialsList";
+	}
+	
+	@GetMapping("{lectNo}/materials/{weekCd}/{sectCd}")
+	public String selectOrderLectureData(@PathVariable String lectNo, @PathVariable String lectWeekNo, @PathVariable String sectCd) {
+		return "lecture/lectureMaterialsDetail";
+	}
+	
+	@PostMapping("{lectNo}/materials")
+	public void insertLectureWeek(@PathVariable String lectNo) {
+		
+	}
+	
+	@PutMapping("{lectNo}/materials/{weekCd}")
+	public void updateLectureWeek(
+		@RequestBody @Validated(UpdateGroup.class) LectureWeekVO lectureWeekVO
+		, @PathVariable String lectNo, @PathVariable String weekCd
+	) {
+		lectureWeekVO.setLectNo(lectNo);
+		lectureWeekVO.setWeekCd(weekCd);
+		log.info("파라미터 체크 : {}", lectureWeekVO);
+		if(!service.updateLectureWeek(lectureWeekVO)) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+		}
+	}
+	
+	@DeleteMapping("{lectNo}/materials/{weekCd}")
+	public void deleteLectureWeek(@PathVariable String lectNo, @PathVariable String weekCd) {
+		
+	}
+	
+	@PostMapping("{lectNo}/materials/{weekCd}")
+	public void insertOrderLectureData(@PathVariable String lectNo, @PathVariable String weekCd) {
+
+	}
+	
+	@PutMapping("{lectNo}/materials/{weekCd}/{sectNo}")
+	public void updateOrderLectureData(@PathVariable String lectNo, @PathVariable String weekCd, @PathVariable String sectCd) {
+
+	}
+	
+	@DeleteMapping("{lectNo}/materials/{weekCd}/{sectNo}")
+	public void deleteOrderLectureData(@PathVariable String lectNo, @PathVariable String weekCd, @PathVariable String sectCd) {
+
+	}
+}

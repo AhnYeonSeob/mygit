@@ -1,0 +1,52 @@
+package kr.or.ddit.yguniv.graduation.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/graduation")
+public class GraduationController {
+	// form으로 보냄
+	@GetMapping("new")
+	public String createForm() {
+		return "graduation/graduationForm";
+	}
+
+	// 전체조회
+	@GetMapping()
+	public String selectlist() {
+
+		return "graduation/graduationList";
+	}
+
+	// 생성
+	@PostMapping()
+	public String create() {
+		return "graduation/graduationDetail";
+	}
+
+	// 상세조회
+	@GetMapping("{gdtCd}")
+	public String select(@PathVariable() String gdtCd) {
+
+		return "graduation/graduationDetail";
+	}
+
+	// 수정
+	@PutMapping("{gdtCd}")
+	public String update(@PathVariable() String gdtCd) {
+		return "graduation/graduationDetail";
+	}
+
+	// 삭제
+	@DeleteMapping("{gdtCd}")
+	public String delete(@PathVariable() String gdtCd) {
+		return "graduation/graduationList";
+	}
+}
+

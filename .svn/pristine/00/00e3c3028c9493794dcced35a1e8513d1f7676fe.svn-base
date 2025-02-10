@@ -1,0 +1,69 @@
+package kr.or.ddit.yguniv.dissent.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/dissent")
+public class DissentController {
+
+
+	//이의 목록으로 이동
+	//교수는 등록된 리스트가
+		@GetMapping
+		public String selectList() {
+				
+			return "dissent/courseDissentList";
+		}
+		
+		//이의 내역 하나 조회
+		//
+		@GetMapping("{dissentId}")
+		public String selectOne() {
+			
+			return "dissent/courseDissentList";
+		}
+		//이의 신청 페이지로 이동
+		//학생은 입력 폼
+		//학생은 등록할수 있는 페이지가
+		@GetMapping("new")
+		public String createForm() {
+			
+			return "dissent/courseDissentForm";
+		}
+
+		//이의신청 등록
+		@PostMapping
+		public String create() {
+			return "dissent/courseDissentDetail";
+		}
+		
+		//이의 수정 페이지로 이동
+		//교수와 교직원이 상세조회를 보고 점수 변동을 할 수 있도록
+		@GetMapping("edit")
+		public String updateForm() {
+			
+			return "dissent/courseDissentEdit";
+		}
+		
+		@PostMapping("edit")
+		public String update() {
+			
+			return "dissent/courseDissentList";
+		}
+		
+		//등록된 이의 삭제?
+		//부적절한 이의 신청 삭제 기능
+		@DeleteMapping()
+		public String delete() {
+			
+			return "dissent/courseDissentList";
+		}
+		
+		
+		
+		
+}

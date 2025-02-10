@@ -1,0 +1,26 @@
+package kr.or.ddit.yguniv.jobboard.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.JobBoardVO;
+
+public interface JobBoardService {
+	/**
+	 * 게시글 전체 출력
+	 * @param paginationInfo
+	 * @return
+	 */
+	public List<JobBoardVO>selectJobBoardListPaging(PaginationInfo<JobBoardVO>paginationInfo);
+	/**
+	 * 게시글 상세 보기
+	 * @param jobNo
+	 * @return
+	 */
+	public JobBoardVO selectJobBoard(String jobNo);
+	/**
+	 * 게시글 생성
+	 * @param board
+	 */
+	public void insertJobBoard(JobBoardVO board);
+}

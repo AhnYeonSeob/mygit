@@ -1,0 +1,218 @@
+package kr.or.ddit.yguniv.mypage.controller;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.yguniv.attendcoeva.service.AttendCoevaService;
+import kr.or.ddit.yguniv.file.ProfileImage;
+import kr.or.ddit.yguniv.mypage.dao.MypageMapper;
+import kr.or.ddit.yguniv.mypage.service.MypageService;
+import kr.or.ddit.yguniv.student.service.StudentServiceImpl;
+import kr.or.ddit.yguniv.vo.AttendeeVO;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import kr.or.ddit.yguniv.vo.StudentVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("mypage")
+public class MypageController {
+	
+	public static final String MODELNAME = "my";
+	
+	@Autowired
+	public MypageService service; 
+	
+	@Autowired
+	public StudentServiceImpl stuSerivce;
+	@Autowired
+	public AttendCoevaService coevaSerivce;
+	
+	
+	@Autowired
+	public MypageMapper mapper;
+	
+	@ModelAttribute(MODELNAME)
+	public PersonVO person() {
+		return new PersonVO();
+	}
+	
+
+	@GetMapping("selectMypage/{id}")
+	public String selectMypage(
+	    Principal principal,
+	    Model model,
+	    @PathVariable String id
+	) throws IllegalAccessException {
+	    String personId = principal.getName();
+	    if (!personId.equals(id)) {
+	        return "redirect:/login";
+	    }
+
+	    PersonVO person = service.selectPerson(id);
+	    boolean isFreshman = "SC06".equals(person.getStreCateCd());
+	    model.addAttribute("isFreshman", isFreshman);
+	    model.addAttribute("my", person);
+
+	    model.addAttribute("fromLogin", true); // 로그인 후 처음 진입 시 모달 표시
+	    
+	
+	    return "mypage/myPageForm";
+	}
+
+
+
+	
+	// 마이페이지 수정폼 
+	// 하려면 비밀번호 인증해야함 
+	
+	@GetMapping("{id}/UpdateMyPage")
+	public String updateMypage(
+			@PathVariable("id") String id,
+			Model model
+			) {
+		PersonVO person = service.selectPerson(id);
+		
+	    // 신입생인지 여부 확인
+	    boolean isFreshman = "SC06".equals(person.getStreCateCd());
+	    model.addAttribute("isFreshman", isFreshman);
+	    model.addAttribute("my", person);
+	    
+	    model.addAttribute("fromLogin", false); // 수정 페이지에서는 모달 띄우지 않음
+		
+		return "mypage/myPageEdit";
+	}
+	
+	
+	
+	 @PostMapping("{id}/UpdateMyPage")
+	    public String updateMypage(
+	            @ModelAttribute(MODELNAME) PersonVO person,
+	            
+	            BindingResult error,
+	            @PathVariable("id") String id,
+	            @RequestParam("confirmPswd") String confirmPswd,
+	            RedirectAttributes redirectAttributes) {
+
+	        log.info("수정 시작: ID {}, 수정 데이터: {}", id, person);
+
+	        if (person == null) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "사용자 정보가 유효하지 않습니다.");
+	            return "redirect:/mypage/" + id + "/UpdateMyPage";
+	        }
+
+	       
+	        // 비밀번호 확인
+	        if (!person.getPswd().equals(confirmPswd)) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
+	            return "redirect:/mypage/" + id + "/UpdateMyPage";
+	        }
+
+	        if (error.hasErrors()) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "입력값에 오류가 있습니다.");
+	            return "redirect:/mypage/" + id + "/UpdateMyPage";
+	        }
+	        try {
+        		StudentVO student = stuSerivce.selectStudet(id);
+        		log.info("학생이 있나없나 보자 ... StudentVO {}",student.getStreCateCd() );
+        	
+        	  // **여기서 상태 업데이트**
+            if ("SC06".equals(student.getStreCateCd().trim())) {
+                mapper.updateStudentCategoryWithMerge(student);
+                log.info("학생 카테고리 상태 업데이트 완료: SC06 -> SC01");
+            } else {
+                log.info("학생 카테고리 상태가 SC06이 아니므로 업데이트 생략");
+            }
+           
+	      
+	        	
+	        	if (person.getProflImage() != null && !person.getProflImage().isEmpty()) {
+	        	    try {
+	        	        String base64Image = ProfileImage.imgToBase64(person.getProflImage());
+	        	        if (base64Image != null) {
+	        	            person.setProflPhoto(base64Image);
+	        	            log.info("프로필 이미지 변환 완료");
+	        	        } else {
+	        	            log.warn("프로필 이미지 변환 결과가 null입니다.");
+	        	        }
+	        	    } catch (Exception e) {
+	        	        log.error("프로필 이미지 변환 중 오류 발생: {}", e.getMessage());
+	        	        redirectAttributes.addFlashAttribute("errorMessage", "이미지 업로드 중 문제가 발생했습니다.");
+	       
+	       
+	        	        return "redirect:/mypage/" + id + "/UpdateMyPage";
+	        	    }
+	        	} else {
+	        	    log.warn("프로필 이미지가 비어 있습니다.");
+	        	}
+
+	        	
+
+	            service.updatePerson(person);
+	            redirectAttributes.addFlashAttribute("successMessage", "수정 완료!");
+	        } catch (Exception e) {
+	            redirectAttributes.addFlashAttribute("errorMessage", "수정 중 오류 발생: " + e.getMessage());
+	        }
+
+	        return "redirect:/mypage/selectMypage/"+id;
+	    }
+	 
+	
+	 // 비밀번호 인증 폼
+    @GetMapping("{id}/auth")
+    public String authenticateForm(
+            @PathVariable String id,
+            Model model
+    ) {
+        model.addAttribute("id", id);
+        return "mypage/authForm";
+    }
+
+    @PostMapping("{id}/auth")
+    public String authenticateUser(
+    	
+            @PathVariable String id,
+            @ModelAttribute(MODELNAME) PersonVO person,
+            RedirectAttributes redirectAttributes
+    ) {
+        try {
+            PersonVO authenticatedPerson = service.authenticateUser(id, person.getPswd());
+            redirectAttributes.addFlashAttribute(MODELNAME, authenticatedPerson);
+            return "redirect:/mypage/" + id + "/UpdateMyPage";
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "비밀번호가 일치하지 않습니다.");
+            return "redirect:/mypage/" + id + "/auth";
+        }
+    }
+
+
+	//myPage용도 한 학생의 전체 학기 성적 조회
+	@GetMapping("score/{stuId}")
+	@ResponseBody
+	public Map<String,Object> selectMyPageList(@PathVariable String stuId ,Model  model) {
+		
+		Map<String,Object> map = new HashMap<>();
+		
+		List<AttendeeVO> myPageLectureList = coevaSerivce.selectMapageList(stuId);
+		
+		map.put("myPageLectureList", myPageLectureList);
+		return map;
+//		return "attendcoeva/attendCoevaList";
+		
+	}
+}

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.mybatis.mappers.Login">
+
+<select id="PersonVoWrapper" resultType="PersonVO">
+
+SELECTID
+PSWD
+NM
+BRDT
+SEXDSTN_CD
+ZIP
+RDNMADR
+DADDR
+MBTLNUM
+EML
+EML_RCPTN_AGRE_YN
+SMS_RCPTN_AGRE_YN
+CRTFC_MN_CD
+LAST_CONECT_DE
+PSWD_FAILR_CO
+PROFL_PHOTO
+PERSON_YN
+		FROM PERSON                                          
+		WHERE ID = #{noname} AND PERSON_YN  == Y     
+
+
+</select>
+
+
+
+
+</mapper>

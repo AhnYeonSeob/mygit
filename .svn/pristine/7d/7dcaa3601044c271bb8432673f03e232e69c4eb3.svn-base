@@ -1,0 +1,108 @@
+package kr.or.ddit.yguniv.mypage.service;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.board.answerBoard.exception.BoardException;
+import kr.or.ddit.yguniv.commons.enumpkg.ServiceResult;
+import kr.or.ddit.yguniv.mypage.dao.MypageMapper;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@RequiredArgsConstructor
+@Slf4j
+@Service
+public class MypageServiceImpl implements MypageService {
+
+    @Autowired
+    private MypageMapper mapper;
+
+
+
+    @Override
+    public PersonVO selectPerson(String id) {
+        PersonVO person = mapper.selectMyPage(id);
+        log.info("id가 있는지 없는지 확인 {}", id);
+
+        if (person == null) {
+            throw new BoardException(String.format("%s 번 글이 없음.", id));
+        }
+
+        return person;
+    }
+
+    
+    @Autowired
+    private AuthenticationManagerBuilder authenticationManagerBuilder;
+    
+    @Override
+    public ServiceResult updatePerson(PersonVO person) {
+    	
+    	ServiceResult result = null; 
+    	 AuthenticationManager authService = authenticationManagerBuilder.getObject();
+	      UsernamePasswordAuthenticationToken inputData =
+	             new UsernamePasswordAuthenticationToken(person.getId(), person.getPswd());
+    	try {
+    		authService.authenticate(inputData);
+    		if(mapper.updateMyPage(person)>0) {
+    			result = ServiceResult.OK;
+    			log.info("프로필 이미지가 성공적으로 저장 되었슴요 {} ", result);
+    			changeAuthentication();
+    		}else {
+    			result = ServiceResult.FAIL;
+    			log.info("프로필 이미지 저장 실패 {} ", result);
+    		}
+    		
+    		
+    	}catch(AuthenticationException e) {
+    		result = ServiceResult.INVALIDPASSWORD;
+    	}
+    	return result;
+    }
+
+    private void changeAuthentication() {
+		   // 현재 인증객체를 새로운 인증 객체로 변경
+       Authentication inputData =  SecurityContextHolder.getContext().getAuthentication();
+        log.info("authentication : { }", inputData );
+        inputData.getAuthorities();
+        
+        
+        
+      AuthenticationManager authService=  authenticationManagerBuilder.getObject();
+     UsernamePasswordAuthenticationToken newAuthentication= (UsernamePasswordAuthenticationToken)authService.authenticate(inputData);  
+      
+      newAuthentication.setDetails(inputData.getDetails());
+        SecurityContext newContext = SecurityContextHolder.createEmptyContext();
+        newContext.setAuthentication(newAuthentication);
+        SecurityContextHolder.setContext(newContext);
+		
+	}
+
+    @Override
+    public PersonVO authenticateUser(String id, String pswd) {
+        // AuthenticationManager로 인증 처리
+        try {
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(id, pswd);
+          AuthenticationManager authService =  authenticationManagerBuilder.getObject();
+          authService.authenticate(token);
+        } catch (AuthenticationException e) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        // 인증 성공 시 사용자 정보 반환
+        return mapper.selectMyPage(id);
+    }
+}
+
+
+

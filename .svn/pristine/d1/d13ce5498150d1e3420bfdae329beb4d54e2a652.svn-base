@@ -1,0 +1,51 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<input type="hidden" id="sibNo" value="${board.sibNo }">
+<security:authentication property="principal.username" var="id"/>
+
+<form:form method="POST" enctype="application/x-www-form-urlencoded" modelAttribute="board" action="${pageContext.request.contextPath }/answer/createAnswerBoard">
+	<table class="table table-bordered">
+		 
+		<!-- 제목 -->
+		<tr>
+			<th>제목</th>
+	 		<td>
+	 			<form:input type="text" path="sibTtl" cssClass="form-control" required="true" /> 
+	 			<form:errors path="sibTtl" element="span" cssClass="text-danger" />
+	 		</td>
+		</tr>
+		
+		<!-- 학번 -->
+		
+    <tr>
+    <th>학번</th>
+    <td>
+        <input type="text" class="form-control" value="${id}" readonly placeholder="학번은 입력하지 않으셔도 됩니다." /> <!-- 사용자에게 보여줌 -->
+        <form:hidden path="userId" value="${id}" /> <!-- Hidden Field로 실제 값 전달 -->
+        <form:errors path="userId" element="span" cssClass="text-danger" />
+    </td>
+</tr>
+
+
+	
+		<!-- 내용 -->
+		<tr>
+			<td colspan="2">
+				<form:textarea path="sibCn" class="tinymce-editor" />
+				<form:errors path="sibCn" cssClass="text-danger" />
+			</td>
+		</tr>  
+		
+		<!-- 버튼 -->
+		<tr>
+			<td colspan="2" align="right">
+				<input type="submit" class="btn btn-primary" value="등록" />
+				<a href="<c:url value='/answer'/>" class="btn btn-primary">목록</a> 
+			</td>
+		</tr>
+		
+	</table>
+</form:form>

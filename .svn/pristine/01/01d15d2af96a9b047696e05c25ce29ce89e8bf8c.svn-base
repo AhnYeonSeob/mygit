@@ -1,0 +1,69 @@
+package kr.or.ddit.yguniv.noticeboard.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @author AYS
+ * lvn에 ?는 디테일로 갈 수 있게 해당넘버를 붙여줘야함
+ * redirect: 도 고려해야할 것 같음
+ */
+@Controller
+@RequestMapping("/yguniv/noticeboard")
+public class NoticeboardController {
+	
+	//게시글전체조회(검색어 있는지 없는지 ntcNm 제목 / ntcDesc 내용)
+	@GetMapping()
+	public String selectList() {
+			
+		return "noticeboard/noticeboardList";
+	}
+	
+	//게시글 생성폼이동
+	@GetMapping("new")
+	public String createForm() {
+		
+		return "noticeboard/noticeboardForm";
+	}
+	
+	//게시글 생성
+	@PostMapping()
+	public String create() {
+		return "noticeboard/?";
+	}
+	
+	
+	
+	//게시글상세조회
+	@GetMapping("{nctCd}")
+	public String select(@PathVariable()int nctCd) {
+		
+		return "noticeboard/noticeboardDetail";
+	}
+	//게시글수정폼이동
+	@GetMapping("{nctCd}/edit")
+	public String updateForm(@PathVariable()int nctCd) {
+		return "noticeboard/noticeboardEditForm";
+	}
+	
+	//게시글수정
+	@PutMapping("{nctCd}")
+	public String update(@PathVariable()int nctCd) {
+		return "noticeboard/?";
+	}
+	
+	//게시글삭제
+	@DeleteMapping("{nctCd}")
+	public String delete(@PathVariable()int nctCd) {
+		return "noticeboard/noticeboardList";
+	}
+		
+	
+	
+	
+}

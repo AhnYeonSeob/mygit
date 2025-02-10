@@ -1,0 +1,41 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+프로젝트팀리스트
+<table class="table table-bordered">
+	<thead>
+		<tr><th>프로젝트상태</th>
+			<th>팀번호</th>
+			<th>프로젝트주제</th>
+			<th>프로젝트시작일</th>
+			<th>프로젝트종료일</th>
+			<th>과제진행도</th></tr>
+	</thead>
+	<tbody>
+		<c:if test="${not empty teamList }">
+			<c:forEach items="${teamList }" var="team">
+				<tr>
+					<td>${team.cocoCd }</td>
+					<td>${team.teamNo }</td>
+					<td>
+						<!-- a태그 안 url 수정해야함 -->
+						<a href="<c:url value='/board/${board.boNo }'/>">${team.teamPurpo }</a>
+					</td>
+					<td>$team.teamDt }</td>
+					<td>${team.teamEt }</td>
+					<td>${team.teamProge }</td>
+				</tr>
+			</c:forEach>
+		</c:if>
+		<c:if test="${empty teamList }">
+			<tr>
+				<td colspan="6">글 없음.</td>
+			</tr>
+		</c:if>
+	</tbody>
+	<tfoot>
+		<!-- 검색 페이징 area -->
+	</tfoot>
+</table>
+<!-- 권한에 따라 보일지말지 -->
+<button>프로젝트팀등록</button>

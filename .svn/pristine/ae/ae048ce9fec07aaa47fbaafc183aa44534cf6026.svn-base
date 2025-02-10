@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.introduce.dao.IntroduceMapper">
+
+
+
+<!-- 전체 게시글 수 조회 -->
+<select id="selectTotalRecord" resultType="int">
+    SELECT COUNT(I.STU_ID)
+    FROM INTRODUCE I
+    LEFT JOIN PERSON P ON I.STU_ID = P.ID
+    <where>
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(simpleCondition.searchWord)">
+            <choose>
+                <when test="simpleCondition.searchType eq 'number'">
+                    INSTR(I.STU_ID, #{simpleCondition.searchWord}) > 0
+                </when>
+                <when test="simpleCondition.searchType eq 'name'">
+                    INSTR(P.NM, #{simpleCondition.searchWord}) > 0
+                </when>
+                <otherwise>
+                    (INSTR(I.INT_QUE1, #{simpleCondition.searchWord}) > 0
+                    OR INSTR(I.INT_QUE2, #{simpleCondition.searchWord}) > 0
+                    OR INSTR(I.INT_QUE3, #{simpleCondition.searchWord}) > 0
+                    OR INSTR(I.STU_ID, #{simpleCondition.searchWord}) > 0
+                    OR INSTR(P.NM, #{simpleCondition.searchWord}) > 0)
+                </otherwise>
+            </choose>
+        </if>
+    </where>
+</select>
+
+
+<resultMap id="IntroduceMap" type="IntroduceVO" autoMapping="true">
+    <id property="stuId" column="STU_ID" />
+     <result property="empfiCd" column="EMPFI_CD" />
+    <result property="intQue1" column="INT_QUE1" />
+    <result property="intQue2" column="INT_QUE2" />
+    <result property="intQue3" column="INT_QUE3" />
+    <result property="intDate" column="INT_DATE" />
+    <result property="intUdate" column="INT_UDATE" />
+    
+    <association property="employmentfield" javaType="EmploymentFieldVO" autoMapping="true">
+    	 <result property="empfiNm" column="EMPFI_NM" />
+    </association>
+    
+    <association property="student" javaType="kr.or.ddit.yguniv.vo.StudentVO" autoMapping="true">
+    	   <result property="nm" column="NM" />
+    </association>
+    
+    <association property="commoncode" javaType="CommonCodeVO" autoMapping="true">
+    	 <result property="cocoStts" column="COCO_STTS" />
+    </association>
+    
+    <collection property="certificate" ofType="CertificateVO" autoMapping="true">
+    	<result property="certNm" column="CERT_NM" />
+        <result property="certDate" column="CERT_DATE" />
+        <result property="atchFileId" column="ATCH_FILE_ID"/>
+    </collection>
+    
+</resultMap>
+
+	<insert id="insertintroduce"></insert>
+	
+	<select id="selectintroduceListPaging" resultMap="IntroduceMap">
+    
+    SELECT *
+    FROM (
+        SELECT A.*, ROWNUM AS RNUM
+        FROM (
+            SELECT 
+                I.STU_ID,
+                I.EMPFI_CD,
+                I.INT_QUE1,
+                I.INT_QUE2,
+                I.INT_QUE3,
+                I.INT_DATE,
+                I.INT_UDATE,
+                E.EMPFI_NM,
+                C.CERT_NM,
+                C.CERT_DATE,
+                P.NM,
+                S.GRADE_CD,
+                CC.COCO_STTS
+            FROM 
+                INTRODUCE I
+            INNER JOIN EMPLOYMENT_FIELD E ON I.EMPFI_CD = E.EMPFI_CD
+            INNER JOIN CERTIFICATE C ON I.STU_ID = C.STU_ID
+            INNER JOIN PERSON P ON I.STU_ID = P.ID
+            INNER JOIN STUDENT S ON I.STU_ID = S.STU_ID
+            INNER JOIN COMMON_CODE CC ON S.GRADE_CD = CC.COCO_CD
+            WHERE 1=1
+                   <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(simpleCondition.searchWord)">
+                    AND
+                    <choose>
+                        <when test="simpleCondition.searchType eq 'number'">
+                            INSTR(I.STU_ID, #{simpleCondition.searchWord}) > 0
+                        </when>
+                        <when test="simpleCondition.searchType eq 'name'">
+                            INSTR(P.NM, #{simpleCondition.searchWord}) > 0
+                        </when>
+                        <otherwise>
+                            (INSTR(I.INT_QUE1, #{simpleCondition.searchWord}) > 0
+                            OR INSTR(I.INT_QUE2, #{simpleCondition.searchWord}) > 0
+                            OR INSTR(I.INT_QUE3, #{simpleCondition.searchWord}) > 0
+                            OR INSTR(I.STU_ID, #{simpleCondition.searchWord}) > 0
+                            OR INSTR(P.NM, #{simpleCondition.searchWord}) > 0)
+                        </otherwise>
+                    </choose>
+                </if>
+            <![CDATA[
+            ORDER BY I.INT_DATE DESC
+            ) A
+            WHERE ROWNUM <= #{endRow}
+        ) B
+        WHERE RNUM >= #{startRow}
+    ]]>
+</select>
+
+
+	
+	
+	<select id="selectintroduce" resultMap="IntroduceMap">
+			SELECT 
+			    I.STU_ID,
+			    I.EMPFI_CD,
+			    I.INT_QUE1,
+			    I.INT_QUE2,
+			    I.INT_QUE3,
+			    I.INT_DATE,
+			    I.INT_UDATE,
+			    C.CERT_NM,
+			    C.CERT_DATE,
+			    C.ATCH_FILE_ID,
+			    P.NM,
+			    C.COCO_STTS,
+			    E.EMPFI_NM
+			    
+			FROM INTRODUCE I
+			INNER JOIN CERTIFICATE C ON I.STU_ID = C.STU_ID
+			INNER JOIN PERSON P ON I.STU_ID = P.ID
+			INNER JOIN STUDENT S ON S.STU_ID = P.ID
+			INNER JOIN COMMON_CODE C ON C.COCO_CD=S.GRADE_CD
+			INNER JOIN EMPLOYMENT_FIELD E ON I.EMPFI_CD=E.EMPFI_CD
+			WHERE I.STU_ID = #{stuId, jdbcType=VARCHAR}
+	</select>
+	
+	
+		
+	<select id="selectEditedIntroduce"  parameterType="String" resultMap="IntroduceMap">
+			SELECT 
+			    I.STU_ID,
+			    I.EMPFI_CD,
+			    I.INT_QUE1,
+			    I.INT_QUE2,
+			    I.INT_QUE3,
+			    I.INT_DATE,
+			    I.INT_UDATE,
+			    C.CERT_NM,
+			    C.CERT_DATE,
+			    C.ATCH_FILE_ID,
+			    P.NM,
+			    C.COCO_STTS,
+			    E.EMPFI_NM
+			    
+			FROM INTRODUCE I
+			INNER JOIN CERTIFICATE C ON I.STU_ID = C.STU_ID
+			INNER JOIN PERSON P ON I.STU_ID = P.ID
+			INNER JOIN STUDENT S ON S.STU_ID = P.ID
+			INNER JOIN COMMON_CODE C ON C.COCO_CD=S.GRADE_CD
+			INNER JOIN EMPLOYMENT_FIELD E ON I.EMPFI_CD=E.EMPFI_CD
+			WHERE I.STU_ID = #{stuId, jdbcType=VARCHAR}
+	</select>
+	
+	
+	
+	
+	
+	
+	
+<!-- 	교직원 자소서 첨삭 -->
+	<update id="updateintroduce">
+		UPDATE INTRODUCE
+			SET 
+			     INT_QUE1 = #{intQue1, jdbcType=VARCHAR}
+			    ,INT_QUE2 = #{intQue2, jdbcType=VARCHAR}
+			    ,INT_QUE3 = #{intQue3, jdbcType=VARCHAR}
+			    ,INT_UDATE = SYSDATE
+			WHERE STU_ID = #{stuId, jdbcType=VARCHAR}
+	</update> 
+		
+	
+	<delete id="deleteintroduce"></delete>
+</mapper>

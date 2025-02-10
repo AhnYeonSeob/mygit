@@ -1,0 +1,120 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const contextPath = document.getElementById("cp").value; // 컨텍스트 경로
+    const sibNo = document.getElementById("sibNo").value; // 게시글 번호
+    const ansInsertDiv = document.getElementById("ansInsertDiv"); // 답변 작성 영역
+    const ansZone = document.querySelector(".ansZone"); // "등록된 답변이 없습니다." 영역
+    const ansInsertBtn = document.querySelector(".ansInsertBtn"); // 등록 버튼
+    const ansCancelBtn = document.querySelector(".ansCancelBtn"); // 취소 버튼
+    const ansSaveBtn = document.querySelector(".ansSaveBtn"); // 저장 버튼
+    const ansDeleteBtn = document.querySelector(".ansDeleteBtn"); // 삭제 버튼
+    const editor = document.getElementById("editor");
+
+    // 등록 버튼 클릭 시 작성 영역 표시
+    ansInsertBtn?.addEventListener("click", function () {
+        ansZone.style.display = "none";
+        ansInsertDiv.style.display = "block";
+    });
+
+    // 취소 버튼 클릭 시 작성 영역 숨기기
+    ansCancelBtn?.addEventListener("click", function () {
+        ansInsertDiv.style.display = "none";
+        ansZone.style.display = "block";
+        editor.value = ""; // 내용 초기화
+    });
+
+    // 저장 버튼 클릭 시
+    ansSaveBtn?.addEventListener("click", function () {
+        const answerContent = editor.value.trim();
+        if (!answerContent) {
+            alert("답변 내용을 입력하세요.");
+            return;
+        }
+
+        axios.post(`${contextPath}/answer/registerReply`, {
+            sibNo: sibNo,
+            sibAns: answerContent
+        })
+        .then(response => {
+            if (response.data === "success") {
+               
+			swal ( "등록 성공" ,  "답변이 등록되었습니다." ,  "success" );
+
+                location.reload(); // 페이지 새로고침
+            } else {
+              
+		swal ( "등록 실패" ,  "답변 등록에 실패하셨습니다." ,  "warning" );
+            }
+        })
+        .catch(error => {
+            console.error(error);
+swal ( "서버 오류" ,  "서버와 통신 중 오류가 발생했습니다." ,  "warning" );
+        });
+    });
+
+
+	const $ansInsertDiv = $('#ansInsertDiv');
+	
+	$('.ansInsertBtn').on('click', function(){
+		$('.ansZone').hide();
+		$ansInsertDiv.find('.textarea').append(editor);
+		$ansInsertDiv.show();
+	});
+	
+	$('.ansCancelBtn').on('click', function(){
+		$ansInsertDiv.hide();
+		editorInstance.setData("");
+		$('.ansZone').show();
+	});
+	
+	$('.ansUpdateBtn').on('click', function(){
+		$('.dispAnswer').hide();
+		$('.textarea').show();
+		$('#delUpBtn').hide();
+		$('#saveCancelBtn').show();
+
+	});
+	
+	$('.cancleBtn').on('click', function(){
+		$('.textarea').hide();
+		$('#saveCancelBtn').hide();
+		$('.dispAnswer').show();
+		$('#delUpBtn').show();
+	});
+	
+
+
+	$('.ansDeleteBtn').on('click', function() {
+    const sibNo = document.getElementById("sibNo").value;
+
+    if (!sibNo) {
+        console.error("SIB_NO가 정의되지 않았습니다."); // 오류 로그 출력
+		swal ( "삭제 실패" ,  "답변을 삭제하는 것을 실패하셨습니다." ,  "error" );
+        return;
+    }
+
+    swal({
+        title: "정말로 삭제하시겠습니까?",
+        text: "삭제하면 복구할 수 없습니다.",
+        icon: "warning",
+        buttons: ["취소", "삭제"],
+        dangerMode: true,
+    }).then((btnVal) => {
+        if (btnVal) {
+            axios.post(`${contextPath}/answer/deleteReply/${sibNo}`)
+                .then((resp) => {
+                    swal("삭제 완료!", "삭제가 완료되었습니다.", "success").then(() => {
+                        location.reload(); // 페이지 새로고침
+                    });
+                })
+                .catch((err) => {
+                    swal("오류", err.response?.data?.message || "오류가 발생했습니다.", "error");
+                });
+        }
+    });
+});
+
+
+
+
+
+});

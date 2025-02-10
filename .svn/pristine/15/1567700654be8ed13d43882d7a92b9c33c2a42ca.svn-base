@@ -1,0 +1,49 @@
+package kr.or.ddit.yguniv.projectchatroom.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.projectchatroom.dao.ProjectChatRoomMapper;
+import kr.or.ddit.yguniv.vo.ProjectChatRoomVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ProjectChatRoomServiceImpl implements ProjectChatRoomService {
+	private final ProjectChatRoomMapper mapper;
+
+	@Override
+	public int createProjectChatRoom(ProjectChatRoomVO projectChatRoom) {
+		// TODO Auto-generated method stub
+		return mapper.insertProjectChatRoom(projectChatRoom);
+	}
+
+	@Override
+	public ProjectChatRoomVO readProjectChatRoom(String teamCd) {
+		// TODO Auto-generated method stub
+		return mapper.selectProjectChatRoom(teamCd);
+	}
+
+	@Override
+	public List<ProjectChatRoomVO> readProjectChatRoomList(String taskNo) {
+		// TODO Auto-generated method stub
+		return mapper.selectProjectChatRoomlist(taskNo);
+	}
+
+	@Override
+	public int updateProjectChatRoom(ProjectChatRoomVO projectChatRoom) {
+		// TODO Auto-generated method stub
+		return mapper.updateProjectChatRoom(projectChatRoom);
+	}
+
+	@Override
+	public int deleteProjectChatRoom(String teamCd) {
+		// TODO Auto-generated method stub
+		return mapper.deleteProjectChatRoom(teamCd);
+	}
+	
+	
+	
+
+}

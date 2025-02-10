@@ -1,0 +1,36 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@Data
+@EqualsAndHashCode(of="stuId")
+@ToString(exclude = {"atchFileId"})
+public class CertificateVO implements Serializable{
+	@NotNull
+    @Size(max = 10)
+	private String stuId; //학생번호
+	
+	@NotNull
+	private Long atchFileId; //파일그룹번호
+	
+	@NotNull
+	@Size(max = 50)
+	private String certNm; //자격증명
+	
+	@NotNull
+	@Size(min = 8, max = 8)
+	private String certDate; //취득일자
+	
+	
+	
+	
+	//첨부파일그룹
+	//학생
+}

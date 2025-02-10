@@ -1,0 +1,69 @@
+package kr.or.ddit.yguniv.assignment.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+/**
+ * @author AYS
+ * lvn에 ?는 디테일로 갈 수 있게 해당넘버를 붙여줘야함
+ */
+@Controller
+@RequestMapping("/assignment")
+public class AssignmentController {
+	
+	//과제전체조회(검색어 있는지 없는지)
+	@GetMapping()
+	public String selectList() {
+			
+		return "assignment/assignmentList";
+	}
+	//과제 생성폼이동
+	@GetMapping("new")
+	public String createForm() {
+		return "assignment/assignmentForm";
+	}
+
+	//과제 생성
+	@PostMapping()
+	public String create() {
+		
+		//새로 만든 과제번호를 리턴 뒤에 붙임==> 디테일로 갈 수 있게
+		return "assignment/?";
+	}
+	
+	//과제상세조회
+	@GetMapping("{assigCd}")
+	public String select(@PathVariable()int assigCd) {
+		
+		return "assignment/assignmentDetail";
+	}
+	
+	//과제수정폼이동
+	@GetMapping("{assigCd}/edit")
+	public String updateForm() {
+		
+		return "assignment/assignmentEditForm";
+	}
+	
+	
+	//과제수정
+	@PutMapping("{assigCd}")
+	public String update(@PathVariable()int assigCd) {
+		return "assignment/?";
+	}
+	
+	//과제삭제
+	@DeleteMapping("{assigCd}")
+	public String delete(@PathVariable()int assigCd) {
+		return "assignment/assignmentList";
+	}
+	
+	
+}

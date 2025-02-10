@@ -1,0 +1,26 @@
+package kr.or.ddit.yguniv.log.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RequestMapping("/yguniv/log")
+@Controller
+public class LogController {
+	//전체조회
+	@GetMapping()
+	public String selectlist() {
+			
+		return "log/logList";
+	}
+
+	
+	//상세조회
+	@GetMapping("{logNo}")
+	public String select(@PathVariable()String logNo) {
+		
+		return "log/logDetail";
+	}
+}
+

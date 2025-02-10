@@ -1,0 +1,62 @@
+package kr.or.ddit.yguniv.award.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.award.dao.AwardMapper;
+import kr.or.ddit.yguniv.board.answerBoard.exception.BoardException;
+import kr.or.ddit.yguniv.vo.AwardVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class AwardServiceImpl implements AwardService {
+
+	
+	private final AwardMapper mapper;
+	
+	
+	@Override
+	public List<AwardVO> awardList() {
+		
+		return mapper.selectList();
+	}
+
+	@Override
+	public AwardVO selectAward(String awardCd) {
+		
+		AwardVO system = mapper.selectAward(awardCd);
+		
+		
+		if(system == null ) {
+			throw new BoardException(String.format("%s 번 글이 없음", awardCd));
+		}else {
+            System.out.println("AwardVO 데이터: " + system);
+        }
+		
+		
+		return system;
+	}
+
+	public void insertAward (final AwardVO award) {
+		mapper.insertAward(award);
+	}
+	
+	@Override
+	public void updateAward(AwardVO award) {
+		mapper.updateAward(award);
+		
+
+	}
+
+	@Override
+	public void deleteAward(String awardCd) {
+		
+		mapper.DeleteAward(awardCd);
+
+		
+
+	}
+
+}

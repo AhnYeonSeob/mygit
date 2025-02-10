@@ -1,0 +1,40 @@
+document.addEventListener("DOMContentLoaded", () => {
+	console.log("DOMContentLoaded 실행되냐 안되는지 좋게 물어본다.");
+	
+	const updateBtn = document.getElementById("update-btn");
+	
+	 if (!updateBtn) {
+        console.error("수정 버튼을 찾을 수 없습니다.");
+        return;
+    }
+	
+
+updateBtn.addEventListener("click", () => {
+	
+	 console.log("수정 버튼 클릭됨");
+	
+	const checkboxes =  document.querySelectorAll(".check:checked"); //체크된 거 가져왹 
+	
+	 console.log("선택된 체크박스 개수:", checkboxes.length);
+	
+	if(checkboxes.length == 0){
+		swal("오류","수정할 게시글을 선택하시오.","warning");
+		return; 
+	}
+	if(checkboxes.length > 1){
+		swal("오류","1개 이상의 게시글을 선택하셨습니다.","warning");
+		return; 
+	}
+
+	const shapDocNo = checkboxes[0].value; 
+	
+	console.log("선택된 shapDocNo ",shapDocNo);
+	
+	const editUrl = `${contextPath}askAward/${shapDocNo}/student/edit`;
+	
+	window.location.href = editUrl;
+	
+	
+});
+});
+

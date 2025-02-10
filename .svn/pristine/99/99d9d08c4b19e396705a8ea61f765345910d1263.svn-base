@@ -1,0 +1,24 @@
+package kr.or.ddit.yguniv.attendeetest.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.QuestionAnswerVO;
+import kr.or.ddit.yguniv.vo.TestVO;
+
+public interface AttendeeTestService {
+	
+	public List<TestVO> getTestPage(String lectNo);
+	/** 학생이 등록한 답과 db에 등록된 값을 비교하는 기능
+	 * @return 완료 1 / 실패 null
+	 */
+	public Integer questionScoreCheck(String testNo,List<QuestionAnswerVO> attendeeTestVOList);
+	
+	public Integer createRecord(String testNo,String stuId);
+	
+	public Integer checkRecord(String testNo,String stuId);
+
+	
+	//	public TestVO ();
+//	public TestVO ();
+//	public TestVO ();
+}

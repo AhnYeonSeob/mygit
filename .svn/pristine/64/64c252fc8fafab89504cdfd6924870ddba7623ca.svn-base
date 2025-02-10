@@ -1,0 +1,62 @@
+function submitReply() {
+	
+	
+    const replyContent = document.getElementById("adminReply").value.trim();
+
+
+
+    if (replyContent === "") {
+        alert("답변 내용을 입력해 주세요.");
+        return;
+    }
+
+    const data = {
+        sibNo: sibNo.value,
+        sibAns: replyContent
+    };
+
+console.log("이거 들어왔니 ? ",data);
+
+    fetch(contextPath + "/answer/registerReply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+			response.text().then(rslt=> {
+				if(rslt == '"success"'){
+					alert("답변이 등록되었습니다");
+					
+					
+					  // 버튼 숨기기
+            const submitButton = document.getElementById("submitButton");
+            if (submitButton) {
+                submitButton.style.display = "none";
+            }
+
+            // 텍스트 영역 비활성화
+            const adminReply = document.getElementById("adminReply");
+            if (adminReply) {
+                adminReply.disabled = true; // 텍스트 영역 비활성화
+            }
+				
+                
+                // 페이지 새로 고침
+                location.href = location.href;
+
+			
+					
+					
+					
+				}else {
+            		alert("등록에 실패했습니다. 다시 시도해주세요.");			
+				}		
+			})	
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("서버 오류가 발생했습니다.");
+
+
+    });
+}

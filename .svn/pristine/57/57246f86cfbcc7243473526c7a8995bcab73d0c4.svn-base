@@ -1,0 +1,107 @@
+package kr.or.ddit.yguniv.lecture.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.yguniv.lecture.dao.LectureMapper;
+import kr.or.ddit.yguniv.vo.LectureVO;
+
+@Controller
+@RequestMapping("/lecture")
+public class LectureController {
+	@Autowired
+	private LectureMapper mapper;
+	
+	@ResponseBody
+	@GetMapping("my")
+	public List<LectureVO> myLectureList(Authentication auth){
+		return mapper.myLectureList(auth.getName());
+	}
+	
+	
+	@GetMapping("request")
+	public String selectLectureRequestList() {
+		return "lecture/lectureRequestList";
+	}
+	
+	@GetMapping("request/{lectNo}")
+	public void selectLectureRequest(@PathVariable String lectNo) {
+		
+	}
+	
+	@GetMapping("request/new")
+	public String lectureRequestForm() {
+		return "lecture/lectureRequestForm";
+	}
+	
+	@PostMapping("request/new")
+	public void InsertLectureRequest() {
+		
+	}
+	
+	@GetMapping("request/{lectNo}/edit")
+	public String lectureRequestEdit(@PathVariable String lectNo) {
+		return "lecture/lectureRequestEdit";
+	}
+	
+	@PutMapping("request/{lectNo}/edit")
+	public void updateLectureRequest(@PathVariable String lectNo) {
+		
+	}
+	
+	@DeleteMapping("request/{lectNo}")
+	public void deleteLectureRequest(@PathVariable String lectNo) {
+		
+	}
+	
+	@PutMapping("request/{lectNo}/consent")
+	public void consentLectureRequest(@PathVariable String lectNo) {
+		
+	}
+	
+	@PutMapping("request/{lectNo}/return")
+	public void returnLectureRequest(@PathVariable String lectNo) {
+		
+	}
+	
+	@GetMapping("abolition")
+	public String selectLectureAbolitionList() {
+		return "lecture/lectureAbolitionList";
+	}
+	
+	@PutMapping("{lectNo}/abolition")
+	public void updateLectureAbolition(@PathVariable String lectNo) {
+		
+	}
+	
+	@DeleteMapping("{lectNo}/abolition")
+	public void deleteLectureAbolition(@PathVariable String lectNo) {
+		
+	}
+	
+	@PutMapping("{lectNo}/abolition/consent")
+	public void consentLectureAbolition(@PathVariable String lectNo) {
+		
+	}
+	
+	@PutMapping("{lectNo}/abolition/return")
+	public void returnLectureAbolition(@PathVariable String lectNo) {
+		
+	}
+	
+	@GetMapping(value = "lecture/{lectNo}", produces = MediaType.APPLICATION_PDF_VALUE)
+	public void selectLecturePDF() {
+		
+	}
+}

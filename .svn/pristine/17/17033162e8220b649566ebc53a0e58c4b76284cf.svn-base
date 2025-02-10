@@ -1,0 +1,27 @@
+package kr.or.ddit.yguniv.eventregistrant.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.eventregistrant.dao.EventRegistrantMapper;
+import kr.or.ddit.yguniv.vo.EventRegistrantVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class EventRegistrantServiceImpl implements EventRegistrantService {
+	
+	@Autowired
+	private final EventRegistrantMapper mapper;
+	
+	 @Override
+	    public void insertEventRegistrant(EventRegistrantVO eventRegistrant) {
+	        int rowsAffected = mapper.insertEventRegistrant(eventRegistrant);
+	        if (rowsAffected == 0) {
+	            throw new RuntimeException("등록에 실패했습니다.");
+	        }
+	    }
+
+}

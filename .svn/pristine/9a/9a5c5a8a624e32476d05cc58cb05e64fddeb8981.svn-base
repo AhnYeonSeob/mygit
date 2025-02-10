@@ -1,0 +1,39 @@
+package kr.or.ddit.yguniv.person.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.yguniv.commons.enumpkg.ServiceResult;
+import kr.or.ddit.yguniv.vo.PersonVO;
+
+@Mapper
+public interface PersonMapper {
+	/**
+	 * 사용자 추가
+	 * @param jobtest
+	 */
+	public Integer insertPerson(PersonVO person);
+	/**
+	 * 사용자 상세조회
+	 * @param jobtestNo
+	 * @return
+	 */
+	public PersonVO selectPerson(@Param("id") String id);
+	/**
+	 * 사용자 전체 리스트 조회
+	 * @return
+	 */
+	public List<PersonVO>selectPersonList();
+	/**
+	 * 사용자 수정
+	 * @param jobtest
+	 */
+	public ServiceResult updatePerson(PersonVO person);
+	/**
+	 * 사용자 삭제
+	 * @param jobtestNo
+	 */
+	public int deletePerson(String id);
+}

@@ -1,0 +1,424 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const taskSelect = document.querySelector('#taskSelect');
+    const contextPath = taskSelect.dataset.path;
+    const lectNo = taskSelect.dataset.lectno;
+    const teamList = document.querySelector('#teamList');
+    const attendeeList = document.querySelector('#attendeeList');
+	const leaderArea = document.querySelector('#leaderArea');
+    const teamSelect = document.querySelector('#teamSelect');
+    const manualBtn = document.querySelector('#manualBtn');
+	const autoBtn = document.querySelector('#autoBtn');
+	
+	// 자동배정 버튼 클릭 시 모달로 1팀당 배정될 인원 수 입력 받는 폼 
+	autoBtn.addEventListener("click", async ()=>{
+		const taskNo = taskSelect.value;
+		if(!taskNo){
+			swal("CHECK!","과제를 선택해주세요!","info");
+			return;
+		}
+		
+		try{
+			const resp =await fetch(`${contextPath}/lecture/${lectNo}/projectMember/getCount/${taskNo}`)
+			if(resp.ok){
+				const data = await resp.json();
+				const teamCount = data.teamCount;
+				const noTeamAttendeeCount = data.noTeamAttendeeCount;
+				
+				showAutoAssignForm(teamCount,noTeamAttendeeCount,taskNo);
+			}
+			else {
+            swal("ERROR", "팀 데이터를 가져오는 데 실패했습니다.", "error");
+       		}
+		}
+		catch(error){
+			console.error("오류 발생:", error);
+		}
+	});// autoBtn Event 끝
+	
+	//모달생성
+	function showAutoAssignForm(teamCount,noTeamAttendeeCount,taskNo) {
+	    const modalContent = `
+	        <div class="modal fade" id="autoAssignModal" tabindex="-1" aria-labelledby="autoAssignModalLabel" aria-hidden="true">
+			    <div class="modal-dialog">
+			        <div class="modal-content">
+			            <div class="modal-header">
+			                <h5 class="modal-title" id="autoAssignModalLabel">자동배정 설정</h5>
+			                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			            </div>
+			            <div class="modal-body">
+			                <table class="table table-bordered">
+			                    <tbody>
+			                        <tr>
+			                            <th scope="row" style="width: 50%;">현재 개설된 팀 수:</th>
+			                            <td><strong>${teamCount}</strong></td>
+			                        </tr>
+			                        <tr>
+			                            <th scope="row">
+			                                <label for="memberCount" class="form-label mb-0">팀 별 배치할 인원 수</label>
+			                            </th>
+			                            <td>
+			                                <input type="number" id="memberCount" class="form-control" min="1">
+			                            </td>
+			                        </tr>
+									<tr>
+										<th scope="row">
+									        <label class="form-label mb-0">작은 팀 허용</label>
+									    </th>
+									    <td>
+									        <div class="d-flex align-items-center gap-3">
+									            <div class="form-check">
+									                <input type="radio" id="allowSmallTeam" name="smallTeamOption" value="Y" class="form-check-input">
+									                <label for="allowSmallTeam" class="form-check-label">허용</label>
+									            </div>
+									            <div class="form-check">
+									                <input type="radio" id="denySmallTeam" name="smallTeamOption" value="N" class="form-check-input">
+									                <label for="denySmallTeam" class="form-check-label">비허용</label>
+									            </div>
+									        </div>
+									    </td>
+									</tr>
+			                    </tbody>
+			                </table>
+			            </div>
+			            <div class="modal-footer">
+			                <button type="button" id="previewBtn" class="btn btn-primary">미리보기</button>
+			                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+			            </div>
+			        </div>
+			    </div>
+			</div>
+	    `;
+	
+	    document.body.insertAdjacentHTML('beforeend', modalContent);
+	    const modal = new bootstrap.Modal(document.getElementById('autoAssignModal'));
+	    modal.show();
+		//미리보기 버튼 클릭 이벤트
+	    document.getElementById('previewBtn').addEventListener('click', () => previewAutoAssign(teamCount,noTeamAttendeeCount, taskNo));
+	}//모달생성끝
+	
+	//미리보기 처리
+	async function previewAutoAssign(teamCount,noTeamAttendeeCount, taskNo) {
+	    const memberCount = document.getElementById('memberCount').value;
+		const allowYn = document.querySelector('input[name="smallTeamOption"]:checked').value;
+		
+	    if (!memberCount || memberCount <= 0) {
+	        swal("ERROR", "팀당 배치할 인원 수를 입력하세요.", "error");
+	        return;
+	    }
+		if(memberCount>noTeamAttendeeCount){
+			swal("ERROR", "배치되지않은 수강생보다 많은값의 인원을 배치할 수 없습니다.", "error");
+	        return;
+		}
+		if((teamCount*memberCount)>noTeamAttendeeCount){
+			if(allowYn == 'N'){
+				swal("Error", "인원이 부족합니다. 작은 팀을 허용해주세요.", "error");
+            	return;
+			}
+		}
+	
+	    try {
+	        const resp = await fetch(`${contextPath}/lecture/${lectNo}/projectMember/getPreview`, {
+	            method: 'POST',
+	            headers: { 'Content-Type': 'application/json' },
+	            body: JSON.stringify({ lectNo, taskNo, teamCount, memberCount, allowYn  })
+	        });
+	
+	        if (resp.ok) {
+	            const data = await resp.json();
+				console.log(data);
+				//TODO----
+				// 배정 결과 표시
+	            if (data.projectTeamList) {
+					swal("SUCCESS", data.message || "미리보기 배정 완료!", "success");
+	                //showPreview(data.projectTeamList);
+	            }
+				
+	        } else {
+				const errors = await resp.json();
+				
+	            swal("ERROR", errors.message || "자동배정을 가져오는 데 실패했습니다.", "error");
+	        }
+	    } catch (error) {
+	        console.error("오류 발생:", error);
+	    }
+	};//미리보기 처리
+	
+	
+    // 팀원 목록 및 팀에 속하지 않은 수강생 데이터를 렌더링
+    manualBtn?.addEventListener("click", async () => {
+        const taskNo = taskSelect.value;
+        const teamCd = teamSelect.value;
+		const selectedOption = document.querySelector('#teamSelect').selectedOptions[0];
+		const rnum = selectedOption.dataset.rnum;
+		
+        if (!taskNo || !teamCd) {
+            swal("CHECK!", "과제와 팀을 선택해주세요.", "info");
+            return;
+        }
+			
+        try {
+            const resp = await fetch(`${contextPath}/lecture/${lectNo}/projectMember/getMemberAndAttendee/${teamCd}/${taskNo}`);
+            if (resp.ok) {
+                const data = await resp.json();
+				
+                renderLeaderAndTeamList(leaderArea, teamList, data.projectMemberList, `${rnum}팀 팀원 목록`, true);
+                renderList(attendeeList, data.noTeamAttendeeList, "수강생 목록", true);
+				setupDropListeners();
+            } else {
+                console.error("데이터를 가져오는 데 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("오류 발생:", error);
+        }
+    });
+
+    // 수강생 리스트 렌더링 함수
+    function renderList(container, items, title, isDraggable = false) {
+        container.innerHTML = ''; // 기존 내용을 초기화
+		const cardHeader = container.closest('.card').querySelector('.card-header');
+        if (cardHeader) {
+            cardHeader.innerHTML = `<h5 class="card-title mb-0">${title}</h5>`;
+        }
+		
+        items.forEach(item => {
+            const li = document.createElement("li");
+            li.classList.add("list-group-item");
+            li.textContent = `${item.studentVO.nm} (${item.stuId})`;
+            li.dataset.studentId = item.stuId;
+			
+            if (isDraggable) {
+                li.setAttribute("draggable", "true");
+                setupDragAndDrop(li);
+            }
+
+            container.appendChild(li);
+        });
+    }
+
+	// 조장과 팀원을 나누어 렌더링하는 함수
+	function renderLeaderAndTeamList(leaderContainer, teamContainer, members, teamTitle) {
+	    // 조장 영역 초기화
+	    leaderContainer.innerHTML = '';
+	
+	    // 팀원 목록 초기화
+	    teamContainer.innerHTML = '';
+	    const cardHeader = teamContainer.closest('.card').querySelector('.card-header');
+	    if (cardHeader) {
+	        cardHeader.innerHTML = `<h5 class="card-title mb-0">${teamTitle}</h5>`;
+	    }
+	
+	    members.forEach(member => {
+	        const li = document.createElement("li");
+	        li.classList.add("list-group-item");
+	        li.textContent = `${member.studentVO.nm} (${member.stuId})`;
+	        li.dataset.studentId = member.stuId;
+	
+	        // 조장 여부 확인
+	        if (member.leadYn === 'Y') {
+	            leaderContainer.appendChild(li);
+	        } else {
+	            teamContainer.appendChild(li);
+	        }
+	
+	        // 조장과 팀원 모두 드래그 가능
+	        li.setAttribute("draggable", "true");
+	        setupDragAndDrop(li);
+	    });
+	}
+
+
+
+    // 드래그 앤 드롭 설정
+    function setupDragAndDrop(element) {
+        element.addEventListener("dragstart", (e) => {
+            e.dataTransfer.setData("text/plain", e.target.dataset.studentId);
+			 e.dataTransfer.setData(
+		        "isLeader",
+		        element.closest("#leaderArea") ? "true" : "false" // CSS 선택자로 변경
+		    );
+        });
+    }
+
+	 // 드롭 이벤트 설정
+    function setupDropListeners() {
+        teamList.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+		
+		leaderArea.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+		
+		leaderArea.addEventListener("drop", async (e) => {
+            e.preventDefault();
+            const stuId = e.dataTransfer.getData("text/plain");
+            const draggedItem = document.querySelector(`[data-student-id="${CSS.escape(stuId)}"]`);
+            const currentLeader = leaderArea.querySelector('.list-group-item'); // 현재 조장 확인
+			const isInitial = draggedItem.dataset.isInitial == "true"; // 최초 요청인지 확인
+
+            if (currentLeader) {
+                swal("알림", "조장은 1명만 추가 가능합니다.", "warning");
+        		return;
+            }
+
+            if (draggedItem) {
+	
+                leaderArea.appendChild(draggedItem); // 조장 영역에 추가
+
+                // 서버 요청: 조장 설정
+                const teamCd = teamSelect.value;
+                const taskNo = taskSelect.value;
+
+                // 서버 요청
+                try {
+                    const apiEndpoint = isInitial
+                        ? `${contextPath}/lecture/${lectNo}/projectMember/updateMember`
+                        : `${contextPath}/lecture/${lectNo}/projectMember/justUpdate`;
+
+                    const resp = await fetch(apiEndpoint, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ stuId, teamCd, taskNo, leadYn: 'Y' }),
+                    });
+
+                    if (!resp.ok) {
+                        console.error("조장 등록 중 오류 발생");
+                    } else {
+                        draggedItem.dataset.isInitial = "false"; // 최초 요청 처리 후 상태 변경
+                    }
+                } catch (error) {
+                    console.error("서버 요청 오류:", error);
+                }
+           }
+        });
+		
+		
+        teamList.addEventListener("drop", async (e) => {
+            e.preventDefault();
+            const stuId = e.dataTransfer.getData("text/plain");
+            const draggedItem = document.querySelector(`[data-student-id="${CSS.escape(stuId)}"]`);
+
+			const isLeader = draggedItem.parentElement == leaderArea; // leaderArea로부터 이동했는지 확인
+			const isInitial = draggedItem.dataset.isInitial === "true"; // 최초 요청인지 확인
+			
+            if (draggedItem) {
+                teamList.appendChild(draggedItem);
+				
+                // 서버에 업데이트 요청
+				const teamCd = teamSelect.value;
+				const taskNo = taskSelect.value; // taskNo 가져오기
+				
+				if (!taskNo) {
+	                swal("ERROR", "과제를 선택해주세요.", "error");
+	                return;
+	            }
+				const apiEndpoint = isInitial
+                        ? `${contextPath}/lecture/${lectNo}/projectMember/updateMember`
+                        : isLeader
+                        ? `${contextPath}/lecture/${lectNo}/projectMember/justUpdate`
+                        : null;
+				if(apiEndpoint){
+                // 서버 요청
+	                try {
+						
+		                    const resp = await fetch(apiEndpoint, {
+		                        method: 'POST',
+		                        headers: { 'Content-Type': 'application/json' },
+		                        body: JSON.stringify({ stuId, teamCd, taskNo, leadYn: 'N' }),
+		                    });
+		
+		                    if (!resp.ok) {
+		                        console.error("팀원 등록 중 오류 발생");
+		                    } else {
+		                        draggedItem.dataset.isInitial = "false"; // 최초 요청 처리 후 상태 변경
+		                    }
+						
+	                } catch (error) {
+	                    console.error("서버 요청 오류:", error);
+	                }
+				}
+				else{
+					console.log("같은 팀 내 이동으로 서버 요청 없음");
+				}
+            }
+        });
+
+        attendeeList.addEventListener("dragover", (e) => {
+            e.preventDefault();
+        });
+
+        attendeeList.addEventListener("drop", async (e) => {
+            e.preventDefault();
+            const stuId = e.dataTransfer.getData("text/plain");
+            const draggedItem = document.querySelector(`[data-student-id="${CSS.escape(stuId)}"]`);
+
+            if (draggedItem) {
+                attendeeList.appendChild(draggedItem);
+				const taskNo = taskSelect.value; // taskNo 가져오기
+				
+				if (!taskNo) {
+	                swal("ERROR", "과제를 선택해주세요.", "error");
+	                return;
+	            }
+
+                // 서버에 업데이트 요청 (팀에서 제거)
+                try {
+					const isInitial = draggedItem.dataset.isInitial == "true";
+                    const resp = await fetch(`${contextPath}/lecture/${lectNo}/projectMember/removeMember`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ stuId, taskNo })
+                    });
+
+                    if (!resp.ok) {
+                        console.error("팀원 제거 중 오류 발생");
+                    }else {
+		                draggedItem.dataset.isInitial = "false"; // 업데이트 완료 후 초기화
+		            }
+                } catch (error) {
+                    console.error("서버 요청 오류:", error);
+                }
+            }
+        });
+    }
+
+    // 과제 선택 시 팀 목록 갱신
+    taskSelect.addEventListener("change", async () => {
+        const taskNo = taskSelect.value;
+        if (!taskNo) {
+            teamSelect.innerHTML = '<option value="" label="팀선택"></option>';
+            return;
+        }
+
+        try {
+            const resp = await fetch(`${contextPath}/lecture/${lectNo}/projectMember/getTeams/${taskNo}`);
+            if (resp.ok) {
+                const teams = await resp.json();
+
+                teamSelect.innerHTML = '<option value="" label="팀선택"></option>'; // 기본 옵션 추가
+                teams.forEach(team => {
+                    const option = document.createElement("option");
+                    option.value = team.teamCd;
+                    option.textContent = `${team.rnum}팀 (${team.teamPurpo})`;
+					option.dataset.rnum = team.rnum; // 추가된 데이터 속성
+                    teamSelect.appendChild(option);
+                });
+            } else {
+                console.error("팀 데이터를 가져오는 데 실패했습니다.");
+            }
+        } catch (error) {
+            console.error("오류 발생:", error);
+        }
+    });
+
+
+
+
+
+
+});

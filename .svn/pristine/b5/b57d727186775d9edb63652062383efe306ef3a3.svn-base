@@ -1,0 +1,13 @@
+package kr.or.ddit.yguniv.attendeetest.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.TestVO;
+
+public interface AttendeeTestService {
+	
+	public List<TestVO> getTestPage(String lectNo);
+//	public TestVO ();
+//	public TestVO ();
+//	public TestVO ();
+}

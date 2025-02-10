@@ -1,0 +1,30 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 강의 평가기준
+ */
+@Data
+@EqualsAndHashCode(exclude = "rate")
+public class LectureEvaluationStandardVO implements Serializable {
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String lectNo;  // 강의번호
+	@NotBlank
+	@Size(min = 4, max = 4)
+	private String evlStdrCd;  // 평가기준코드
+	@NotNull
+	@Size(min = 0, max = 100)
+	private Integer rate;  // 평가 비율
+	
+	private LectureVO lectureVO;
+	// private CommonCodeVO commonCodeVO
+}

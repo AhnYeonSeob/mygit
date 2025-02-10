@@ -1,0 +1,86 @@
+function showPersonDetail(personId) {
+    axios.get(`../person/detail/${personId}`)
+        .then(resp => {
+            const person = resp.data; // 서버 응답 데이터
+            const personDetailModal = new bootstrap.Modal(document.getElementById('personDetailModal'));
+            personDetailModal.show();
+			for(key in person){
+				console.log(key);
+				$(`#detail-${key}`).text(person[key]);
+			}
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보실패");
+        });
+}
+
+
+
+function showPersonUpdate(personId) {
+	  // data-id 속성에서 person.id 값을 가져옴
+    
+    // personId를 사용하여 필요한 작업을 진행
+    axios.get(`../person/edit/${personId}`) 
+        .then(resp => {
+            console.log(resp.data);
+            const person = resp.data; // 서버 응답 데이터
+            const personUpdateModal = new bootstrap.Modal(document.getElementById('personUpdateModal'));
+            personUpdateModal.show();
+            for (key in person) {
+                console.log(key);
+                // form의 경우 .val()을 사용해 값 설정
+                $(`#update-${key}`).text(person[key]); // .val()을 사용하여 form 요소에 값 채우기
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("사용자 정보 실패");
+        });
+}
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const insertBtn = document.querySelector("#singleinsert-btn");
+	insertBtn.addEventListener("click", () => {
+		$.ajax({
+			url: '../person/new', //여기로보내
+			type: 'GET',  // GET 방식
+			success: function() {
+
+				window.location.href = "../person/new";
+			},
+			error: function() {
+				alert("조회 실패");
+			}
+		});
+	});
+	
+	
+	
+});
+
+/*
+
+
+document.addEventListener("DOMContentLoaded", () => {
+	const updateBtn = document.querySelector("#update-Btn");
+	updateBtn.addEventListener("click", () => {
+		const personId = document.querySelector("#personId").value;
+		$.ajax({
+			url: '../person/edit/' + personId, //여기로보내
+			type: 'PUT',  
+			success: function() {
+				window.location.href = "../person/list";
+			},
+			error: function() {
+				alert("수정 실패");
+			}
+		});
+	});
+});
+
+*/
+
+

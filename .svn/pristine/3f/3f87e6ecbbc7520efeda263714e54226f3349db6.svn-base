@@ -1,0 +1,89 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<head>
+    <title>역할 선택</title>
+<script>
+    // 역할 선택 시 섹션 표시
+    function onRoleChange() {
+        const roleSelect = document.getElementById("roleSelect").value;
+
+        // 섹션들을 가져오기
+        const studentSection = document.getElementById("studentSection");
+        const professorSection = document.getElementById("professorSection");
+        const staffSection = document.getElementById("staffSection");
+        
+      
+
+        // 초기화: 모든 섹션 숨김
+        studentSection.style.display = "none";
+        professorSection.style.display = "none";
+        staffSection.style.display = "none";
+
+        // 선택한 역할에 따라 섹션 표시
+        if (roleSelect === "학생") {
+            studentSection.style.display = "block";
+        } else if (roleSelect === "교수") {
+            professorSection.style.display = "block";
+        } else if (roleSelect === "교직원") {
+            staffSection.style.display = "block";
+        }
+    }
+</script>
+   <body>
+    <form action="${pageContext.request.contextPath }/role/allRole" method="post">
+    <label for ="roleSelect">역할:</label>
+    	<select id="roleSelect" class="form-select" onchange="onRoleChange()">
+    		<option value="" disabled="disabled" > 역할 선택</option>
+    		<option value="학생" > 학생</option>
+    		<option value="교수" > 교수</option>
+    		<option value="교직원" > 교직원</option>    	
+    	</select>
+    	
+    	<br><br>
+    	<div id="studentSection" style="display: none;">
+    	
+    	<label for ="studentGradeSelect" >학년: </label>
+    	<select id="studentGradeSelect" name ="studentGrade"  class="form-select" >
+    	<option value="" disabled selected> 학년선택 </option>
+    
+    	<c:forEach items ="${student}" var="student">
+    	<option value="${student.gradeCd}">${student.gradeCd }</option>
+
+    	</c:forEach>
+
+    	</select>
+    	
+    	</div>
+    	
+    	 
+        <div id="professorSection"  style="display:none;">
+            <label for="professorDeptSelect">학과:</label>
+            <select id="professorDeptSelect" name="professorDept"  class="form-select">
+                <option value="" disabled selected>학과 선택</option>
+                <c:forEach var="department" items="${departments}">
+                    <option value="${department.code}">${department.name}</option>
+                </c:forEach>
+            </select>
+        </div>
+
+       
+        <div id="staffSection" style="display:none;">
+            <label for="staffDeptSelect">부서:</label>
+            <select id="staffDeptSelect" name="staffDept"  class="form-select">
+                <option value="" disabled selected>부서 선택</option>
+                <c:forEach var="staffDept" items="${staffDepts}">
+                    <option value="${staffDept.code}">${staffDept.name}</option>
+                </c:forEach>
+            </select>
+        </div>
+    	
+    	
+    	
+        <br><br>
+        <button type="submit">확인</button>
+    </form>
+    	
+</body>       
+
+

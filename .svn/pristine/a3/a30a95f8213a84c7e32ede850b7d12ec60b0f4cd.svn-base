@@ -1,0 +1,70 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<h1>강의페이지에서 시험 탭 클릭하면 올 곳</h1>
+<h1> 중간고사 기말고사 선택 페이지 </h1>
+학생이 강의페이지로 이동
+시험 버튼 클릭
+등록된 시험 링크 클릭
+시험 대기화면 이동
+응시버튼 클릭
+문제 풀기
+푼 이후 제출 버튼 클릭
+전송 완료 하고 다시 밖으로 나옴
+
+
+<c:if test="${not empty attendeeTestList }">
+	<c:forEach items="${attendeeTestList }" var="attendeeTest" >
+		<div id="contextData" 
+   			  data-context-path="${pageContext.request.contextPath}" >
+			${attendeeTest.testNo }	
+			${attendeeTest.lectNo }
+			${attendeeTest.testSe        }
+			${attendeeTest.testCd        }
+			${attendeeTest.testOnlineYn }
+			${attendeeTest.testSchdl     }
+			${attendeeTest.testDt        }
+			${attendeeTest.testEt        }
+			${attendeeTest.croomCd       }
+	<button class="btn btn-primary" onclick="showConfirm('${attendeeTest.testNo}', '${attendeeTest.lectNo}')"> 응시 </button>
+		
+		</div>
+	</c:forEach>
+</c:if>
+
+<script>
+function showConfirm(testNo, lectNo) {
+    // SweetAlert confirm 창 띄우기
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    swal({
+        title: "시험을 응시하시겠습니까?",   // 제목
+        text: "응시를 시작하려면 예를 클릭하세요.",  // 본문
+        type: "warning",  // 알림 타입 (경고)
+        buttons: ["취소", "응시"], 
+        cancelButtonText: "아니오",  // 아니오 버튼 텍스트
+   		confirmButtonText: "예",  // 예 버튼 텍스트
+        closeOnConfirm: false,  // 확인을 눌러도 창 닫히지 않도록 설정
+        closeOnCancel: false  // 취소를 눌러도 창 닫히지 않도록 설정
+    }).then(function(isConfirm) {
+        if (isConfirm) {
+            // "예" 버튼을 클릭한 경우 팝업 창 띄우기
+            
+            
+            window.open(`../\${lectNo}/attendeeTest/\${testNo}`, 
+//             window.open(`${contextPath}/attendeeTest/\${lectNo}/attendeeTest/\${testNo}`, 
+                        "testPopup", 
+                        "width=700,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no");
+        } else {
+            // "아니오" 버튼을 클릭한 경우
+            swal("취소되었습니다!", "응시를 취소했습니다.", "error");
+        }
+    });
+}
+</script>
+
+
+
+
+

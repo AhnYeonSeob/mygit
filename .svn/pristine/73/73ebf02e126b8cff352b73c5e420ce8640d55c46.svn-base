@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.test.dao.TestMapper">
+
+	<resultMap type="TestVO" id="testMap" autoMapping="true">
+		<result property="testNo" column="TEST_NO"/>
+		<association property="lectVO" javaType="LectureVO" autoMapping="true">
+			<association property="professorVO" javaType="ProfessorVO" autoMapping="true">
+				<association property="person" javaType="PersonVO" autoMapping="true"></association>
+			</association>
+		</association>
+		<association property="classroomVO" javaType="ClassRoomVO" autoMapping="true"></association>
+		<association property="commonVO" javaType="CommonCodeVO" autoMapping="true"></association>
+	</resultMap>
+
+<sql id="selectFrag">
+		<trim prefix="WHERE" prefixOverrides="AND"><!--  조건을 만족하면 AND를 지우고 WHERE을 붙힘-->
+				<if test="paging neq null and paging.detailCondition neq null">
+					<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.testCd)">
+						AND T.TEST_CD=#{paging.detailCondition.testCd}
+					</if>
+					<if test="@org.apache.commons.lang3.StringUtils@isNotBlank(paging.detailCondition.profeId)">
+						AND P.PROFE_ID=#{paging.detailCondition.profeId}
+					</if>
+				</if>
+			</trim>
+	</sql>
+
+<select id="selectTestList" resultMap="testMap">
+<!-- 등록된 시험 리스트 -->
+<!-- 관리자는 상태에 따른 조회기능과 교수는 아이디에 따른 조회기능이 필요 -->
+ SELECT      T.TEST_NO,T.TEST_SE,T.TEST_CD,L.LECT_NM,M.NM,C.CROOM_CD,CO.COCO_STTS
+FROM
+    TEST T INNER JOIN LECTURE L ON T.LECT_NO=L.LECT_NO 
+           INNER JOIN PROFESSOR P ON L.PROFE_ID = P.PROFE_ID
+           INNER JOIN PERSON M ON P.PROFE_ID = M.ID
+           LEFT OUTER JOIN CLASS_ROOM C ON T.CROOM_CD = C.CROOM_CD
+           INNER JOIN COMMON_CODE CO ON T.TEST_CD=CO.COCO_CD
+
+<!-- 	<include refid="selectFrag" /> -->
+WHERE T.TEST_CD='COMP'
+
+</select>
+
+<resultMap id="testResultMap" type="TestVO" autoMapping="true">
+    <id property="testNo" column="TEST_NO"/>
+    <collection property="questionVO" ofType="QuestionVO" autoMapping="true">
+        <id property="queNo" column="QUE_NO"/>
+        <collection property="answerVO" ofType="AnswerChoiceVO" autoMapping="true">
+            <id property="anchNo" column="ANCH_NO"/>
+        </collection>
+    </collection>
+</resultMap>
+<select id="selectTestOne" resultMap="testResultMap">
+    SELECT 
+        T.TEST_NO, T.TEST_SE, T.TEST_CD, T.TEST_ONLINE_YN, T.TEST_SCHDL, T.TEST_DT, T.TEST_ET,
+        Q.QUE_NO, Q.QUE_DESCR, Q.QUE_TYPE, Q.QUE_SCORE, Q.QUE_ANSWER,
+        AC.ANCH_NO, AC.ANCH_DESCR
+    FROM 
+        TEST T
+        INNER JOIN QUESTION Q ON T.TEST_NO = Q.TEST_NO
+        LEFT OUTER JOIN ANSWER_CHOICE AC ON Q.QUE_NO = AC.QUE_NO
+    WHERE 
+        T.TEST_NO = #{TEST_NO}
+</select>
+
+<update id="checkTest">
+UPDATE test
+SET
+    TEST_CD=#{TEST_CD}
+WHERE
+        test_no = #{TEST_NO}
+</update>
+
+
+
+
+
+
+</mapper>

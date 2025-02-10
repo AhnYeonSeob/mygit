@@ -1,0 +1,33 @@
+package kr.or.ddit.yguniv.test.dao;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.TestVO;
+
+/**
+ * 교수 및 교직원 용 TEST person student
+ */
+public interface TestMapper {
+	
+	//시험
+	/** [교직원] 등록된 시험 리스트가 출력된다. [교수] 등록한 시험 리스트
+	 * @return List<TestVO>
+	 */
+	public List<TestVO> selectTestList();
+	/** [교직원] 해당 시험을 상세 조회한다
+	 * @return
+	 */
+	public TestVO selectTestOne(String testNo);
+	/** [교수] 시험을 새로 등록한다
+	 * @return
+	 */
+	public int insertTest();
+	/** [교직원] 등록된 시험을 {대기} 에서 {등록} 상태로 변경한다
+	 * @return
+	 */
+	public int updateTest();
+	/**
+	 * @return
+	 */
+	public int deleteTest();
+}

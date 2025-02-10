@@ -1,0 +1,95 @@
+/**
+ * 학생이 이의신청 페이지에 들어온다. 가장 베스트는 이번 학기에 들은 강의를 선택하고 해당 학기에서 교수에게 받은 점수를 조회할 수 있어야 한다
+ */
+const url = "../../yguniv/dissent"
+const upBtn = document.getElementById("upBtn")
+const selDiv = document.getElementById("selDiv");
+const disForm = document.getElementById("disForm");
+
+document.addEventListener("DOMContentLoaded", ()=>{
+    const $lectNo = $('[name="lectNo"]');
+    const $profeNm = $('[name="profeNm"]');
+    
+    $lectNo.on("change",async event=>{
+        // 선택된 옵션의 value 값 가져오기
+			
+        const selLectNo = event.target.value;
+        const nmUrl = `${url}/${selLectNo}`
+        console.log("선택된 강의번호 : ", selLectNo);
+        console.log("선택: ", nmUrl);
+        
+        const resp = await fetch(nmUrl);
+		const pars = await resp.json();
+		const data = await pars.profeList;
+		
+		const $lectNm = $('#lectNm');
+
+		const $score = $('#score');
+		data.forEach(item => {
+		    const $option = $('<option>')
+		        .val(item.personVO.nm)
+		        .text(item.personVO.nm);
+			$lectNm.empty();
+		    $lectNm.append($option);
+
+
+		});
+		//const stuId= $('#score') 로그인 한 정보
+		const stuId= "2024100003";
+		const rrrurl=`${url}/atten/${stuId}/${selLectNo}`
+		console.log(rrrurl)
+		 // 서버에 해당 강의번호에 대한 데이터 요청
+	 	const scresp = await fetch(rrrurl);
+		const scpars = await scresp.json();
+		const scdata = await scpars.attenOne;
+		
+console.log(scdata)
+		
+		var $lectScore = $('#lectScore');
+		var $attenScore = $('#attenScore');
+		var $assigScore = $('#assigScore');
+		var $testScore = $('#testScore');
+
+		var lectScore = scdata.lectVO.lectScore
+		var attenScore = scdata.attenVO.attenAtndScore
+		var assigScore = scdata.attenVO.assigScore
+		var testScore = scdata.attenVO.testScore
+
+		$lectScore.text(lectScore);  // 학점
+		$attenScore.text(attenScore );  // 출석점수
+		$assigScore.text(assigScore);  // 과제점수
+		$testScore.text(testScore);  // 시험점수
+		
+	});//체인지 이벤ㅌ ㅡ끝
+	
+	disForm.addEventListener
+	
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

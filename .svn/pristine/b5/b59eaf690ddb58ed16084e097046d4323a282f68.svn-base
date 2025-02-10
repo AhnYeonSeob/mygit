@@ -1,0 +1,143 @@
+package kr.or.ddit.yguniv.dissent.controller;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.yguniv.dissent.service.DissentService;
+import kr.or.ddit.yguniv.vo.AttendeeVO;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.ScoreFormalObjectionVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/yguniv/dissent")
+@RequiredArgsConstructor
+public class DissentController {
+	
+	public static final String MODELNAME = "newDissent";
+	private final DissentService service;
+
+	//학생 개인의 강의 리스트 조회
+	//추후에 로그인 한 학생의 학번을 가져와야함!
+	public static final String STUDENTID="2024100001";
+	
+	@ModelAttribute(MODELNAME)
+	public ScoreFormalObjectionVO newModel() {
+		return new ScoreFormalObjectionVO();
+	}
+
+
+	//이의 목록으로 이동
+	//교수는 등록된 리스트가
+		@GetMapping
+		public String selectList(Model model) {
+			
+			List<ScoreFormalObjectionVO> dissList = service.readProfeDissentList();
+			log.info("{}",dissList);
+			
+				model.addAttribute("dissList", dissList) ;
+			return "dissent/courseDissentList";
+		}
+		
+		//이의 내역 하나 조회
+		//
+		@GetMapping("{stuId}/{lectNo}")
+		@ResponseBody
+		public Map<String, Object> selectOne(@PathVariable String stuId,@PathVariable String lectNo,Model model) {
+			log.info("{}",stuId);
+			log.info("{}",lectNo);
+
+		    Map<String, Object> resp = new HashMap<>();
+		    resp.put("dissOne", service.readDissentOne(stuId, lectNo));
+		    
+			return resp;
+		}
+
+		@GetMapping("atten/{stuId}/{lectNo}")
+		@ResponseBody
+		public Map<String, Object> readAttenLectOne(@PathVariable String stuId,@PathVariable String lectNo,Model model) {
+			log.info("★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★{}",stuId);
+			log.info("{}",lectNo);
+			
+			Map<String, Object> resp = new HashMap<>();
+			resp.put("attenOne", service.readAttenLectOne(stuId, lectNo));
+			
+			return resp;
+		}
+		//이의 신청 페이지로 이동
+		//학생은 입력 폼
+		//학생은 등록할수 있는 페이지가
+		@GetMapping("new")
+		public String createForm(Model model) {
+			model.addAttribute("attenLectList", service.readAttenLectList(STUDENTID));
+			
+			return "dissent/courseDissentForm";
+		}
+
+		//이의신청 등록
+		@PostMapping
+		public String create() {
+			return "dissent/courseDissentDetail";
+		}
+		
+		//이의 수정 페이지로 이동
+		//교수와 교직원이 상세조회를 보고 점수 변동을 할 수 있도록
+		@PutMapping
+		@ResponseBody
+//		public Map<String, Object> updateForm(@RequestBody HashMap<String, Object> map) {
+		public Map<String, Object> updateForm(@RequestBody ScoreFormalObjectionVO sVo) {
+			 Map<String, Object> resp = new HashMap<>();
+			 log.info("{}",sVo);
+			
+			 AttendeeVO aVo = sVo.getAttenVO();
+			 aVo.setLectNo(sVo.getLectNo());
+			 aVo.setStuId(sVo.getStuId());
+			 log.info("※※※※※※※※※※※※※※※※※※※※※※※※※※※※※{}",sVo.getAttenVO());
+			 
+			 Integer res = service.modifyDissentAndAttendee(sVo, aVo);
+			 
+			 resp.put("nice", "okok");
+			 
+			return resp;
+		}
+		
+		@GetMapping("{lectNo}")
+		@ResponseBody
+		public Map<String, Object> getProfeName(@PathVariable String lectNo) {
+			log.info("☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆☆{}",lectNo);
+			 Map<String, Object> resp = new HashMap<>();
+			 
+			 List<LectureVO> lVo = service.readProfeName(lectNo);
+			 
+			 resp.put("profeList", lVo);
+			 
+			return resp;
+		}
+		
+		//등록된 이의 삭제?
+		//부적절한 이의 신청 삭제 기능
+		@DeleteMapping()
+		public String delete() {
+			
+			return "dissent/courseDissentList";
+		}
+		
+		
+		
+		
+}

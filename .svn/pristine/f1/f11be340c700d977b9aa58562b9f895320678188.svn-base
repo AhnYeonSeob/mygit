@@ -1,0 +1,27 @@
+package kr.or.ddit.yguniv.mypage.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/mypage")
+public class MypageController {
+	
+	@GetMapping
+	public String MypageForm(){
+		return "mypage/myPageForm";
+	}
+	
+	@PutMapping("{prsId}")
+	public String UpdateMyPage(@PathVariable() String prsId) {
+		return "mypage/myPageEdit";
+	}
+	
+	
+	
+	
+
+}

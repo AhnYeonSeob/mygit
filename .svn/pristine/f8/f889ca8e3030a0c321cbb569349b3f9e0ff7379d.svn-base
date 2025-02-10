@@ -1,0 +1,67 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
+<script>
+    const contextPath = "${pageContext.request.contextPath}/";
+</script>
+
+
+<div class="container">
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <c:forEach var="award" items="${award}">
+            <security:authorize access="hasRole('STUDENT')">
+                <c:if test="${award.awardType == '신청서'}">
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${award.awardNm}</h5>
+                                <p class="card-text">${award.awardDetail}</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">유형: ${award.awardType}</li>
+                                <li class="list-group-item">금액: <fmt:formatNumber value="${award.awardGiveAmt}" type="number" pattern="#,###"/> 원</li>
+                                <li class="list-group-item">혜택: ${award.awardBenefit}</li>
+                                <li class="list-group-item">제출 서류: ${award.awardDocument}</li>
+                            </ul>
+                            <div class="card-footer" style="text-align: right">
+                                <a href="${pageContext.request.contextPath}/askAward/createAwardAsk/new?awardCd=${award.awardCd}&awardNm=${award.awardNm}" 
+                                   class="card-link">신청하기</a>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </security:authorize>
+
+            <security:authorize access="hasRole('PROFESSOR')">
+                <c:if test="${award.awardType == '추천서'}">
+                    <div class="col">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">${award.awardNm}</h5>
+                                <p class="card-text">${award.awardDetail}</p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">유형: ${award.awardType}</li>
+                                <li class="list-group-item">금액: <fmt:formatNumber value="${award.awardGiveAmt}" type="number" pattern="#,###"/> 원</li>
+                                <li class="list-group-item">혜택: ${award.awardBenefit}</li>
+                                <li class="list-group-item">제출 서류: ${award.awardDocument}</li>
+                            </ul>
+                            <div class="card-footer" style="text-align: right">
+                                <a href="${pageContext.request.contextPath}/recommendAward/createRecAward/new?awardCd=${award.awardCd}&awardNm=${award.awardNm}" 
+                                   class="card-link">신청하기</a>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>
+            </security:authorize>
+        </c:forEach>
+    </div>
+</div>
+
+
+
+<%-- <script src="${pageContext.request.contextPath }/resources/js/award/awardAll.js"></script> --%>

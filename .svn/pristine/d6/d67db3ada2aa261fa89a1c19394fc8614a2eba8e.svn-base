@@ -1,0 +1,24 @@
+/**
+ * 
+ */
+
+document.addEventListener('DOMContentLoaded',async function(){
+ 	const id = document.getElementById("id").value
+ 	const contextPath = document.getElementById("contextPath").value
+	
+	console.log(id)
+	console.log(contextPath)
+	
+	url=`${contextPath}/attendCoeva/${id}`
+	console.log(url)
+	fetch(url)
+	.then(resp=>resp.json())
+	.then(data=>{
+		console.log(data.semList)
+	})
+	
+	
+
+
+});
+

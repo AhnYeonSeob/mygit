@@ -1,0 +1,44 @@
+
+document.addEventListener("DOMContentLoaded", () => {
+	
+	const contextPath = document.getElementById('contextPath').value;
+	const cnbNo = document.getElementById('cnbNo').value;
+
+	// 공지사항 게시판 상세조회
+	fetch(`${contextPath}/lecture/${lectNo.value}/board/boardDetail/${cnbNo}`)
+	        .then(response => response.json())  // 서버에서 받은 JSON 응답
+	        .then(data => {
+			console.log("data : ", data);
+			document.getElementById('absenceReason2').innerHTML = data.cnbNotes; // 게시물에 CK에디터 넣어주기
+			renderFileDetails(data.atchFile.fileDetails)
+		})
+	
+	// 서버에서 받은 파일 상세 목록 데이터를 렌더링하는 함수
+	function renderFileDetails(fileDetails) {
+	    const container = document.getElementById('fileDetailsContainer'); 
+	    container.innerHTML = ''; // 기존 내용을 초기화
+	
+	    if (fileDetails && fileDetails.length > 0) {
+	        let content = '<td>'; // 파일 리스트를 <td> 안에 넣을 것임
+	
+	        fileDetails.forEach((fd, index) => {
+	            const downUrl = `${contextPath}/absence/atch/${fd.atchFileId}/${fd.fileSn}`; // 다운로드 URL 생성
+	            content += `
+	                <a href="${downUrl}">${fd.orignlFileNm} (${fd.fileFancysize})</a>
+	                ${index !== fileDetails.length - 1 ? '|' : ''} <!-- 마지막 항목 뒤에 '|' 추가 -->
+	            `;
+	        });
+	
+	        content += '</td>'; // <td> 태그 닫기
+	        container.innerHTML = content; // 최종적으로 동적으로 생성된 내용을 container에 삽입
+	    } else {
+	        container.innerHTML = '<td>첨부파일 없음</td>'; // 파일이 없을 경우
+	    }
+	}
+
+
+}); 
+
+
+
+

@@ -1,0 +1,52 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.time.LocalDateTime;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+/**
+ * 학적변동기록(서류)
+ */
+@Data
+@EqualsAndHashCode(of = "streIssuNo")
+@ToString(exclude = {"streRes", "returnRsn"})
+public class StudentRecordsVO {
+	@NotBlank
+	@Size(min = 9, max = 9)
+	private String streIssuNo;  // 서류발급번호
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String stuId;  // 신청학생번호
+	@Size(min = 10, max = 10)
+	private String profeId;  // 담당교수번호
+	@NotBlank
+	@Size(max = 4)
+	private String streCateCd;  // 학적상태코드
+	@NotBlank
+	@Size(max = 4)
+	private String streStatusCd;  // 결제상태코드
+	@NotBlank
+	@Size(max = 3000)
+	private String streRes;  // 학적변동사유
+	@NotNull
+	@DateTimeFormat(iso = ISO.DATE_TIME)
+	private LocalDateTime reqstDt;  // 신청일시
+	@Size(min = 8, max = 8)
+	private String confmDe;  // 승인일자
+	@Size(max = 3000)
+	private String returnRsn;  // 반려사유
+	
+	private StudentVO studentVO;
+	private ProfessorVO professorVO;
+	private CommonCodeVO streCateCodeVO;
+	private CommonCodeVO streStatusCodeVO;
+}

@@ -1,0 +1,96 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+    <style>
+        .details-container {
+            margin-top: 30px;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .section-header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="section-header text-center">학생 논문 상세보기</div>
+
+    <!-- 논문 상세 정보 -->
+    <div class="details-container">
+        <table class="table table-bordered">
+            <thead class="table-primary">
+                <tr>
+                    <th colspan="2" class="text-center">논문 정보</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th class="text-center">제목</th>
+                    <td>${paper.gpaNm}</td>
+                </tr>
+                <tr>
+                    <th class="text-center">부제목</th>
+                    <td>${paper.gpaDnm != null ? paper.gpaDnm : "없음"}</td>
+                </tr>
+                <tr>
+                    <th class="text-center">주제</th>
+                    <td>${paper.gpaSub != null ? paper.gpaSub : "없음"}</td>
+                </tr>
+                <tr>
+                    <th class="text-center">학생 번호</th>
+                    <td>${paper.stuId}</td>
+                </tr>
+                <tr>
+                    <th class="text-center">논문 등록일자</th>
+                    <td>${paper.gpaDate}</td>
+                </tr>
+                <tr>
+                    <th class="text-center">상태</th>
+                    <td>
+                        <c:choose>
+                            <c:when test="${paper.gpaStatus eq 'G003'}">승인 대기</c:when>
+                            <c:when test="${paper.gpaStatus eq 'G004'}">승인</c:when>
+                            <c:when test="${paper.gpaStatus eq 'G005'}">반려</c:when>
+                            <c:otherwise>알 수 없음</c:otherwise>
+                        </c:choose>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- 첨부 파일 -->
+        <table class="table table-bordered mt-4">
+            <thead class="table-secondary">
+                <tr>
+                    <th colspan="2" class="text-center">첨부 파일</th>
+                </tr>
+            </thead>
+            <tbody>
+                <c:if test="${paper.atchFile != null && paper.atchFile.useAt}">
+                    <tr>
+                        <th class="text-center">다운로드</th>
+                        <td>
+                            <a href="${pageContext.request.contextPath}/atch/download/${paper.atchFile.atchFileId}" 
+                               >논문 파일 다운로드</a>
+                        </td>
+                    </tr>
+                </c:if>
+                <c:if test="${paper.atchFile == null || !paper.atchFile.useAt}">
+                    <tr>
+                        <td colspan="2" class="text-center">첨부 파일이 없습니다.</td>
+                    </tr>
+                </c:if>
+            </tbody>
+        </table>
+
+		<div style="text-align: right; margin-top: 20px;">
+		    <a href="${pageContext.request.contextPath}/graduationpaper/list" class="btn btn-secondary">목록</a>
+		</div>
+
+    </div>
+</div>
+</body>
+</html>

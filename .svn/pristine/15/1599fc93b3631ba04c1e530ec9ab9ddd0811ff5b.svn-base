@@ -1,0 +1,12 @@
+package kr.or.ddit.yguniv.studentCard.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface StudentCardMapper {
+	
+
+	
+	
+
+}

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.jobboard.dao.JobBoardMapper">
+
+<resultMap type="JobBoardVO" id="boardMap" autoMapping="true">
+  <!-- has-many 관계로 여러 EventRegistrant 객체를 가져옴 -->
+  <collection property="eventRegistrants" ofType="EventRegistrantVO"
+    column="JOB_NO" />
+</resultMap>
+
+
+<sql id="freeBoardColumns">
+	JOB_NO, JOB_NM, JOB_DATE, JOB_CATE_CD, JOB_CNT, JOB_DT, JOB_ET,
+	JOB_LIMIT, ATCH_FILE_ID, JOB_YN
+</sql>
+	<insert id="insertjobBoard" parameterType="JobBoardVO">
+		<selectKey order="BEFORE" resultType="String" keyProperty="jobNo">
+			SELECT JOBBOARD_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO JOBBOARD
+		<include refid="freeBoardColumns"/>
+		)VALUES(
+			, #{jobNo, jdbcType=VARCHAR}
+			, #{jobNm, jdbcType=VARCHAR}
+			, #{jobDate, jdbcType=DATE}
+			, #{jobCateCd, jdbcType=VARCHAR}
+			, #{jobCnt, jdbcType=NUMERIC}
+			, #{jobDt, jdbcType=DATE}
+			, #{jobEt, jdbcType=DATE}
+			, #{jobLimit, jdbcType=NUMERIC}
+			, #{atchFileId, jdbcType=NUMERIC}
+			, #{jobYn , jdbcType=VARCHAR}
+		)
+		
+	</insert>
+	<select id="selectjobBoardList" resultType="JobBoardVO">
+		SELECT
+		<include refid="freeBoardColumns"/>
+		FROM JOBBOARD
+	</select>
+	
+	<select id="selectjobBoard" resultType="JobBoardVO">
+		SELECT
+		<include refid="freeBoardColumns"/>
+		FROM JOBBOARD
+		WHERE JOB_NO= #{jobNo}
+	</select>
+	
+	 
+	<update id="updatejobBoard">
+		UPDATE JOB_BOARD
+		  SET
+		  	  JOB_NM = #{jobNm, jdbcType=VARCHAR}
+			  ,JOB_DATE #{jobDate, jdbcType=DATE}
+			  ,JOB_CATE_CD #{jobCateCd, jdbcType=VARCHAR}
+			  ,JOB_CNT #{jobCnt, jdbcType=NUMERIC}
+			  ,JOB_DT #{jobDt, jdbcType=DATE}
+			  ,JOB_ET #{jobEt, jdbcType=DATE}
+			  ,JOB_LIMIT #{jobLimit, jdbcType=NUMERIC}
+			  ,ATCH_FILE_ID #{atchFileId, jdbcType=NUMERIC}
+			  ,JOB_YN #{jobYn , jdbcType=VARCHAR}
+	WHERE JOB_NO = #{jobNo, jdbcType=VARCHAR}
+		  
+	
+	</update>
+	
+	<update id="deletejobBoard">
+	UPDATE JOB_BOARD
+		SET JOB_YN ='Y'
+	WHERE JOB_NM = #{jobNm, jdbcType=VARCHAR}
+	</update>
+
+
+
+</mapper>

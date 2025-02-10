@@ -1,0 +1,16 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<h1>강의평가 리스트</h1>
+<h1>학생은 등록 UI</h1>
+<h1>교수는 강의 UI가</h1>
+${id }
+${pageContext.request.contextPath }
+<input type="hidden" id="id" name="id" value="${id }">
+<input type="hidden" id="contextPath" name="contextPath" value="${pageContext.request.contextPath }">
+
+
+
+<!-- /Team01Project/src/main/webapp/resources/js/attendcoeva/attendCoevaScript.js -->
+<script src="${pageContext.request.contextPath }/resources/js/attendcoeva/attendCoevaScript.js"></script>
+
+

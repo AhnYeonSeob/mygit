@@ -1,0 +1,37 @@
+package kr.or.ddit.yguniv.jobtest.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.JobTestVO;
+
+@Mapper
+public interface JobTestMapper {
+	/**
+	 * 직업선호도검사 추가
+	 * @param jobtest
+	 */
+	public void insertjobTest(JobTestVO jobtest);
+	/**
+	 * 직업선호도검사 상세조회
+	 * @param jobtestNo
+	 * @return
+	 */
+	public JobTestVO selectjobTest(String jobtestNo);
+	/**
+	 * 직업선호도검사 전체 리스트 조회
+	 * @return
+	 */
+	public List<JobTestVO>selectjobTestList();
+	/**
+	 * 직업선호도검사 수정
+	 * @param jobtest
+	 */
+	public void updatejobTest(JobTestVO jobtest);
+	/**
+	 * 직업선호도 검사 삭제
+	 * @param jobtestNo
+	 */
+	public void deletejobTest(String jobtestNo);
+}

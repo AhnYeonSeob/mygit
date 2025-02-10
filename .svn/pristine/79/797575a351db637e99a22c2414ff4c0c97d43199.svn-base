@@ -1,0 +1,311 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", async () => {
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+
+	await getLectureCartList(contextPath);
+})
+
+
+async function getLectureCartList(url) {
+	const getUrl = `${url}/lectureCart`; // 요청 URL
+	const $dummyTable = $("#parentTable"); // table
+	const $studentTable = $("#studentTable"); // table
+
+	$.ajax({
+		url: getUrl,
+		type: "GET",
+		success: function(data) {
+			console.log(data);
+			const cleanData = removeNullProperties(data);
+			console.log(cleanData);
+			const lectureList = cleanData.lectureList;
+			const studentLectureList = cleanData.studentLectureList;
+			console.log(lectureList);
+			console.log(studentLectureList);
+			const studentLectNos = new Set(cleanData.studentLectureList.map(lecture => lecture.lectNo));
+
+			// $dummyTable 데이터테이블 초기화
+			var table = $dummyTable.DataTable({
+				 language: {
+        emptyTable: "등록된 강의가 없습니다",
+        lengthMenu: "페이지당 _MENU_ 개씩 보기",
+        info: "총 _TOTAL_ 건의 강의 중 _START_ ~ _END_ 표시",
+        infoEmpty: "강의 없음",
+        infoFiltered: "(전체 _MAX_ 건 중 검색결과)"
+    },
+ ordering: false,
+				data: lectureList,
+				dom: 'lrtip', // 기본 검색창 제거
+				searching: true,
+				// 기존 옵션들...
+				classes: {
+					header: 'fw-bold',  // 헤더 텍스트 굵게
+					sInfo: 'text-primary mb-2', // 정보 텍스트 스타일
+					sPageButton: 'btn btn-outline-primary' // 페이지네이션 버튼 스타일
+				},
+				rowCallback: function(row, data) {
+					$(row).addClass('align-middle'); // 행 내용 수직 중앙 정렬
+				},
+				columns: [
+					{ data: 'lectNm', name: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', name: 'subjectVO.subFicdCd', title: '구분' },
+					{ data: 'professorVO.nm', name: 'professorVO.nm', title: '교수명' },
+					{ data: 'subjectVO.departmentVO.deptNm', name: 'subjectVO.departmentVO.deptNm', title: '학과' },
+					{ data: 'subjectVO.gradeCd', name: 'subjectVO.gradeCd', title: '학년' },
+					{ data: 'lectScore', title: '학점' },
+					{
+						data: null,
+						title: '정원',
+						render: function(data, type, row) {
+//							return `${row.lectEnNope} / ${row.lectAttenNope}`; 
+							return `${row.lectEnNope} / 0`; //예비 수강신청은 신청자 수를 안보이도록
+						}
+					},
+					{
+						data: 'joinSchedule',
+						title: '시간',
+						render: function(data, type, row) {
+							return row.joinSchedule == null ? '온라인' : row.joinSchedule;
+						}
+					},
+					{
+						data: 'scheduleVO[0].classRoomVO.croomPstn',
+						title: '강의실',
+						render: function(data, type, row) {
+							return (row.scheduleVO && row.scheduleVO[0] && row.scheduleVO[0].classRoomVO && row.scheduleVO[0].classRoomVO.croomPstn) || '온라인';
+						}
+					},
+					{
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					},
+					{
+						data: null,
+						title: '장바구니',
+						render: function(data, type, row) {
+							if (studentLectNos.has(row.lectNo)) {
+								return `<button class="btn btn-warning">신청완료</button>`;
+							} else {
+								return `<button class="btn btn-primary" onclick="insertCart('${row.lectNo}')">담기</button>`;
+							}
+						}
+					}
+				]
+			});
+
+			$('#resetButton').on('click', function() {
+
+				// 검색 입력 필드 초기화
+				$('#searchInput').val('');
+
+				// 데이터테이블의 모든 검색 필터 제거 및 다시 그리기
+				table.search('').columns().search('').draw();
+			});
+
+
+			// 검색 기능 추가
+			$('#searchButton').on('click', function() {
+				var searchColumn = $('#searchColumn').val(); // 선택된 검색 조건
+				var searchTerm = $('#searchInput').val(); // 입력된 검색어
+					console.log(searchColumn)
+					console.log(searchTerm)
+				// 선택된 열에서 검색 수행
+				table.column(`${searchColumn}:name`).search(searchTerm).draw();
+			});
+
+			// $studentTable 데이터테이블 초기화
+			$studentTable.DataTable({
+				 language: {
+        emptyTable: "조회 가능한 강의가 없습니다",
+        lengthMenu: "페이지당 _MENU_ 개씩 보기",
+        info: "총 _TOTAL_ 건의 강의 중 _START_ ~ _END_ 표시",
+        infoEmpty: "강의 없음",
+        infoFiltered: "(전체 _MAX_ 건 중 검색결과)"
+    },
+ordering: false,
+				data: studentLectureList,
+				classes: {
+					header: 'fw-bold',  // 헤더 텍스트 굵게
+					sInfo: 'text-primary mb-2', // 정보 텍스트 스타일
+					sPageButton: 'btn btn-outline-primary' // 페이지네이션 버튼 스타일
+				},
+				rowCallback: function(row, data) {
+					$(row).addClass('align-middle'); // 행 내용 수직 중앙 정렬
+				},
+				columns: [
+					{
+						data: null,
+						title: '신청',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="deleteCart('${row.lectNo}')">취소</button>`;
+						}
+					},
+					{ data: 'lectNm', title: '강의명' },
+					{ data: 'subjectVO.subFicdCd', title: '구분' },
+					{ data: 'professorVO.nm', title: '교수명' },
+					{ data: 'lectScore', title: '학점' },
+					{
+						data: null,
+						title: '강의계획서',
+						render: function(data, type, row) {
+							return `<button class="btn btn-primary" onclick="showLecturePaper('${row.lectNo}')">강의계획서</button>`;
+						}
+					}
+				],
+				// 기본 UI 요소 비활성화
+				searching: false, // 검색창 제거
+				paging: false,     // 페이징 비활성화
+				info: false,       // 테이블 정보 제거
+				lengthChange: false, // 출력 갯수 선택 제거
+				pageLength: -1     // 모든 데이터를 한 페이지에 출력
+			});
+		},
+		error: function(request, status, error) {
+			console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+		}
+	});
+}
+
+
+
+// null 값을 제거하는 재귀 함수
+function removeNullProperties(obj) {
+	if (typeof obj !== 'object' || obj === null) {
+		return obj; // 객체가 아니거나 null인 경우 그대로 반환
+	}
+
+	// 객체를 복제하면서 null이 아닌 값만 유지
+	if (Array.isArray(obj)) {
+		return obj.map(item => removeNullProperties(item)).filter(item => item !== null);
+	}
+
+	const result = {};
+	for (const key in obj) {
+		if (obj[key] !== null) {
+			result[key] = removeNullProperties(obj[key]);
+		}
+	}
+	return result;
+}
+
+async function insertCart(lectNo) {
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const url = `${contextPath}/lectureCart`;
+    const stuId = document.getElementById("stuId").value;
+
+    try {
+        const resp = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                lectNo: lectNo,
+                stuId: stuId
+            })
+        });
+
+        if (!resp.ok) {
+            const errorData = await resp.json();
+            throw new Error(errorData.message || "Unknown error occurred");
+        }
+
+        const data = await resp.json();
+        
+        // 기존 테이블 제거
+        $('#parentTable').DataTable().destroy();
+        $('#studentTable').DataTable().destroy();
+        
+        // 데이터 다시 불러오기
+        await getLectureCartList(contextPath);
+
+        swal({
+            title: "수강신청 성공",
+            text: "수강신청 성공",
+            icon: "success",
+            button: "확인"
+        });
+    } catch (err) {
+        swal({
+            title: "처리 실패",
+            text: err.message,
+            icon: "error",
+            button: "확인"
+        });
+    }
+}
+
+async function deleteCart(lectNo) {
+    const dataElement = document.getElementById('contextData');
+    const contextPath = dataElement.dataset.contextPath;
+    const url = `${contextPath}/lectureCart`;
+    const stuId = document.getElementById("stuId").value;
+    
+    try {
+        const resp = await fetch(url, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                lectNo: lectNo,
+                stuId: stuId
+            })
+        });
+
+        if (!resp.ok) {
+            const errorData = await resp.json();
+            throw new Error(errorData.message || "Unknown error occurred");
+        }
+
+        const data = await resp.json();
+        
+        // 기존 테이블 제거
+        $('#parentTable').DataTable().destroy();
+        $('#studentTable').DataTable().destroy();
+        
+        // 데이터 다시 불러오기
+        await getLectureCartList(contextPath);
+
+        swal({
+            title: "수강신청 취소",
+            text: "수강신청 취소 성공",
+            icon: "success",
+            button: "확인"
+        });
+    } catch (err) {
+        swal({
+            title: "처리 실패",
+            text: err.message,
+            icon: "error",
+            button: "확인"
+        });
+    }
+}
+async function showLecturePaper(lectNo) {
+	const dataElement = document.getElementById('contextData');
+	const contextPath = dataElement.dataset.contextPath;
+	const url = `${contextPath}/lectureCart/lecturePaper/${lectNo}`;
+	console.log(lectNo)
+
+	window.open(url,
+		"testPopup",
+		"width=700,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no");
+
+
+}
+
+
+
+
+
+
+
+

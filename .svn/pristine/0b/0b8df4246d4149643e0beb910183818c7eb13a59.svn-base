@@ -1,0 +1,5 @@
+package kr.or.ddit.yguniv.login.service;
+
+public interface PersonService {
+	public int mergeIntoPersonVisit(String date);
+}

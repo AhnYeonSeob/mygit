@@ -1,0 +1,192 @@
+/**
+ * 
+ */
+let fnPaging;
+let fnDetailStu;
+
+document.addEventListener("DOMContentLoaded", function(){
+	let search = document.getElementById('search');
+	let searchDiv = document.getElementById('searchDiv');
+	let searchBtn = document.getElementById('searchBtn');
+	let resetBtn = document.getElementById('resetBtn');
+	let searchForm = document.forms['searchForm'];
+	let $stuTable = $('#stuTable');
+	
+	// 검색 컬랩스 이벤트에 따른 전송 버튼 가시성 수정
+	const toggleBtn = function(){
+		if (searchDiv.classList.contains('hidden')) {
+	        searchDiv.classList.remove('hidden');
+	        searchDiv.classList.add('visible');
+	    } else {
+	        searchDiv.classList.remove('visible');
+	        searchDiv.classList.add('hidden');
+	    }
+	}
+	search.addEventListener('hide.bs.collapse', function(){
+		toggleBtn();
+	});
+	search.addEventListener('show.bs.collapse', function(){
+		toggleBtn();
+	});
+	
+	// 검색버튼으로 검색
+	searchBtn.addEventListener('click', function(){
+		searchForm.requestSubmit();
+	});
+	
+	// reset버튼으로 초기화
+	resetBtn.addEventListener('click', function(){
+		$('#search').find('input, select').each((i,v)=>{
+			v.value = '';
+		});
+	});
+	
+	// 페이지 버튼 누르면 동작
+	fnPaging = function(page){
+		document.querySelector('#page').value = page;
+		searchForm.requestSubmit();
+	};
+	
+	searchForm.addEventListener('submit', e=>{
+		e.preventDefault();
+		table.draw();
+	})
+	
+	let orderColumn = ['STU_ID', 'NM', 'GRADE_CD', 'DEPT_CD', 'STRE_CATE_CD']
+	var table = $stuTable.DataTable({
+        processing: true // 로딩 표시 활성화
+        , serverSide: true // 서버사이드 렌더링 활성화
+		, searching: false
+		, lengthChange: false
+		, paging: false
+		, info: false
+        , ajax: {
+            url: `${cp.value}/student`
+            , type: 'POST'
+			, contentType: 'application/json'
+            , data: function (d) {
+				let formData = new FormData(searchForm);
+				let conditionObj = {};
+				formData.forEach((value, key) => {
+					if (value.trim() != '') {
+        				conditionObj[key] = value;
+					}
+			    });
+				d.detailCondition = conditionObj;
+				let orderList = [];
+				for(order of d.order){
+					orderList.push({
+						column: orderColumn[order.column]
+						, dir: order.dir
+					});
+				}
+				d.orderList = orderList;
+				d.length = $('#pageLength').val();
+				d.start = d.length * ($('#page').val()-1);
+				return JSON.stringify(d);
+            }
+			, dataSrc: function(json){
+				$('#stuTable tfoot').html('<tr><td colspan="6">' + json.pageHTML + '</td></tr>')
+				return json.data;
+			}
+        }
+        , columns: [
+            { data: 'stuId' }
+            , { data: 'nm' }
+            , { data: 'gradeCocoVO.cocoStts' }
+            , { data: 'departmentVO.deptNm' }
+            , { data: 'streCateCocoVO.cocoStts' }
+            , { data: 'professor.nm' }
+        ]
+		, columnDefs: [
+	        {
+	            targets: '_all'
+	            , createdCell: function (td, cellData, rowData, row, col) {
+	                $(td).addClass('text-center');
+	            }
+	        }
+	        , {
+	            targets: 5
+	            , orderable: false
+	        }
+		]
+		, initComplete: function(settings, json) {
+	        $('#stuTable thead th').css('text-align', 'center');
+	        $('#stuTable tbody').addClass('table-light');
+	    }
+		, createdRow: function(row, data, dataIndex) {
+	        $(row).attr('onclick', `fnDetailStu(${data.stuId});`);
+	    }
+		, language: {
+	        emptyTable: "현재 표시할 학생이 존재하지 않습니다"
+	        , zeroRecords: "해당하는 학생이 존재하지 않습니다"
+	        , infoEmpty: "현재 표시할 학생이 존재하지 않습니다"
+	    }
+    });
+
+	$('#pageLength').on('change', function () {
+	    var newLength = $(this).val();
+	    table.page.len(newLength).draw();
+	});
+	
+	fnDetailStu = function(id){
+		console.log(id);
+		axios.get(`${cp.value}/student/${id}`)
+		.then(({data})=>{
+			console.log(data);
+			let basicInfoHtml = `
+				<table class="table table-bordered m-0">
+					<colgroup>
+						<col width="100px">
+						<col width="60px">
+						<col width="120px">
+					</colgroup>
+		      		<tbody>
+		      			<tr>
+		      				<th rowspan="6"><img src="data:image/*;base64,${data.proflPhoto}"/></th>
+		      				<th>학번</th>
+		      				<td>${data.id}</td>
+		      			</tr>
+		      			<tr>
+		      				<th>이름</th>
+		      				<td>${data.nm}</td>
+		      			</tr>
+		      			<tr>
+		      				<th>학년</th>
+		      				<td>${data.gradeCocoVO.cocoStts}</td>
+		      			</tr>
+		      			<tr>
+		      				<th>학과</th>
+		      				<td>${data.departmentVO.deptNm}</td>
+		      			</tr>
+		      			<tr>
+		      				<th>학적</th>
+		      				<td>${data.streCateCocoVO.cocoStts}</td>
+		      			</tr>
+		      			<tr>
+		      				<th>담당교수</th>
+		      				<td>${data.professor.nm}</td>
+		      			</tr>
+						<tr>
+							<th>전화번호</th>
+							<td colspan="2">${data.mbtlnum}</td>
+						</tr>
+						<tr>
+							<th>이메일</th>
+							<td colspan="2">${data.eml}</td>
+						</tr>
+						<tr>
+							<th>주소</th>
+							<td colspan="2">(${data.zip})${data.rdnmadr} ${data.daddr}</td>
+						</tr>
+		      		</tbody>
+		      	</table>
+			`;
+			$('#basicInfo').html(basicInfoHtml);
+			new bootstrap.Modal('#detailStuModal').show();
+			
+		}).catch((err)=>{
+			
+		});
+	};
+})

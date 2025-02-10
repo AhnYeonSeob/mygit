@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.person.dao.PersonMapper">
+	
+<resultMap type="PersonVO" id="personMap" autoMapping="true">
+
+  <collection property="student" ofType="StudentVO"
+    column="STU_ID" />
+  <collection property="professor" ofType="ProfessorVO"
+    column="PROFE_ID" />
+  <collection property="employee" ofType="EmployeeVO"
+    column="EMP_ID" />
+ 
+</resultMap>
+	
+	
+	
+	<insert id="insertPerson">
+		
+	</insert>
+	
+	<select id="selectPerson">
+	
+	</select>
+	
+<!-- 	사용자 리스트 조회 -->
+	<select id="selectPersonList" resultType="PersonVO">
+		SELECT * FROM PERSON
+	</select>
+	
+	<update id="updatePerson">
+	
+	</update>
+	
+	<delete id="deletePerson">
+	
+	</delete>
+	
+
+</mapper>

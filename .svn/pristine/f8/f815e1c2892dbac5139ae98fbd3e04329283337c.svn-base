@@ -1,0 +1,90 @@
+package kr.or.ddit.yguniv.introduce.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.introduce.dao.IntroduceMapper;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.IntroduceVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class IntroduceServiceImpl implements IntroduceService {
+	
+	private final IntroduceMapper mapper;
+
+	@Override
+	public void insertintroduce(IntroduceVO introduce) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public IntroduceVO updateintroduce(IntroduceVO introduce) {
+		int updateCount = mapper.updateintroduce(introduce); 
+        if (updateCount > 0) {
+            // 업데이트 성공 시 수정된 데이터 다시 조회
+            return mapper.selectintroduce(introduce.getStuId());
+        }
+        return null;
+	}
+
+
+	@Override
+	public IntroduceVO selectintroduce(String stuId) {
+		IntroduceVO introduce =mapper.selectintroduce(stuId);
+		return introduce;
+	}
+	
+	@Override
+	public IntroduceVO selectEditedIntroduce(String stuId) {
+		return mapper.selectEditedIntroduce(stuId);
+	}
+
+	//교직원용
+	@Override
+	public List<IntroduceVO> selectintroduceListPaging(PaginationInfo<IntroduceVO> paging) {
+		paging.setTotalRecord(mapper.selectTotalRecord(paging));
+		List<IntroduceVO>introduceList = mapper.selectintroduceListPaging(paging);
+		return introduceList;
+	}
+	
+	//학생용
+	@Override
+	public List<IntroduceVO> selectIntroduceByUserId(String stuId,PaginationInfo<IntroduceVO> paging) {
+		paging.setTotalRecord(mapper.selectTotalRecord(paging));
+		List<IntroduceVO>myintroduce = mapper.selectIntroduceByUserId(stuId,paging);
+		return myintroduce;
+	}
+
+	@Override
+	public void deleteintroduce(String stuId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int selectTotalRecord(PaginationInfo<IntroduceVO> paging) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+	
+	
+
+    
+    
+
+
+
+
+	}
+
+

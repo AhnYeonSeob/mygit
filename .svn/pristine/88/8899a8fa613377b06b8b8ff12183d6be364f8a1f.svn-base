@@ -1,0 +1,43 @@
+package kr.or.ddit.yguniv.lecturenoticeboard.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.LectureNoticeBoardVO;
+
+@Mapper
+public interface LectureNoticeBoardMapper {
+	
+	/**
+	 * 강의 공지 게시판 등록
+	 * @param lectureNoticeBoard
+	 */
+	public void insertLectureNoticeBoard(LectureNoticeBoardVO lectureNoticeBoard);
+	
+	/**
+	 * 강의 공지 게시판 상세 조회
+	 * @param cnbNo
+	 * @return
+	 */
+	public LectureNoticeBoardVO selectLectureNoticeBoard(String cnbNo);
+	
+	/**
+	 * 강의 공지 게시판 전체 리스트 조회
+	 * @return
+	 */
+	public List<LectureNoticeBoardVO> selectLectureNoticeBoardList();
+	
+	/**
+	 * 강의 공지 게시판 수정
+	 * @param lectureNoticeBoard
+	 */
+	public void updateLectureNoticeBoard(LectureNoticeBoardVO lectureNoticeBoard);
+	
+	/**
+	 * 강의 공지 게시판 삭제
+	 * @param cnbNo
+	 */
+	public void deleteLectureNoticeBoard(String cnbNo);
+	
+}

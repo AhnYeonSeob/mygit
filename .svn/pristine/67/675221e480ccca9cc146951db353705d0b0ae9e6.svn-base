@@ -1,0 +1,15 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>    
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="security" %>    
+
+<body>
+	<div class="welcome">
+        <h1>학사정보시스템에 오신 것을 환영합니다!</h1>
+        <p>시스템을 통해 다양한 학사 정보를 관리할 수 있습니다.</p>
+	</div>
+</body>
+
+
+
+

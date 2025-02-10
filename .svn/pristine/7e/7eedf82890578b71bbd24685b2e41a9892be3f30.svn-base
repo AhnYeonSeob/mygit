@@ -1,0 +1,48 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+@ToString
+@Data
+@EqualsAndHashCode(of = "stuId")
+public class StudentVO implements Serializable{
+	
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String stuId; // 학번
+	@NotBlank
+	@Size(min = 4, max = 4)
+	private String gradeCd; // 학년
+	@NotBlank
+	@Size(min = 4, max = 4)
+	private String stuEnrollmentYn; // 학적상태코드
+	@NotBlank
+	private String deptCd; // 학과번호 
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String profeId; // 담당교수
+	
+	private String dormantDate; // 휴면게정일자 
+	
+
+		@ToString.Exclude
+		private PersonVO person;
+		
+		@ToString.Exclude
+		private ProfessorVO professor;
+		
+//		@ToString.Exclude
+//		private CommonVO common;
+//		
+//		@ToString.Exclude
+//		private CommonVO common2;
+	
+
+}

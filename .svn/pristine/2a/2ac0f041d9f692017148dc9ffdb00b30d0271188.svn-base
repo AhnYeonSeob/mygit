@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.test.dao.TestMapper">
+
+	<resultMap type="TestVO" id="testMap">
+		<association property="lectVO" javaType="LectureVO" autoMapping="true">
+			<association property="professorVO" javaType="ProfessorVO" autoMapping="true">
+				<association property="person" javaType="PersonVO" autoMapping="true"></association>
+			</association>
+		</association>
+		<association property="classroomVO" javaType="ClassRoomVO" autoMapping="true"></association>
+	</resultMap>
+
+<select id="selectTestList" >
+<!-- 등록된 시험 리스트 -->
+<!-- 시험 문제와 그거에 대한 테이블이 필요한지 고민하기-->
+SELECT
+    T.TEST_NO, T.TEST_SE, T.TEST_CD, L.LECT_NM, M.NM, C.CROOM_CD
+FROM
+    TEST T INNER JOIN LECTURE L ON T.LECT_NO=L.LECT_NO 
+           INNER JOIN PROFESSOR P ON L.PROFE_ID = P.PROFE_ID
+           INNER JOIN PERSON M ON P.PROFE_ID = M.ID
+           INNER JOIN CLASS_ROOM C ON T.CROOM_CD = C.CROOM_CD
+
+
+</select>
+
+<!-- 시험 한 건을 조회 -->
+<select id="selectTestOne">
+
+</select>
+
+
+</mapper>

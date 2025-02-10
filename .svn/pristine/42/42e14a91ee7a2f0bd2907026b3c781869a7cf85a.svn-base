@@ -1,0 +1,228 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<input id="cp" type="hidden" value="${pageContext.request.contextPath }"/>
+<input id="lectNo" type="hidden" value="${lecture.lectNo }"/>
+<input id="lectSession" type="hidden" value="${lecture.lectSession }"/>
+<c:set value="${lecture.lectOnlineYn }" var="online"/>
+<table class="table table-primary align-middle table-bordered">
+	<thead>
+		<tr class="text-center align-middle">
+			<th style="width: 70px;">순서</th>
+			<th>강의명</th>
+		<c:if test="${online eq 'Y' }">
+			<th style="width: 110px;">학습시작일</th>
+			<th style="width: 110px;">학습종료일</th>
+			<th style="width: 120px;">이수인정시간<br>(분)</th>
+		</c:if>
+		<c:if test="${online eq 'N' }">
+			<th>학습일</th>
+			<th>강의실</th>
+			<th>교시</th>
+		</c:if>
+			<th style="width: 140px;"></th><!-- 교수권한 -->
+			<!-- 수강생일 경우 : 강의명 | 학습기간(시작일~종료일) | 이수인정시간 | 이수시간 | 완료여부 | 강의입장 -->
+		</tr>
+	</thead>
+	<tbody class="table-group-divider">
+	<c:forEach items="${lectureMaterialsList }" var="week">
+		<tr class="table-light weekCd delWeek" data-week-cd="${week.weekCd }">
+			<td class="fw-bold text-center cocoStts">${week.commonCodeVO.cocoStts }</td>
+			<td colspan="4" class="leweNm fw-bold">${week.leweNm }</td>
+			<td class="text-center"><!-- 교수권한 -->
+				<button class="btn btn-outline-info week-update-btn">수정</button>
+				<button class="btn btn-outline-danger week-delete-btn">삭제</button>
+				<button class="btn btn-outline-primary week-update-save-btn" style="display: none;">저장</button>
+				<button class="btn btn-outline-secondary week-update-cancel-btn" style="display: none;">취소</button>
+			</td>
+		</tr>
+		<c:forEach items="${week.orderLectureDataList }" var="data">
+		<tr class="table-secondary delWeek orderLecture" data-week-cd="${week.weekCd }" data-lect-order="${data.lectOrder }">
+			<td class="text-center lectOrder" data-lect-order="${data.lectOrder }">${data.lectOrder }차시</td>
+			<td>${data.sectNm }</td>
+		<c:if test="${online eq 'Y' }">
+			<td class="text-center">${fn:substring(data.sectDt,0,4) }-${fn:substring(data.sectDt,4,6) }-${fn:substring(data.sectDt,6,8) }</td>
+			<td class="text-center">${fn:substring(data.sectEt,0,4) }-${fn:substring(data.sectEt,4,6) }-${fn:substring(data.sectEt,6,8) }</td>
+			<td class="text-center">${data.sectIdnty}</td>
+		</c:if>
+		<c:if test="${online eq 'N' }">
+			<td class="text-center">${fn:substring(data.sectDt,0,4) }-${fn:substring(data.sectDt,4,6) }-${fn:substring(data.sectDt,6,8) }</td>
+			<td></td>
+			<td></td>
+		</c:if>
+			<td class="text-center">
+				<button class="btn btn-info data-update-btn">수정</button>
+				<button class="btn btn-danger data-delete-btn">삭제</button>
+			</td><!-- 교수권한 -->
+		</tr>
+		</c:forEach>
+	</c:forEach>
+	</tbody>
+</table>
+<button class="btn btn-primary float-end me-2" style="position: sticky; bottom: 50px;"
+	data-bs-toggle="modal" data-bs-target="#insertWeekModal">등록</button><!-- 교수권한 -->
+
+<!-- 추가 모달 -->
+<div class="modal fade" id="insertWeekModal" tabindex="-1" aria-labelledby="insertWeekModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="insertWeekModalLabel">등록</h1>
+        <div class="ms-auto">        
+	        <input type="radio" class="btn-check" name="insertOption" id="week" autocomplete="off" checked>
+			<label class="btn btn-outline-secondary mx-1" for="week">주차</label>
+			
+			<input type="radio" class="btn-check" name="insertOption" id="order" autocomplete="off">
+			<label class="btn btn-outline-secondary" for="order">차시</label>
+		</div>
+      </div>
+      <div id="insertWeekDiv">
+	      <div class="modal-body">
+		  	<div class="input-group">
+		  		<select class="form-select" id="weekCd"></select>
+				<input type="text" id="leweNm" class="form-control" style="width: 250px;" placeholder="주차제목을 입력하세요"/>
+			</div>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-primary week-insert-btn">저장</button>
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	      </div>
+      </div>
+      <div id="insertOrderDiv" style="display: none;">
+      	<div class="modal-body">
+	      	<form name="insertDataForm">
+	      		<div class="row">
+	      			<div class="col">
+				      	<div class="mb-3">
+					    	<label for="dataWeekCd" class="form-label">차시 등록 주차</label>
+					  		<select class="form-select dataWeekCd" name="weekCd"></select>
+					  	</div>
+					</div>
+	      			<div class="col">
+					  	<div class="mb-3">
+					    	<label for="lectOrder" class="form-label">강의차시</label>
+					    	<div class="input-group">
+					  			<input type="number" class="form-control" name="lectOrder" min=1 max="${lecture.lectSession }"/>
+					  			<label class="input-group-text" for="lectOrder">차시</label>
+					  		</div>
+					  	</div>
+					</div>
+			  	</div>
+			  	<div>
+			    	<label for="lectNm" class="form-label">차시제목</label>
+			  		<input type="text" class="form-control" name="sectNm"/>
+			  	</div>
+			  	<div class="row align-middle">
+	      			<div class="col">
+					  	<div class="my-3">
+					    	<label for="sectDt" class="form-label">학습시작일</label>
+					  		<input type="date" class="form-control" name="sectDt"/>
+					  	</div>
+					</div>
+					<div class="col-auto">
+					    <div style="display: flex; align-items: center; height: 130%;">
+					      <h4>~</h4>
+					    </div>
+					</div>
+	      			<div class="col">
+					  	<div class="my-3">
+					    	<label for="sectEt" class="form-label">학습종료일</label>
+					  		<input type="date" class="form-control" name="sectEt"/>
+					  	</div>
+					</div>
+				</div>
+			  	<div class="mb-2">
+			    	<label for="sectIdnty" class="form-label">이수인정시간 : <span id="output">0</span>분</label>
+			  		<input type="range" class="form-range" name="sectIdnty"
+			  			min="0" max="120" step="10" value="0" oninput="document.getElementById('output').textContent = this.value"/>
+			  	</div>
+			  	<div>
+				  <label class="form-label" for="uploadFiles">차시 강의 영상</label>
+				  <input type="file" class="form-control" name="uploadFiles" accept="video/*">
+				</div>
+		  	</form>
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-primary data-insert-btn">저장</button>
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+	      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 차시 수정 모달 -->
+<div class="modal fade" id="updateDataModal" tabindex="-1" aria-labelledby="updateDataModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="updateDataModalLabel">차시 수정</h1>
+      </div>
+      <div class="modal-body">
+      	<form name="updateDataForm">
+      		<div class="row">
+      			<div class="col">
+			      	<div class="mb-3">
+				    	<label for="dataWeekCd" class="form-label">차시 등록 주차</label>
+				  		<select class="form-select dataWeekCd" name="weekCd"></select>
+				  	</div>
+				</div>
+      			<div class="col">
+				  	<div class="mb-3">
+				    	<label for="lectOrder" class="form-label">강의차시</label>
+				    	<div class="input-group">
+				  			<input type="number" class="form-control" name="lectOrder" min=1 max="${lecture.lectSession }"/>
+				  			<label class="input-group-text" for="lectOrder">차시</label>
+				  		</div>
+				  	</div>
+				</div>
+		  	</div>
+		  	<div>
+		    	<label for="sectNm" class="form-label">차시제목</label>
+		  		<input type="text" class="form-control" name="sectNm"/>
+		  	</div>
+		  	<div class="row align-middle">
+      			<div class="col">
+				  	<div class="my-3">
+				    	<label for="sectDt" class="form-label">학습시작일</label>
+				  		<input type="date" class="form-control" name="sectDt"/>
+				  	</div>
+				</div>
+				<div class="col-auto">
+				    <div style="display: flex; align-items: center; height: 130%;">
+				      <h4>~</h4>
+				    </div>
+				</div>
+      			<div class="col">
+				  	<div class="my-3">
+				    	<label for="sectEt" class="form-label">학습종료일</label>
+				  		<input type="date" class="form-control" name="sectEt"/>
+				  	</div>
+				</div>
+			</div>
+		  	<div class="mb-2">
+		    	<label for="sectIdnty" class="form-label">이수인정시간 : <span id="updateOutput">0</span>분</label>
+		  		<input type="range" class="form-range" name="sectIdnty"
+		  			min="0" max="120" step="10" value="0" oninput="document.getElementById('updateOutput').textContent = this.value"/>
+		  	</div>
+		  	<div>
+			  <label class="form-label" for="uploadFiles">차시 강의 영상</label>
+			  <div class="input-group mb-3">
+				  <span class="input-group-text">등록 영상</span>
+				  <input type="text" class="form-control" name="uploadedFiles" disabled>
+			  </div>
+			  <input type="file" class="form-control" name="uploadFiles">
+			</div>
+	  	</form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary data-update-submit-btn">저장</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="${pageContext.request.contextPath }/resources/js/lecture/lectureMaterialsList.js"></script>
+

@@ -1,0 +1,49 @@
+/**
+ * 
+ */
+
+
+document.addEventListener("DOMContentLoaded",()=>{
+	const taskSelect= document.querySelector('#taskSelect');
+	const contextPath = taskSelect.dataset.path;
+	const lectNo = taskSelect.dataset.lectno;
+	const teamArea = document.querySelector('#teamArea');
+	
+	taskSelect.addEventListener("change",async ()=>{
+		const taskNo = taskSelect.value;
+		if(taskNo==""){
+			teamArea.innerHTML = "";
+			return;
+		}
+		   // 초기화
+        teamArea.innerHTML = "";
+
+        try {
+            const resp = await fetch(`${contextPath}/lecture/${lectNo}/projectTeam/${taskNo}`);
+            if (!resp.ok) {
+                throw new Error("서버 통신 오류");
+            }
+
+            const data = await resp.json();
+			console.log(data);
+            // 리스트를 순회하며 team-box 요소 추가
+            data.forEach(team => {
+                const teamDiv = document.createElement("div");
+                teamDiv.className = "team-box";
+                teamDiv.innerHTML = `<a href="javascript:void(0);" onclick="fnGetDetail(${team.teamCd})">${team.rnum}팀 (${team.teamPurpo})</a>`; // 팀 이름 출력
+                teamArea.appendChild(teamDiv);
+            });
+        } catch (error) {
+            console.error(error);
+            swal("오류 발생", "서버 통신 중 오류가 발생했습니다.", "error").then(() => {
+                window.location.reload();
+            });
+        }
+    });
+	
+	//function fnGetDetail(teamCd){
+		
+	//}
+	
+	
+});//DOM 끝

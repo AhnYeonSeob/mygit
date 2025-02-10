@@ -1,0 +1,5 @@
+package kr.or.ddit.yguniv.professor.dao;
+
+public interface professorMapper {
+
+}

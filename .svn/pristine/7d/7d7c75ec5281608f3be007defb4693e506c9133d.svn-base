@@ -1,0 +1,31 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+
+@Data
+public class AbsenceCertificateReceiptVO implements Serializable {
+
+	@Size(max = 10)
+	@NotBlank
+	private String stuId;
+	@NotBlank
+	@Size(max = 10)
+	@NotBlank
+	private String courNo;
+	@NotBlank
+	@Size(max = 10)
+	private String sectNo;
+	@NotBlank
+	@Size(max = 10)
+	private String lectNo;
+	
+	private String absenceResn;
+
+	private Long atchFileId;
+}

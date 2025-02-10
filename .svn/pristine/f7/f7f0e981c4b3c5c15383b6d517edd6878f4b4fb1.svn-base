@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.login.dao.PersonDAO">
+	<select id="selectPersonForAuth" resultType="PersonVO">
+		SELECT
+			ID
+			, PSWD
+			, NM
+			, MBTLNUM
+			, EML
+			, CRTFC_MN_CD
+			, CASE 
+	            WHEN S.STU_ID IS NOT NULL THEN 'STUDENT'
+	            WHEN E.EMP_ID IS NOT NULL THEN 'EMPLOYEE'
+	            WHEN F.PROFE_ID IS NOT NULL THEN 'PROFESSOR'
+	            ELSE 'ADMIN'
+	        END AS PERSON_TYPE
+		FROM PERSON P
+	    LEFT OUTER JOIN STUDENT S ON(P.ID = S.STU_ID)
+	    LEFT OUTER JOIN PROFESSOR F ON(P.ID = F.PROFE_ID)
+	    LEFT OUTER JOIN EMPLOYEE E ON(P.ID = E.EMP_ID)
+		WHERE ID = #{id, jdbcType=VARCHAR} AND PERSON_YN = 'N'
+	</select>
+	
+	<!-- 실패횟수 증가 -->
+	
+	<update id="loginCount">
+	
+	UPDATE PERSON 
+SET
+PSWD_FAILR_CO = PSWD_FAILR_CO+1
+WHERE ID = #{id,jdbcType= VARCHAR}
+	</update>
+	
+	<!-- 실패 횟수 초기화 -->
+	<update id="resetFail">
+	UPDATE PERSON 
+	SET 
+	PSWD_FAILR_CO = 0
+	WHERE ID =#{id,jdbcType=VARCHAR}
+	</update>
+	
+	
+	<!-- 실패 횟수 조회 -->
+	<select id="failLoginCount" resultType="String" >
+	SELECT PSWD_FAILR_CO
+	FROM PERSON 
+	WHERE ID=#{id,jdbcType=VARCHAR}
+	
+	
+	
+	</select>
+	
+	
+</mapper>

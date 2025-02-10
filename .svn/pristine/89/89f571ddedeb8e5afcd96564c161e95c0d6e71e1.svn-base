@@ -1,0 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<div id="contextData" data-context-path="${pageContext.request.contextPath}" >
+<input type="hidden" id="lectNo" name="lectNo" value="${lectNo }"></div>  
+<h1>강의계획서용 단독페이지</h1>
+
+
+
+
+
+
+
+
+<script  src="${pageContext.request.contextPath }/resources/js/lecturecart/lecturePaperScript.js"></script>

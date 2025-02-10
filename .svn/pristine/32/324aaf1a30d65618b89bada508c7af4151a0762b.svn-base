@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.absencecertificatereceipt.dao.AbsenceCertificateReceiptMapper">
+
+<resultMap type="AbsenceCertificateReceiptVO" id="absenceMap" autoMapping="true">
+	<association property="attendanceVO" javaType="AttendanceVO" autoMapping="true" />
+	<association property="studentVO" javaType="StudentVO" autoMapping="true" />
+	<association property="attendeeVO" javaType="AttendeeVO" autoMapping="true" />
+	<association property="commonCodeVO" javaType="CommonCodeVO" autoMapping="true" />
+	<association property="orderVO" javaType="OrderLectureDataVO" autoMapping="true" 	/>
+	<collection property="atchFileDetailList" ofType="AtchFileDetailVO" autoMapping="true"/>
+</resultMap>
+	
+
+	<!-- 공결인정서 신규 등록 -->
+	<insert id="insertAbsenceCertificateReceipt">
+		<selectKey order="BEFORE" resultType="string" keyProperty="absenceCd">
+			SELECT SEQ_ABSENCE.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO ABSENCE_CERTIFICATE_RECEIPT
+		(ABSENCE_CD, STU_ID, LECT_ORDER, LECT_NO, ABSENCE_RESN, ATCH_FILE_ID, WEEK_CD, COCO_CD)
+		VALUES
+		(#{absenceCd, jdbcType=VARCHAR}
+		, #{stuId, jdbcType=VARCHAR}
+		, #{lectOrder, jdbcType=NUMERIC}
+		, #{lectNo, jdbcType=VARCHAR}
+		, #{absenceResn, jdbcType=VARCHAR}
+		, #{atchFileId, jdbcType=NUMERIC}
+		, #{weekCd, jdbcType=VARCHAR}
+		, 'CO01')
+	</insert>
+	
+	<!-- 하나의 공결인정서 수정 -->
+	<update id="updateAbsence">
+		UPDATE ABSENCE_CERTIFICATE_RECEIPT
+		SET ABSENCE_RESN = #{absenceResn, jdbcType=VARCHAR}
+		WHERE ABSENCE_CD = #{absenceCd, jdbcType=VARCHAR} 
+	</update>
+	
+	
+	<!-- 하나의 공결인정서 상태 수정   -->
+	<update id="updateAbsenceCertificateReceipt">
+		UPDATE ABSENCE_CERTIFICATE_RECEIPT
+		SET COCO_CD = #{cocoCd, jdbcType=VARCHAR}
+		WHERE ABSENCE_CD = #{absenceCd, jdbcType=VARCHAR} 
+	</update>	
+	
+	<!-- 동시 수정 absence, attendance -->
+	<update id="updateAbsenceAndAttendance">
+    <!-- 공결인정서 상태 수정 -->
+	    UPDATE ABSENCE_CERTIFICATE_RECEIPT A
+	    SET A.COCO_CD = #{cocoCd, jdbcType=VARCHAR}
+	    WHERE ABSENCE_CD = #{absenceCd, jdbcType=VARCHAR} 
+	
+	<!-- 출결 상태 수정 / 여기서 하지말고 attendanceMapper에서 처리하기 -->
+<!-- 	    UPDATE ATTENDANCE -->
+<!-- 	    SET ATND_CD = #{attendanceVO.atndCd, jdbcType=VARCHAR} -->
+<!-- 	    WHERE STU_ID = #{attendanceVO.stuId, jdbcType=VARCHAR} -->
+<!-- 		  AND LECT_NO = #{attendanceVO.lectNo, jdbcType=VARCHAR} -->
+<!-- 		  AND WEEK_CD = #{attendanceVO.weekCd, jdbcType=VARCHAR} -->
+<!-- 		  AND LECT_ORDER = #{attendanceVO.lectOrder, jdbcType=NUMERIC} -->
+	</update>
+
+	<!-- 하나의 공결인정서 '삭제'로 상태 수정   -->
+	<update id="deleteAbsenceCertificateReceipt">
+		UPDATE ABSENCE_CERTIFICATE_RECEIPT
+		SET COCO_CD = 'CO04'
+		WHERE ABSENCE_CD = #{absenceCd, jdbcType=VARCHAR} 
+	</update>
+	
+	
+
+	<!-- 하나의 공결인정서 상세 조회 -->
+	<select id="selectAbsenceCertificateReceipt" resultMap="absenceMap">
+		SELECT A.ABSENCE_CD
+		, A.LECT_NO
+		, A.LECT_ORDER
+        , E.SECT_DT 
+        ,(SELECT COCO_STTS FROM COMMON_CODE WHERE COCO_CD = E.SECT_ETIME ) AS TEIN
+        , A.STU_ID
+        , C.NM
+        ,(SELECT COCO_STTS FROM COMMON_CODE WHERE COCO_CD = D.ATND_CD) AS ATST
+        , A.ABSENCE_RESN
+        , A.ATCH_FILE_ID
+        ,(SELECT COCO_STTS FROM COMMON_CODE WHERE COCO_CD = A.COCO_CD) AS PRST
+        , A.COCO_CD
+        , D.ATND_CD
+        , A.WEEK_CD
+        FROM 
+		    ABSENCE_CERTIFICATE_RECEIPT A
+            INNER JOIN ATCH_FILE_DETAIL B ON A.ATCH_FILE_ID = B.ATCH_FILE_ID
+            INNER JOIN PERSON C ON A.STU_ID = C.ID
+            INNER JOIN ATTENDANCE D ON A.STU_ID = D.STU_ID
+                AND A.WEEK_CD = D.WEEK_CD
+                AND A.LECT_ORDER = D.LECT_ORDER
+                AND A.LECT_NO = D.LECT_NO
+            INNER JOIN ORDER_LECTURE_DATA E ON A.LECT_ORDER = E.LECT_ORDER
+                AND A.WEEK_CD = E.WEEK_CD
+                AND A.LECT_NO = E.LECT_NO
+        WHERE ABSENCE_CD = ${absenceCd, jdbcType=VARCHAR} 
+	</select>
+	
+	
+	<!-- 공결상태 리스트 조회 -->
+	<select id="selectAbsenceCertificateReceiptList" resultMap="absenceMap">
+		SELECT 
+		    A.ABSENCE_CD,
+		    A.LECT_NO,
+		    A.LECT_ORDER,
+		    E.SECT_DT,
+		    (SELECT COCO_STTS FROM COMMON_CODE WHERE COCO_CD = E.SECT_ETIME ) AS TEIN,
+		    A.STU_ID,
+		    C.NM,
+		    (SELECT COCO_STTS FROM COMMON_CODE WHERE COCO_CD = D.ATND_CD) AS ATST,
+		    A.ABSENCE_RESN,
+		    A.ATCH_FILE_ID,
+		    PRST.COCO_STTS AS PRST, -- 서브쿼리 결과를 별칭으로 가져오기
+		    A.COCO_CD,
+		    D.ATND_CD,
+		    A.WEEK_CD
+		FROM 
+		    ABSENCE_CERTIFICATE_RECEIPT A
+		    INNER JOIN ATCH_FILE_DETAIL B ON A.ATCH_FILE_ID = B.ATCH_FILE_ID
+		    INNER JOIN PERSON C ON A.STU_ID = C.ID
+		    INNER JOIN ATTENDANCE D ON A.STU_ID = D.STU_ID
+		        AND A.WEEK_CD = D.WEEK_CD
+		        AND A.LECT_ORDER = D.LECT_ORDER
+		        AND A.LECT_NO = D.LECT_NO
+		    INNER JOIN ORDER_LECTURE_DATA E ON A.LECT_ORDER = E.LECT_ORDER
+		        AND A.WEEK_CD = E.WEEK_CD
+		        AND A.LECT_NO = E.LECT_NO
+		    LEFT JOIN COMMON_CODE PRST ON PRST.COCO_CD = A.COCO_CD
+        WHERE A.LECT_NO = #{lectNo, jdbcType=VARCHAR}
+        <if test="@org.apache.commons.lang3.StringUtils@isNotBlank(stuId)">
+        	AND PRST.COCO_STTS != '삭제'
+        	AND A.STU_ID = #{stuId, jdbcType=VARCHAR}
+        </if>
+	</select>
+	
+
+	
+
+
+
+</mapper>

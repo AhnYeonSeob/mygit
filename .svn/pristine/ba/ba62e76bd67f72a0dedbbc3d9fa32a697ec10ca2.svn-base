@@ -1,0 +1,97 @@
+document.querySelectorAll('.fetch-attendance-btn').forEach(button => {
+    button.addEventListener('click', function() {
+        const weekCd = this.dataset.weekCd;
+        const lectOrder = this.dataset.lectOrder;
+        
+        console.log('weekCd:', weekCd);  // weekCd 출력
+        console.log('lectOrder:', lectOrder);  // lectOrder 출력
+
+        // 모든 출결 데이터 행을 가져옵니다.
+        const rows = document.querySelectorAll('#attendanceTableBody .attendanceRow');
+
+        // 모든 행을 숨기고, 필터링된 행만 표시합니다.
+        rows.forEach(row => {
+            // 각 행의 data-week-cd, data-lect-order 속성을 가져옵니다.
+            const rowWeekCd = row.dataset.weekCd;
+            const rowLectOrder = row.dataset.lectOrder;
+
+            // weekCd와 lectOrder가 일치하는 행만 보이게 처리
+            if (rowWeekCd === weekCd && rowLectOrder === lectOrder) {
+                row.style.display = '';  // 일치하는 행은 보이게
+            } else {
+                row.style.display = 'none';  // 일치하지 않으면 숨깁니다.
+            }
+        });
+    });
+});
+
+// 출결 셀렉트 버튼 처리
+function setAttendanceStatus(button, stuId, weekCd, lectOrder) {
+	// 해당 학생의 모든 버튼을 가져옵니다 (stuId, weekCd, lectOrder로 구분)
+    const buttons = document.querySelectorAll(`button[data-student-id="${stuId}"][data-week-cd="${weekCd}"][data-lect-order="${lectOrder}"]`);
+
+    // 모든 버튼에서 'selected' 클래스 제거
+    buttons.forEach(btn => btn.classList.remove('selected'));
+
+    // 클릭한 버튼에 'selected' 클래스 추가
+    button.classList.add('selected');
+
+    // 해당 학생의 출석 상태를 서버에 전송하는 로직을 여기에 추가할 수 있습니다.
+    const selectedStatus = button.getAttribute('data-status');
+    console.log(`학생 ID: ${stuId}, 주차: ${weekCd}, 차수: ${lectOrder}, 선택된 출석 상태: ${selectedStatus}`);
+
+}
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function() {
+    // 전부 출석 버튼
+    const markAllPresentButton = document.getElementById("markAllPresentButton");
+
+    // 전부 출석 버튼 클릭 이벤트 핸들러
+    markAllPresentButton.addEventListener("click", function() {
+        // 조건에 맞는 모든 출석 버튼을 찾아서 상태를 '출석'으로 설정
+        const attendanceButtons = document.querySelectorAll('.attendance-btn');
+
+        attendanceButtons.forEach(button => {
+            // data-week-cd, data-lect-order, data-lect-no 값이 동일한 조건을 가진 버튼을 찾아서
+            const weekCd = button.getAttribute('data-week-cd');
+            const lectOrder = button.getAttribute('data-lect-order');
+            const lectNo = button.getAttribute('data-lect-no');
+
+            // '조회' 버튼의 조건과 일치하는 버튼만 처리
+            if (weekCd === fetchAttendanceData.weekCd && lectOrder === fetchAttendanceData.lectOrder && lectNo === fetchAttendanceData.lectNo) {
+                button.classList.add('selected');  // 출석 상태로 표시
+                button.setAttribute('data-status', '출석');  // 상태를 '출석'으로 설정
+            }
+        });
+    });
+
+    // 조회 버튼 클릭 시 조건에 맞는 출석 상태를 업데이트하는 코드
+    const fetchAttendanceButtons = document.querySelectorAll('.fetch-attendance-btn');
+
+    fetchAttendanceButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 클릭한 조회 버튼의 data-attributes를 추출
+            const weekCd = this.getAttribute('data-week-cd');
+            const lectOrder = this.getAttribute('data-lect-order');
+            const lectNo = this.getAttribute('data-lect-no');
+
+            // 조회된 정보로 출석 버튼들을 업데이트
+            fetchAttendanceData = { weekCd, lectOrder, lectNo };  // 해당 조건 저장
+
+            // 이 조건에 맞는 출석 버튼만 '출석' 상태로 변경
+            const attendanceButtons = document.querySelectorAll('.attendance-btn');
+            attendanceButtons.forEach(button => {
+                // 조건에 맞는 버튼을 찾아서 '출석'으로 처리
+                if (button.getAttribute('data-week-cd') === weekCd && button.getAttribute('data-lect-order') === lectOrder && button.getAttribute('data-lect-no') === lectNo) {
+                    button.classList.add('selected');  // 출석 상태로 표시
+                    button.setAttribute('data-status', '출석');  // 상태를 '출석'으로 설정
+                }
+            });
+        });
+    });
+});
+

@@ -1,0 +1,67 @@
+package kr.or.ddit.yguniv.attendcoeva.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.attendcoeva.dao.AttendCoevaMapper;
+import kr.or.ddit.yguniv.vo.AttendeeVO;
+import kr.or.ddit.yguniv.vo.DummyVO;
+import kr.or.ddit.yguniv.vo.SemesterVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class AttendCoevaServiceImpl implements AttendCoevaService {
+
+	private final AttendCoevaMapper dao;
+	
+	
+	@Override
+	public List<SemesterVO> selectAttenSemesterList(String stuId) {
+		// TODO Auto-generated method stub
+		return dao.selectAttenSemesterList(stuId);
+	}
+	
+
+	@Override
+	public List<SemesterVO> selectProfeSemesterList(String profeId) {
+		// TODO Auto-generated method stub
+		return dao.selectProfeSemesterList(profeId);
+	}
+	
+	@Override
+	public List<AttendeeVO> selectCoevaList(String stuId, String semNo) {
+		// TODO Auto-generated method stub
+		return dao.selectCoevaList(stuId, semNo);
+	}
+
+	@Override
+	public AttendeeVO selectCoevaPaper() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int insertCoeva(AttendeeVO aVo) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int updateCoeva(AttendeeVO aVo) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public int deleteCoeva() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+
+
+
+}

@@ -1,0 +1,17 @@
+/**
+ * 
+ */
+
+const cp = document.querySelector("cp").value;
+
+document.addEventListener("DOMContentLoaded", async ()=>{
+	
+	await getData()
+})
+
+async function getData(){
+	axios.get(`${cp}/student`)
+	.then(resp=>{
+		console.log(resp)
+	})
+}

@@ -1,0 +1,105 @@
+package kr.or.ddit.yguniv.projectTask.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.projectTask.service.ProjectTaskService;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.ProjectTaskVO;
+
+/**
+ * @author AYS
+ * lvn에 ?는 디테일로 갈 수 있게 해당넘버를 붙여줘야함
+ */
+@Controller
+@RequestMapping("/lecture/{lectNo}/projectTask")
+public class ProjectTaskController {
+	
+	@Autowired
+	private ProjectTaskService service;
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureservice;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureservice.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+		model.addAttribute("lectNo", lectNo);
+	}
+	
+	//프로젝트 목록조회
+	@GetMapping
+	public String selectList(
+			@PathVariable String lectNo
+			, Model model
+			) {
+		model.addAttribute("projectTaskList", service.readProjectTaskList(lectNo));
+		
+		return "lecture/materials/projectTask/projectTaskList";
+	}
+	
+	//프로젝트 상세조회
+	@GetMapping("{taskNo}")
+	public String select(@PathVariable()int taskCd) {
+		
+		return "projectTask/projectTaskDetail";
+	}
+	//프로젝트 생성폼 이동
+	@GetMapping("new")
+	public String createForm(@PathVariable String lectNo, Model model) {
+		if(!model.containsAttribute("projectTask")) {
+			ProjectTaskVO projectTask = new ProjectTaskVO();
+			model.addAttribute("projectTask", projectTask);
+		}
+		
+		return "lecture/materials/projectTask/projectTaskForm";
+	}
+	//프로젝트 생성
+	@PostMapping()
+	public String create(@PathVariable()int lectNo) {
+		//생성로직 작성해야함
+		return "projectTask/?";
+	}
+	
+	//프로젝트 수정폼이동
+	@GetMapping("{taskCd}/edit")
+	public String updateForm(@PathVariable()int taskCd) {
+		
+		
+		return "projectTask/projectTaskEditForm";
+	}
+	
+	//프로젝트 수정
+	@PutMapping("{taskNo}")
+	public String update(@PathVariable()int taskCd) {
+		
+		
+		return "projectTask/?";
+	}
+	
+	//프로젝트 삭제
+	@DeleteMapping("{taskNo}")
+	public String delete(@PathVariable()int taskCd) {
+		
+		
+		return "projectTask/projectTaskList";
+	}
+	
+	
+	
+	
+}

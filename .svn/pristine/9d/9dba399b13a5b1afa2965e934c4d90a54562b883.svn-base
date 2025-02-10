@@ -1,0 +1,13 @@
+/**
+ * 
+ */
+
+
+document.addEventListener("DOMContentLoaded", function(){
+	function login(){
+		let person = {};
+		person.id = id.value;
+		person.pswd = pswd.value;
+		axios.post(`${cp.value}/login`, person)
+	}
+})

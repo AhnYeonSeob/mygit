@@ -1,0 +1,71 @@
+const yjclrBtn = document.querySelector("#yjClr");
+
+yjclrBtn.addEventListener("click",()=>{
+	document.querySelector("#result").value="";
+})
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const findButton = document.getElementById("findButton");
+    const result = document.getElementById("result");
+    const cp = document.getElementById("cp").value; // Context Path 값
+
+    console.log("Context Path:", cp);
+
+    findButton.addEventListener("click", function () {
+        const nm = document.getElementById("nm").value.trim(); // 이름 입력
+        const brdt = document.getElementById("brdt").value.trim(); // 생년월일 입력
+
+        console.log("name을 입력했니? 했으면 나타나라:", nm);
+        console.log("birth도 입력했니? 했으면 나타나라:", brdt);
+
+
+        if (!nm) {
+            result.value = "이름을 입력하세요";
+            return;
+        }
+        if (!brdt) {
+            result.value = "생년월일을 입력하세요";
+            return;
+        }
+
+        // URL 생성
+        const url = `${cp}/findLogin?nm=${encodeURIComponent(nm)}&brdt=${encodeURIComponent(brdt)}`;
+        console.log("Request URL:", url);
+
+        fetch(url, {
+			    method: "GET",
+			    headers: {
+			        "Content-Type": "application/json",
+			    },
+			})
+			    .then((response) => {
+			        const contentType = response.headers.get("Content-Type") || "";
+			        console.log("HTTP Status Code:", response.status);
+			        console.log("Content-Type:", contentType);
+			
+			        if (response.ok && contentType.includes("application/json")) {
+			            return response.json(); 
+			        } else {
+			            throw new Error(`서버 오류 발생 (HTTP ${response.status}): ${contentType}`);
+			        }
+			    })
+			    .then((data) => {
+			        console.log("Response:", data);
+			        if (typeof data === "object" && data.id) {
+			            result.value = `${nm}님의 학번은 ${data.id}`;
+						
+			        } else {j.
+			            result.value = "${nm}님의 학번을 찾을 수 없습니다.";
+			        }
+			    })
+			    .catch((error) => {
+			        result.value = `${nm}님의 학번을 찾을 수 없습니다.`;
+					
+			    })
+			
+			
+
+			
+			    });
+});

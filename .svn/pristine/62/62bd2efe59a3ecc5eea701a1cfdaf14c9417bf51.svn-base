@@ -1,0 +1,32 @@
+package kr.or.ddit.yguniv.tuition.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/tuition")
+public class TuitionController {
+	@GetMapping
+	public String selectTuitionList() {
+		return "tuition/tuitionList";
+	}
+	
+	@PostMapping("{semeCd}/{stuId}")
+	public void updateTuition(@PathVariable String semeCd, @PathVariable String stuId) {
+		
+	}
+	
+	@GetMapping("{semeCd}/{stuId}/invoice")
+	public void selectTuitionInvoice(@PathVariable String semeCd, @PathVariable String stuId) {
+		
+	}
+	
+	@GetMapping("{semeCd}/{stuId}/confirm")
+	public void selectTuitionConfirm(@PathVariable String semeCd, @PathVariable String stuId) {
+		
+	}
+	
+}

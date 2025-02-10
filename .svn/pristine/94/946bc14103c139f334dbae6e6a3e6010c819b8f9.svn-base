@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.login.dao.PersonDAO">
+	<select id="selectPersonForAuth" resultType="PersonVO">
+		SELECT
+			ID
+			, PSWD
+			, NM
+			, MBTLNUM
+			, EML
+			, CRTFC_MN_CD
+			, CASE 
+	            WHEN S.STU_ID IS NOT NULL THEN 'STUDENT'
+	            WHEN E.EMP_ID IS NOT NULL THEN 'PROFESSOR'
+	            WHEN F.PROFE_ID IS NOT NULL THEN 'EMPLOYEE'
+	            ELSE 'ADMIN'
+	        END AS PERSON_TYPE
+		FROM PERSON P
+	    LEFT OUTER JOIN STUDENT S ON(P.ID = S.STU_ID)
+	    LEFT OUTER JOIN PROFESSOR F ON(P.ID = F.PROFE_ID)
+	    LEFT OUTER JOIN EMPLOYEE E ON(P.ID = E.EMP_ID)
+		WHERE ID = #{id, jdbcType=VARCHAR} AND PERSON_YN = 'N'
+	</select>
+</mapper>

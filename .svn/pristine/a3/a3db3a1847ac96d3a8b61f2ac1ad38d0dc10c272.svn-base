@@ -1,0 +1,43 @@
+package kr.or.ddit.yguniv.graduation.dao;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.GraduationVO;
+
+public interface GraduationMapper {
+	/**
+	 * 졸업인증자료 추가
+	 * 
+	 * @param graduation
+	 */
+	public void insertgraduation(GraduationVO graduation);
+
+	/**
+	 * 졸업인증제 상세보기
+	 * 
+	 * @param gdtCd
+	 * @return
+	 */
+	public GraduationVO selectgraduation(String gdtCd);
+
+	/**
+	 * 졸업인증제 전체리스트
+	 * 
+	 * @return
+	 */
+	public List<GraduationVO> selectgraduationList();
+
+	/**
+	 * 졸업인증제 수정
+	 * 
+	 * @param graduation
+	 */
+	public void updategraduation(GraduationVO graduation);
+
+	/**
+	 * 졸업인증제 삭제
+	 * 
+	 * @param gdtCd
+	 */
+	public void deletegraduation(String gdtCd);
+}

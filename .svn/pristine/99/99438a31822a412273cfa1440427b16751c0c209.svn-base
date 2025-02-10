@@ -1,0 +1,58 @@
+
+
+    function showApprovalButtons() {
+        document.getElementById('approval-buttons').style.display = 'block';
+        document.getElementById('waiting-button').style.display = 'none';
+    }
+
+    function change(testNo,status) {
+        let check = status == 'approved' ? '시험 승인됨' : '시험 반려됨';
+        document.getElementById('test-status').innerHTML = '상태: ' + check;
+     //   var testNo = document.getElementById('testNo').value;
+    	console.log(testNo,status)
+        testCheck(testNo,status);
+    }
+    
+async function testCheck(testNo,ch){
+	   	const url = "/yguniv/test/profe";
+	   	const pUrl = `${url}/${testNo}/${ch}`
+	   	console.log(pUrl);
+	   const resp = await fetch(pUrl)
+	   
+		if(resp.ok){
+			swal({
+				title: "성공",
+				text: "변경되었습니다.",
+				icon: "success",
+				button: "확인"
+			});
+			
+			//등록이 성공하면 리스트 최신화 하기 + 라디오 버튼 검색조건 추가하기
+		}else{
+			swal({
+				title: "추가실패",
+				text: "입력실패",
+				icon: "error",
+				button: "확인"
+			});
+		}
+    	
+    }
+
+const findBox = document.querySelector("#findBox")
+
+findBox.addEventListener("change",(e)=>{
+	const url = "/yguniv/test/profe";
+	console.log(e.target)
+	var what = e.target.value
+	fetch(`${url}?searchType=${what}`)
+	.then(resp=>console.log(resp.ok))
+	
+	
+})
+
+
+
+
+
+

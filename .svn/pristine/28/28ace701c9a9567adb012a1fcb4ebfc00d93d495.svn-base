@@ -1,0 +1,56 @@
+package kr.or.ddit.yguniv.projectboard.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.paging.SimpleCondition;
+import kr.or.ddit.yguniv.projectboard.service.ProjectBoardService;
+import kr.or.ddit.yguniv.vo.LectureVO;
+
+@Controller
+@RequestMapping("/lecture/{lectNo}/projectBoard")
+public class ProjectBoardController {
+	
+	@Autowired
+	private ProjectBoardService service;	
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureservice;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureservice.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+		model.addAttribute("lectNo", lectNo);
+	}
+	//게시글 목록조회
+	@GetMapping("{teamCd}")
+	public String getProjectBoardList(
+			@RequestParam(required = false, defaultValue = "1") int page
+			,@ModelAttribute("condition") SimpleCondition simpleCondition
+			,@PathVariable String teamCd
+			,Model model
+			) {
+		
+		
+		
+		
+		
+		
+		return "lecture/materials/projectPersonal/projectBoardList";
+	}
+	
+	
+	
+}

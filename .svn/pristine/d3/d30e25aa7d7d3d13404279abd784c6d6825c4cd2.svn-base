@@ -1,0 +1,20 @@
+
+
+// 모달이 열릴 때마다 해당 데이터를 채워넣는 함수
+var myModal = document.getElementById('staticBackdrop');
+myModal.addEventListener('show.bs.modal', function (event) {
+	// 버튼을 클릭했을 때 전달된 데이터를 가져오기
+	var button = event.relatedTarget; // 버튼을 클릭한 요소
+	var lectOrder = button.getAttribute('data-lectOrder');
+	var studentName = button.getAttribute('data-studentName');
+	var studentId = button.getAttribute('data-studentId');
+	var absenceReason = button.getAttribute('data-absenceReason');
+	var absenceStatus = button.getAttribute('data-absenceStatus');
+	
+	// 모달에 해당 데이터 채우기
+	document.getElementById('lectOrder').textContent = lectOrder;
+	document.getElementById('studentName').textContent = studentName;
+	document.getElementById('studentId').textContent = studentId;
+	document.getElementById('absenceReason').textContent = absenceReason;
+	document.getElementById('absenceStatus').textContent = absenceStatus;
+});

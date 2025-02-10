@@ -1,0 +1,222 @@
+package kr.or.ddit.yguniv.askAward.controller;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import kr.or.ddit.yguniv.askAward.service.AskAwardService;
+import kr.or.ddit.yguniv.award.dao.AwardMapper;
+import kr.or.ddit.yguniv.noticeboard.exception.BoardException;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.paging.SimpleCondition;
+import kr.or.ddit.yguniv.paging.renderer.BootStrapPaginationRenderer;
+import kr.or.ddit.yguniv.paging.renderer.PaginationRenderer;
+import kr.or.ddit.yguniv.vo.AwardAskVO;
+import kr.or.ddit.yguniv.vo.AwardVO;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Controller
+@RequestMapping("/askAward")
+public class AskAwardController {
+
+
+	public static final String MODELNAME ="ask";
+	
+	@Autowired
+	private AskAwardService service;
+	
+	@ModelAttribute(MODELNAME)
+	public AwardAskVO ask() {
+		return new AwardAskVO();
+	}
+	
+	// 관리자가 보는 장학금 신청서 목록 조회 
+	@GetMapping
+	public String askAwardList(
+			
+			@RequestParam(name = "page", required = false, defaultValue = "1") int page,
+			@ModelAttribute("condition") SimpleCondition simpleCondition, Model model
+			
+			){
+		
+		PaginationInfo<AwardAskVO> paging = new PaginationInfo<AwardAskVO>();
+		paging.setCurrentPage(page);
+		paging.setSimpleCondition(simpleCondition);
+		model.addAttribute("ask", service.awardAskList(paging));
+		PaginationRenderer renderer = new BootStrapPaginationRenderer();
+		model.addAttribute("pagingHTML", renderer.renderPagination(paging, "fnPaging"));
+		
+		return "awardAsk/awardAskList";
+		
+	}
+
+	  
+	  // 장학금 신청서 상세조회
+	  
+	 @GetMapping("{shapDocNo}") 
+	 public String selectAskAwardDetail(
+			 
+			 @PathVariable String shapDocNo
+			 ,Model model
+			 )
+	 	{ 
+		AwardAskVO ask = service.select(shapDocNo);
+		model.addAttribute(MODELNAME, ask);
+		
+		 return "awardAsk/awardAskDetail"; 
+		
+	 	}
+	  
+	 
+	  // 장학금 신청서 작성
+
+	  @GetMapping("createAwardAsk/new") 
+	  public String createAwardAsk(
+			  
+			  Model model,
+			  @ModelAttribute(MODELNAME) AwardAskVO ask
+			
+			  
+			  ){ 
+
+		  model.addAttribute(MODELNAME, ask);
+		  return "awardAsk/awardAskForm"; 
+		
+	  }
+	  
+	  
+	  @PostMapping ("createAskAward")
+	  public String create(
+			  @ModelAttribute(MODELNAME) AwardAskVO ask, 
+			  BindingResult errors,
+			  RedirectAttributes redirectAttributes
+			  
+			  ){ 
+		  
+		  if(errors.hasErrors()) {
+			  return "awardAsk/awardForm";
+		  }
+		  
+		  log.info("유정보드체크 {}",ask);
+		  service.insertAwardAsk(ask);
+		  redirectAttributes.addFlashAttribute(MODELNAME, ask);
+		  redirectAttributes.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX + MODELNAME, errors);
+		  
+
+		  	return "redirect:/askAward/"+ask.getShapDocNo();
+	  }
+	  
+	  
+	  //학생이 보는 신청 내역 확인
+	 @GetMapping("selectStudent")
+	 public String selectStudentAwardAsk(Model model) {
+		 model.addAttribute("ask",service.studentAwardAskList());
+		 
+		 return "awardAsk/awardAskStuList";
+	 }
+	 
+	  
+	  //학생이 상세조회  교직원이랑 같ㅇ므
+	 @GetMapping("{shapDocNo}/student")
+	 public String selectStudent(@PathVariable String shapDocNo, Model model) {
+		
+		 return "awardAsk/awardAskDetail"; 
+		 
+	 }
+	 
+	 
+	//학생이 수정하는 것도 폼이 같아야겠네
+		 // 장학금 정보 수정은 회원 정보 수정에서 하기 
+		 @GetMapping ("{shapDocNo}/student/edit")
+		 public String updateStudentAwardAsk
+		 		(
+				 @PathVariable String shapDocNo,
+				 Model model, 
+				 @ModelAttribute(MODELNAME) AwardAskVO ask 
+				 ) {
+			 
+			 model.addAttribute(MODELNAME,service.select(shapDocNo));
+			 
+			 
+			 return "awardAsk/awardAskStuEdit";
+			 
+		 }
+		 
+		 @PostMapping("{shapDocNo}/student/edit")
+		 public String update(
+				 
+				 @ModelAttribute(MODELNAME) AwardAskVO ask
+				 ,BindingResult errors
+				 ,RedirectAttributes redirectAttributes
+				 ) {
+			 String lvn= null;
+				if (!errors.hasErrors()) {
+					try {
+						service.updateAwardAsk(ask);
+						lvn = "redirect:/askAward/{shapDocNo}/student";
+					} catch (BoardException e) {
+						redirectAttributes.addFlashAttribute(MODELNAME, ask);
+						redirectAttributes.addFlashAttribute("message", e.getMessage());
+						lvn = "redirect:/askAward/{shapDocNo}/student";
+					}
+				} else {
+					redirectAttributes.addFlashAttribute(MODELNAME, ask);
+					redirectAttributes.addFlashAttribute(BindingResult.MODEL_KEY_PREFIX, errors);
+					return "redirect:/askAward/{shapDocNo}/student/edit";
+				}
+				ask.setAtchFile(null);
+				return lvn;
+			 
+		 }
+		 
+		 
+		 
+		 
+		 
+		//학생이 삭제 
+	  //학생이 [장학금신청] 버튼을 만들어야함. 그 버튼을 뉴누르면 이제 신청 
+	 // 신청하기 전에 동의서에 체크를 해야 넘어올 수 있음 
+	 // 신청하기 버튼을 눌러야 신청하는 것으로 들어갈 수 있음 - 신청폼 만들어져 있음
+	 // 학생이 신청할 수 있는 신청폼 - 동의 
+	 
+//	  // 삭제 - 학생 페이지가 있어야 가능 
+//	  @PostMapping("delete/{awardCd}") 
+//	 public String DeleteAward(@PathVariable()String awardCd){ 
+//	  return "awardAsk/AwardAskDetail"; 
+//	 } 
+//	 
+//	  // 접수 승인 - 이거는 굳이 굳이 왜먀녀 SERVICE 딴에서 해줄수 있음
+//	 @PutMapping("{awardCd}") 
+//	  public String SelectAwardAskOk(@PathVariable()String awardCd){
+//	  return "awardAsk/AwardAskDetail"; 
+//	  }
+//	  
+//	 // 접수 반려 -이거는 굳이 굳이 왜먀녀 SERVICE 딴에서 해줄수 있음
+//	 @PutMapping("{awardCd}") 
+//	  public String SelectAwardAskNo(@PathVariable()String awardCd){ 
+//	 return "awardAsk/AwardAskDetail"; }
+	 
+	  @Inject
+	  private AwardMapper awardMapper;
+	  
+	  @ModelAttribute("awardList")
+	  public List<AwardVO> awardList(){
+		  return awardMapper.selectList();
+	  }
+	  
+	  
+	  
+}

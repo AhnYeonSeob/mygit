@@ -1,0 +1,19 @@
+package kr.or.ddit.yguniv.dissent.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.AttendeeVO;
+import kr.or.ddit.yguniv.vo.ScoreFormalObjectionVO;
+
+public interface DissentService {
+
+	
+	public List<ScoreFormalObjectionVO> readDissentList ();
+	public List<ScoreFormalObjectionVO> readProfeDissentList ();
+	public ScoreFormalObjectionVO readDissentOne(String stuId,String lectNo);
+	public Integer createDissent(ScoreFormalObjectionVO sVo);
+	public Integer modifyDissentAndAttendee(ScoreFormalObjectionVO sVo,AttendeeVO aVo);
+	public Integer removeDissent(String lectNo,String stuId);
+}
+
+

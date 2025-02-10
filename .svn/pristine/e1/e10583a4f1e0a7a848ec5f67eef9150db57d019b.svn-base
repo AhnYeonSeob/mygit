@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="kr.or.ddit.yguniv.attendcoeva.dao.AttendCoevaMapper">
+	
+	
+	
+<select id="selectAttenSemesterList" resultType="SemesterVO">
+	--하나의 수강생이 수강기록이 있는 학기만 리스트로 
+	SELECT 
+		  DISTINCT(L.SEMSTR_NO)
+	FROM 
+		  ATTENDEE A
+		           INNER JOIN LECTURE L ON A.LECT_NO = L.LECT_NO
+	WHERE 
+		  STU_ID = #{stuId}
+</select>
+	
+	
+<select id="selectCoevaList">
+select 
+    a.lect_no
+    , a.stu_id
+    , a.atten_atnd_score
+    , a.assig_score
+    , a.pr_test_score
+    , a.ft_test_score
+    , a.etc_score
+    , a.atten_score
+    , a.atten_coeva
+from 
+    attendee a inner join lecture b on a.lect_no = b.lect_no
+               inner join semester c on b.semstr_no = c.semstr_no
+where
+    a.stu_id = #{stuId}     
+     and c.semstr_no = #{semstr_no}
+     and a.atten_coeva is null
+     
+</select>
+	
+	
+</mapper>

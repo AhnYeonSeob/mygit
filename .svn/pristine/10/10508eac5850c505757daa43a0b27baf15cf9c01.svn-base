@@ -1,0 +1,119 @@
+package kr.or.ddit.yguniv.coursecart.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import kr.or.ddit.yguniv.coursecart.dao.LectureCartMapper;
+import kr.or.ddit.yguniv.vo.LectureCartVO;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import lombok.RequiredArgsConstructor;
+@Service
+@RequiredArgsConstructor
+public class LectureCartServiceImpl implements LectureCartService {
+
+	private final LectureCartMapper dao;
+	@Override
+	public List<LectureVO> getLectureList() {
+		// TODO Auto-generated method stub
+		return dao.getLectureList();
+	}
+	@Override
+	public List<LectureVO> getStudentLectureList(String stuId) {
+		// TODO Auto-generated method stub
+		return dao.getStudentLectureList(stuId);
+	}
+
+	@Override
+	public LectureVO getLecturePaper(String lectNo) {
+		// TODO Auto-generated method stub
+		return dao.selectLecturePaper(lectNo);
+	}
+
+	@Override
+	public List<LectureVO> attendeeStudentLectureList(String stuId) {
+		// TODO Auto-generated method stub
+		return dao.attendeeStudentLectureList(stuId);
+	}
+	
+	@Override
+	public int insertCart(LectureCartVO lcVo) {
+		
+		
+		return dao.insertCart(lcVo);
+	}
+	@Override
+	public int deleteCart(LectureCartVO lcVo) {
+		// TODO Auto-generated method stub
+		return dao.deleteCart(lcVo);
+	}
+	
+	
+	//수강신청 wait => succ으로 바꾸는 update작업
+	@Override
+	public int updateCart(List<LectureCartVO> lcVoList) {
+		// TODO Auto-generated method stub
+		return realUpdateCart(lcVoList);
+	}
+	
+	
+	//현재 강의 신청수가 초과하면 신청을 못하게 해야함
+	public int getLectureCartAttendeeCount(String lectNo) {
+			
+		return dao.getLectureCartAttendeeCount(lectNo);
+	}
+	
+	//하나의 강의의 인원 모집수를 가져오는 
+	public int getLectureAttendeeCount(String lectNo) {
+		
+		return dao.getLectureAttendeeCount(lectNo);
+	}
+	
+	
+	
+	public int realUpdateCart(List<LectureCartVO> lcVoList) {
+		
+		int result = 0;
+		int cartCount = 0;
+		int lectCount = 0;
+		String lectNo="";
+		
+		for(LectureCartVO lcVo : lcVoList) {
+			lectNo=lcVo.getLectNo();
+			cartCount = getLectureCartAttendeeCount(lectNo);
+			lectCount = getLectureAttendeeCount(lectNo);
+			if(cartCount<lectCount) { //현재 강의 신청자 수 < 강의 모집 인원 수
+				result += dao.updateCart(lcVo);			// succ 등록
+			}else {
+				//여기서 Fail로 업데이트 하고 해당 번호를 리턴해야함.
+			}
+			
+			
+		}
+		
+		return result;
+	}
+	//본 수강신청에서는 [신청]버튼을 눌렀을 때 바로 수강신청 요청을 보내야함.
+	@Override
+	public int directInsertOneCart(LectureCartVO lcVo) {
+
+		String lectNo=lcVo.getLectNo();
+		int cartCount = getLectureCartAttendeeCount(lectNo);
+		int lectCount = getLectureAttendeeCount(lectNo);
+		int result = 0;
+		
+		if(cartCount<lectCount) { //현재 강의 신청자 수 < 강의 모집 인원 수
+			result += dao.directInsertOneCart(lcVo);			// succ 등록
+		}else {
+			//여기서 Fail로 업데이트 하고 해당 번호를 리턴해야함.
+		}
+		
+		
+		return result;
+	}
+	
+	
+	
+
+}

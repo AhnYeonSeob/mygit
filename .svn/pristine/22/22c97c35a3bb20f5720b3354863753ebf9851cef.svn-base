@@ -1,0 +1,250 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", ()=>{
+	// 주차 공통 코드 리스트 불러오기
+	const getWeek = function(){
+		axios.get(`${cp.value}/commoncode/WEEK`)
+		.then(({data})=>{
+			$("#weekCd").empty();
+			$("#weekCd").append('<option selected label="주차선택"/>');
+			leweNm.value = "";
+			data.forEach(v=>{
+				if($(`.weekCd[data-week-cd="${v.cocoCd}"]`).length==0){
+					$("#weekCd").append(`<option value="${v.cocoCd}" label="${v.cocoStts}">`);
+				}
+			});
+		});
+	};
+	
+	// 차시 주차 공통 코드 추가하기
+	const getOrderWeek = function(){
+		$(".dataWeekCd").empty();
+		$(".dataWeekCd").append('<option selected label="등록주차선택"/>');
+		document.querySelectorAll('.weekCd').forEach(v=>{
+			$('.dataWeekCd').append(`<option value="${$(v).data('weekCd')}" label="${$(v).find('.cocoStts').text()}">`);
+		});
+	};
+	
+	$("#insertWeekModal").on('show.bs.modal', function(){
+		getWeek();
+		getOrderWeek();
+	});
+	
+	$("#insertWeekModal").on('hidden.bs.modal', function(){
+		document.getElementById("insertDataForm").reset();
+		document.getElementById("output").textContent = '0';
+	});
+	
+	// 추가 모달 주차/차시 선택
+	$('input[type="radio"][name="insertOption"]').on('change', function(){
+		$('#insertWeekDiv').toggle();
+		$('#insertOrderDiv').toggle();
+	})
+	
+	// 주차 추가 버튼 클릭
+	document.querySelector('.week-insert-btn').addEventListener('click', function(){
+		axios.post(`${cp.value}/lecture/${lectNo.value}/materials/new`
+		, {
+			weekCd: $('#weekCd').val(),
+			leweNm: $('#leweNm').val()
+		}).then(resp=>{
+			swal({
+				title: "추가완료",
+				text: "주차가 성공적으로 추가되었습니다",
+				icon: "success",
+				button: "확인"
+			}).then(()=>location.reload());
+		}).catch(err=>{
+			swal({
+				title: "추가실패",
+				text: err.response.data.message,
+				icon: "error",
+				button: "확인"
+			});
+		});
+	});
+	
+	// 주차 수정 버튼 클릭
+	$(document).on('click', '.week-update-btn', function(){
+		let $tr = $(this).parents('tr');
+		$tr.find('button').toggle();
+		let $td = $tr.find('.leweNm');
+		$td.html(`<input class="form-control" type="text" value="${$td.text()}" data-origin="${$td.text()}"/>`);	
+	});
+	
+	// 주차 수정 저장 버튼 클릭
+	$(document).on('click', '.week-update-save-btn', function(){
+		let $tr = $(this).parents('tr');
+		let $td = $tr.find('.leweNm');
+		let $input = $td.find('input');
+		axios.put(`${cp.value}/lecture/${lectNo.value}/materials/${$tr.data("weekCd")}/edit`
+			, {leweNm: $input.val()})
+		.then(resp=>{
+			swal({
+				title: "수정완료",
+				text: "주차명이 성공적으로 수정되었습니다",
+				icon: "success",
+				button: "확인"
+			});
+			$td.text($input.val());
+		}).catch(err=>{
+			swal({
+				title: "수정실패",
+				text: err.response.data.message,
+				icon: "error",
+				button: "확인"
+			});
+			$td.text($input.data("origin"));
+		});
+		$tr.find('button').toggle();
+	});
+	
+	// 주차 수정 취소 버튼 클릭
+	$(document).on('click', '.week-update-cancel-btn', function(){
+		let $tr = $(this).parents('tr');
+		$tr.find('button').toggle();
+		let $td = $tr.find('.leweNm');
+		let $input = $td.find('input');
+		$td.text($input.data("origin"));
+	});
+	
+	// 주차 삭제 버튼 클릭
+	$(document).on('click', '.week-delete-btn', function(){
+		let $tr = $(this).parents('tr');
+		swal({
+			title: "정말로 삭제하시겠습니까?",
+			text: "주차를 삭제하면 주차에 해당하는 차시까지 같이 삭제됩니다",
+			icon: "warning",
+			buttons: ["취소", "삭제"],
+			dangerMode: true,
+		}).then(btnVal=>{
+			if(btnVal){
+				axios.delete(`${cp.value}/lecture/${lectNo.value}/materials/${$tr.data("weekCd")}`)
+				.then(resp=>{
+					swal({
+						title: "수정완료",
+						text: "주차가 성공적으로 삭제되었습니다",
+						icon: "success",
+						button: "확인"
+					});
+					// 삭제 후 처리(주차 정보 삭제, 하위 차시 삭제, 차시 추가 버튼 삭제)
+					$(`.delWeek[data-week-cd="${$tr.data('weekCd')}"]`).remove();
+				}).catch(err=>{
+					swal({
+						title: "삭제실패",
+						text: err.response.data.message,
+						icon: "error",
+						button: "확인"
+					});
+				})
+			}
+		});
+	});
+	
+	const insertDataForm = document.forms["insertDataForm"];
+	// 강의차시 검증
+	insertDataForm.lectOrder.addEventListener('change', function(){
+		let input = insertDataForm.lectOrder.value;
+		if(input<0 || Number(input)>lectSession.value){
+			swal({
+				title: "입력오류",
+				text: `강의 차시는 1 ~ ${lectSession.value} 사이의 값이어야 합니다`,
+				icon: "error",
+				button: "확인"
+			});
+			insertDataForm.lectOrder.value = '';
+		}
+		if($(`.lectOrder[data-lect-order="${input}"]`).length > 0){
+			swal({
+				title: "입력오류",
+				text: "해당 강의 차시는 이미 등록되었습니다",
+				icon: "error",
+				button: "확인"
+			});
+			insertDataForm.lectOrder.value = '';
+		}
+	});
+	// 학습 시작일 검증
+	insertDataForm.sectDt.addEventListener('input', function(){
+		if(insertDataForm.sectEt.value){
+			let sectDt = new Date(insertDataForm.sectDt.value);
+			let sectEt = new Date(insertDataForm.sectEt.value);
+			if(sectDt - sectEt > 0){
+				swal({
+					title: "입력오류",
+					text: "학습시작일이 학습종료일 이후에 올 수 없습니다",
+					icon: "error",
+					button: "확인"
+				});
+				insertDataForm.sectDt.value = insertDataForm.sectEt.value;
+			}
+		}
+	});
+	// 학습 종료일 검증
+	insertDataForm.sectEt.addEventListener('input', function(){
+		if(insertDataForm.sectDt.value){
+			let sectDt = new Date(insertDataForm.sectDt.value);
+			let sectEt = new Date(insertDataForm.sectEt.value);
+			if(sectDt - sectEt > 0){
+				swal({
+					title: "입력오류",
+					text: "학습종료일이 학습시작일 이전에 올 수 없습니다",
+					icon: "error",
+					button: "확인"
+				});
+				insertDataForm.sectEt.value = insertDataForm.sectDt.value;
+			}
+		}
+	});
+	
+	// 차시 추가 버튼 클릭
+	document.querySelector('.data-insert-btn').addEventListener('click', function(){
+		let formData = new FormData(insertDataForm);
+		formData.set('sectDt', insertDataForm.sectDt.value.replaceAll('-', ''));
+		formData.set('sectEt', insertDataForm.sectEt.value.replaceAll('-', ''));
+		
+		axios.post(`${cp.value}/lecture/${lectNo.value}/materials/orderdata/new`
+		, formData)
+		.then(resp=>{
+			swal({
+				title: "추가완료",
+				text: "차시가 성공적으로 추가되었습니다",
+				icon: "success",
+				button: "확인"
+			}).then(()=>location.reload());
+		}).catch(err=>{
+			swal({
+				title: "추가실패",
+				text: err.response.data.message,
+				icon: "error",
+				button: "확인"
+			});
+		});
+	});
+	
+	// 차시 수정 버튼 클릭
+	$(document).on('click', '.data-update-btn', function(){
+		let $orderLecture = $(this).parents('.orderLecture');
+		getOrderWeek();
+		axios.get(`${cp.value}/lecture/${lectNo.value}/materials/${$orderLecture.data("weekCd")}/${$orderLecture.find('.lectOrder').data('lectOrder')}`)
+		.then(resp=>{
+			let order = resp.data.orderLectureDataVO;
+			let updateDataForm = document.forms['updateDataForm'];
+			updateDataForm.weekCd.value = order.weekCd;
+			updateDataForm.lectOrder.value = order.lectOrder;
+			updateDataForm.sectNm.value = order.sectNm;
+			updateDataForm.sectDt.value = order.sectDt.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+			updateDataForm.sectEt.value = order.sectEt.replace(/(\d{4})(\d{2})(\d{2})/, '$1-$2-$3');
+			$('#updateOutput').text(order.sectIdnty);
+			updateDataForm.sectIdnty.value = order.sectIdnty;
+			updateDataForm.uploadedFiles.value = order.atchFileDetailList[0].orignlFileNm;
+			$('#updateDataModal').modal('show');
+		});
+	});
+	
+	// 차시 삭제 버튼 클릭
+	$(document).on('click', '.data-delete-btn', function(){
+		console.log(".data-delete-btn");
+	});
+});

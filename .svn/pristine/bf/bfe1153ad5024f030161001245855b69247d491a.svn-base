@@ -1,0 +1,74 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("personForm");
+
+    form.addEventListener("submit", function (event) {
+        
+
+        const formData = new FormData(form);
+        const person = {};
+
+        // 기본 person 
+        formData.forEach((value, key) => {
+            if (!key.startsWith('professorVO.') && !key.startsWith('employeeVO.') && !key.startsWith('studentVO.')) {
+                person[key] = value;
+            }
+        });
+
+        // 유형 가져오기
+        const userType = document.getElementById("user-type").value;
+
+        if (userType === "professor") {
+            person.professor = {};
+            formData.forEach((value, key) => {
+                if (key.startsWith('professorVO.')) {
+                    const nestedKey = key.replace('professorVO.', '');
+                    person.professor[nestedKey] = value;
+                }
+            });
+       
+			//personId 교수한테 주입
+            person.professor.profeId = person.id;  
+
+        } else if (userType === "employee") {
+            person.employee = {};
+            formData.forEach((value, key) => {
+                if (key.startsWith('employeeVO.')) {
+                    const nestedKey = key.replace('employeeVO.', '');
+                    person.employee[nestedKey] = value;
+                }
+            });
+  
+            person.employee.empId = person.id;  
+
+		//얜 아직
+        } else if (userType === "student") {
+            person.student = {};
+            formData.forEach((value, key) => {
+                if (key.startsWith('studentVO.')) {
+                    const nestedKey = key.replace('studentVO.', '');
+                    person.student[nestedKey] = value;
+                }
+            });
+
+            person.student.studId = person.id;  
+        }
+
+        console.log(person);  // 콘솔로 최종 객체 확인
+		 
+		
+		
+		
+
+    });
+});
+
+
+	
+	
+	
+	
+	
+

@@ -1,0 +1,52 @@
+document.getElementById('confirmApplication').addEventListener('click', function () {
+    swal({
+        title: "신청하시겠습니까?",
+        text: "신청 후에는 취소할 수 없습니다.",
+        icon: "info",
+        buttons: ["취소", "네, 신청합니다!"],
+        dangerMode: true,
+    }).then((willSubmit) => {
+        if (willSubmit) {
+            // 서버에 신청 요청 보내기
+            fetch(`${contextPath}/studentCard/apply`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    studentId: studentData.id,
+                    name: studentData.name,
+                    brdt: studentData.brdt
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data) {
+                    swal({
+                        title: "신청 완료",
+                        text: "학생증 신청이 완료되었습니다.",
+                        icon: "success",
+                        button: "확인"
+                    }).then(() => {
+                        location.reload(); // 페이지 새로고침
+                    });
+                } else {
+                    swal({
+                        title: "신청 실패",
+                        text: "신청 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
+                        icon: "error",
+                        button: "확인"
+                    });
+                }
+            })
+            .catch(error => {
+                swal({
+                    title: "서버 오류",
+                    text: "서버와의 통신 중 오류가 발생했습니다.",
+                    icon: "error",
+                    button: "확인"
+                });
+            });
+        }
+    });
+});

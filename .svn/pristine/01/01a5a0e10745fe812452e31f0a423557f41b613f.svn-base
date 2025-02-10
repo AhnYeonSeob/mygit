@@ -1,0 +1,65 @@
+package kr.or.ddit.yguniv.lecture.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.PersonVO;
+
+@Mapper
+public interface LectureMapper {
+	/**
+	 * R-학생일 경우 수강중인, 교사일 경우 강의중인 강의목록 조회
+	 */
+	public List<LectureVO> myLectureList(@Param("id") String id);
+	/**
+	 * R-강의 개설 신청 목록 조회
+	 */
+	public List<LectureVO> selectLectureRequestList(LectureVO lectureVO);
+	/**
+	 * R-강의 개설 신청 상세 조회
+	 */
+	public LectureVO selectLectureRequest(LectureVO lectureVO);
+	/** 
+	 * C-강의 개설 신청 추가
+	 */
+	public int insertLectureRequest(LectureVO lectureVO);
+	/** 
+	 * U-강의 개설 신청 수정
+	 */
+	public int updateLectureRequest(LectureVO lectureVO);
+	/** 
+	 * D-강의 개설 신청 삭제
+	 */
+	public int deleteLectureRequest(LectureVO lectureVO);
+	/** 
+	 * U-강의 개설 신청 승인
+	 */
+	public int lectureRequestConsent(LectureVO lectureVO);
+	/** 
+	 * U-강의 개설 신청 반려
+	 */
+	public int lectureRequestReturn(LectureVO lectureVO);
+	/** 
+	 * R-강의 폐강 신청 목록 조회
+	 */
+	public List<LectureVO> selectLectureAbolitionList();
+	/** 
+	 * U-강의 폐강 신청
+	 */
+	public int lectureAbolition(LectureVO lectureVO);
+	/** 
+	 * U-강의 폐강 신청 철회
+	 */
+	public int cancelLectureAbolition(LectureVO lectureVO);
+	/** 
+	 * U-강의 폐강 신청 승인
+	 */
+	public int lectureAbolitionConsent(LectureVO lectureVO);
+	/** 
+	 * U-강의 폐강 신청 반려
+	 */
+	public int lectureAbolitionReturn(LectureVO lectureVO);
+}

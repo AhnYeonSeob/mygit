@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.jobtest.dao.JobTestMapper">
+
+<!-- 직업선호도검사 새로운거 insert -->
+	<insert id="insertjobTest"></insert>
+	
+	<select id="selectjobTestList" resultType="JobTestVO">
+		SELECT
+			JOB_TEST_NO
+		   ,JOB_TEST_TYPE
+		   ,JOB_TEST_TEXT
+		FROM JOB_TEST
+		ORDER BY TO_NUMBER(JOB_TEST_NO) ASC
+	</select>
+	
+	
+	<select id="getJobTestByNo" resultType="JobTestVO">
+		SELECT JOB_TEST_TYPE
+			FROM JOB_TEST
+	</select>
+	<update id="updatejobTest"></update>
+	<delete id="deletejobTest"></delete>
+
+
+<!-- 직업선호도검사결과 insert -->
+<insert id="insertJobTestResult" parameterType="JobTestResultVO">
+	INSERT INTO JOB_TEST_RESULT (
+		     STU_ID
+		    ,JTR_REA
+		    ,JTR_INQ
+		    ,JTR_ART
+		    ,JTR_SOC
+		    ,JTR_ENT
+		    ,JTR_CON
+		    ,JTR_DT
+		) VALUES (
+		   	  #{stuId, jdbcType=VARCHAR}
+			, #{jtrRea, jdbcType=NUMERIC}
+			, #{jtrInq, jdbcType=NUMERIC}
+			, #{jtrArt, jdbcType=NUMERIC}
+			, #{jtrSoc, jdbcType=NUMERIC}
+			, #{jtrEnt, jdbcType=NUMERIC}
+			, #{jtrCon, jdbcType=NUMERIC}
+			, SYSDATE
+		)
+</insert>
+
+<!-- 업데이트 -->
+<update id="updateJobTestResult" parameterType="JobTestResultVO">
+    UPDATE JOB_TEST_RESULT
+    SET JTR_REA = #{jtrRea, jdbcType=NUMERIC},
+        JTR_INQ = #{jtrInq, jdbcType=NUMERIC},
+        JTR_ART = #{jtrArt, jdbcType=NUMERIC},
+        JTR_SOC = #{jtrSoc, jdbcType=NUMERIC},
+        JTR_ENT = #{jtrEnt, jdbcType=NUMERIC},
+        JTR_CON = #{jtrCon, jdbcType=NUMERIC},
+        JTR_DT = SYSDATE
+    WHERE STU_ID = #{stuId, jdbcType=VARCHAR}
+      AND TRUNC(JTR_DT) = TRUNC(SYSDATE)
+</update>
+
+<select id="checkTestToday" parameterType="string" resultType="int">
+    SELECT COUNT(*)
+    FROM JOB_TEST_RESULT
+    WHERE STU_ID = #{stuId}
+      AND TRUNC(JTR_DT) = TRUNC(SYSDATE)
+</select>
+
+<select id="selectjobTestResult" resultType="JobTestResultVO">
+SELECT 
+    STU_ID
+    ,JTR_REA
+    ,JTR_INQ
+    ,JTR_ART
+    ,JTR_SOC
+    ,JTR_ENT
+    ,JTR_CON
+    ,JTR_DT
+FROM JOB_TEST_RESULT
+WHERE STU_ID=#{stuId, jdbcType=VARCHAR}
+</select>
+
+	
+	
+</mapper>

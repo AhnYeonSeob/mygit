@@ -1,0 +1,53 @@
+package kr.or.ddit.yguniv.jobtest.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/jobTest")
+public class JobTestController {
+
+	// form으로 보냄
+	@GetMapping("new")
+	public String createForm() {
+		return "jobTest/jobTestForm";
+	}
+
+	// 전체조회
+	@GetMapping()
+	public String selectlist() {
+
+		return "jobTest/jobTestList";
+	}
+
+	// 생성, 응시
+	@PostMapping()
+	public String create() {
+		return "jobTest/jobTestDetail";
+	}
+
+	// 상세조회
+	@GetMapping("{jobTestId}")
+	public String select(@PathVariable() String personId) {
+
+		return "jobTest/jobTestDetail";
+	}
+
+	// 수정
+	@PutMapping("{jobTestId}")
+	public String update(@PathVariable() String personId) {
+		return "jobTest/jobTestDetail";
+	}
+
+	// 삭제
+	@DeleteMapping("{jobTestId}")
+	public String delete(@PathVariable() String personId) {
+		return "jobTest/jobTestList";
+	}
+}
+

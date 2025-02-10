@@ -1,0 +1,52 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="stuId")
+public class JobTestResultVO implements Serializable{
+	
+	@NotNull
+	@Size(max = 10)
+	private String stuId; //학생번호
+	
+	@NotNull
+	@Size(max = 3)
+	private String jtrRea; //현실형점수 
+	
+	@NotNull
+	@Size(max = 3)
+	private String jtrInq; //탐구형점수
+	
+	@NotNull
+	@Size(max = 3)
+	private String jtrArt; //예술형점수
+	
+	@NotNull
+	@Size(max = 3)
+	private String jtrSoc; //사회형점수
+	
+	@NotNull
+	@Size(max = 3)
+	private String jtrEnt; //진취형점수
+	
+	@NotNull
+	@Size(max = 3)
+	private String jtrCon; //관습형점수
+	
+	@NotNull
+	@DateTimeFormat(iso=ISO.DATE)
+	private LocalDate jtrDt; //검사일자
+	
+	//학생 
+}

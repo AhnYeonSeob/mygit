@@ -1,0 +1,234 @@
+package kr.or.ddit.yguniv.assignmentSubmission.controller;
+
+import java.security.Principal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.server.ResponseStatusException;
+
+import kr.or.ddit.yguniv.assignment.service.AssignmentService;
+import kr.or.ddit.yguniv.assignmentSubmission.service.AssignmentSubmissionService;
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.vo.AssignmentSubmissionVO;
+import kr.or.ddit.yguniv.vo.AssignmentVO;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.SerchMappingVO;
+
+/**
+ * @author AYS
+ * lvn에 ?는 디테일로 갈 수 있게 해당넘버를 붙여줘야함
+ */
+@Controller
+@RequestMapping("/lecture/{lectNo}/assignmentSubmission")
+public class AssignmentSubmissionController {
+	
+	@Autowired
+	private AssignmentSubmissionService service;
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureservice;
+	
+	@Autowired
+	private AssignmentService assignmentservice;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureservice.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+	}
+	@GetMapping
+	public String getList(@PathVariable String lectNo, Model model) {
+		
+		List<AssignmentVO> assignmentList = assignmentservice.readAssignmentList(lectNo);
+		
+		model.addAttribute("assignmentList", assignmentList);
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmission";
+	}
+	//과제상세조회
+	@GetMapping("assign/{assigNo}")
+	@ResponseBody
+	public AssignmentVO detailAssignment(@PathVariable String assigNo) {
+		AssignmentVO data = assignmentservice.readAssignment(assigNo);
+		return data;
+	}
+	//제출과제전체조회
+	//lectNo 강의번호 assigNo 과제번호 stuId 학번 여부에따라 조회를 다르게해야함(수정필요)
+	@GetMapping("get")
+	@ResponseBody
+	public List<AssignmentSubmissionVO> selectList(@PathVariable String lectNo) {
+		SerchMappingVO search = new SerchMappingVO();
+		search.setLectNo(lectNo);
+		 List<AssignmentSubmissionVO> data = service.readAssignmentSubmissionlist(search);
+		return data;
+	}
+	
+	//과제 제출
+	@PostMapping()
+	@ResponseBody
+	public ResponseEntity<Object> create(Principal user
+			,@Validated AssignmentSubmissionVO assignmentSubmission
+			,BindingResult error
+			) {
+		String id = user.getName();
+		HttpStatus status = HttpStatus.OK;
+		Map<String, Object> body = new HashMap<>();
+		
+		if(id==null || id.isEmpty()) {
+			status = HttpStatus.UNAUTHORIZED;
+			body.put("message","로그인이 필요합니다!");
+			return ResponseEntity.status(status).body(body);
+		}
+		
+		if(!error.hasErrors()) {
+			service.modifyAssignmentSubmission(assignmentSubmission);
+			body.put("message", "과제가 성공적으로 제출되었습니다.");
+			
+		}else {
+			status = HttpStatus.BAD_REQUEST;
+			String errorMessage = error.getFieldErrors().stream()
+								.map(FieldError :: getDefaultMessage)
+								.collect(Collectors.joining("\r\n"));
+			body.put("message", errorMessage);
+		}
+		
+		return ResponseEntity.status(status).body(body);
+	}
+	
+	//제출과제상세조회 json
+	@GetMapping("detail/{assigNo}/{stuId}")
+	@ResponseBody
+	public AssignmentSubmissionVO select(
+			@PathVariable()String lectNo
+			,@PathVariable()String assigNo
+			,@PathVariable()String stuId
+			,Principal user
+			) {
+		String id = user.getName();
+		if(id==null || id.isEmpty()) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+		}
+		SerchMappingVO search = new SerchMappingVO();
+		search.setAssigNo(assigNo);
+		search.setLectNo(lectNo);
+		search.setStuId(stuId);
+		
+		AssignmentSubmissionVO data = service.readAssignmentSubmission(search);
+		
+		return data;
+	}
+	
+	//제출과제수정
+	@PostMapping("{assigNo}")
+	@ResponseBody
+	public ResponseEntity<Object> updateAssignmentSubmission(
+			@PathVariable()String lectNo
+			,@PathVariable()String assigNo
+			,AssignmentSubmissionVO assignmentsubmission
+			,Principal user
+			) {
+		String id = user.getName();
+		assignmentsubmission.setStuId(id);
+		
+		HttpStatus status = HttpStatus.OK;
+		Map<String, Object> body = new HashMap<>();
+		
+		if(id==null || id.isEmpty()) {
+			status = HttpStatus.UNAUTHORIZED;
+			body.put("message","로그인이 필요합니다!");
+			return ResponseEntity.status(status).body(body);
+		}
+		try {
+			service.modifyAssignmentSubmission(assignmentsubmission);
+			body.put("message", "제출과제수정완료!");
+		}catch(RuntimeException e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			body.put("message","서버오류");
+		}
+		
+		return ResponseEntity.status(status).body(body);
+	}
+	
+	//제출과제상태수정 회수처리
+	@PutMapping("{assigNo}")
+	@ResponseBody
+	public ResponseEntity<Object> update(
+			@PathVariable()String lectNo
+			,@PathVariable()String assigNo
+			,@RequestBody SerchMappingVO search
+			,Principal user
+			) {
+		String id = user.getName();
+		HttpStatus status = HttpStatus.OK;
+		Map<String, Object> body = new HashMap<>();
+		
+		if(id==null || id.isEmpty()) {
+			status = HttpStatus.UNAUTHORIZED;
+			body.put("message","로그인이 필요합니다!");
+			return ResponseEntity.status(status).body(body);
+		}
+		try {
+			service.updateSubmissionStatus(search);
+			body.put("message", "제출과제회수완료!");
+		}catch(RuntimeException e) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			body.put("message","서버오류");
+		}
+		
+		return ResponseEntity.status(status).body(body);
+	}
+	
+	//점수입력
+	@PostMapping("grade")
+	@ResponseBody
+	public ResponseEntity<Object> gradeUpdate(
+			@PathVariable String lectNo
+			,@RequestBody AssignmentSubmissionVO assignmentSubmssion
+			){
+		assignmentSubmssion.setLectNo(lectNo);
+		
+		HttpStatus status = HttpStatus.OK;
+		Map<String, Object> body = new HashMap<>();
+		
+		int res = service.createGrade(assignmentSubmssion);
+		if(res<=0) {
+			status = HttpStatus.INTERNAL_SERVER_ERROR;
+			body.put("message","서버오류; 점수입력실패!");
+		}
+		
+		return ResponseEntity.status(status).body(body);
+	}
+	
+	
+	//제출과제삭제
+	@DeleteMapping("{assigCd}")
+	public String delete(@PathVariable()int assigCd) {
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionList";
+	}
+
+}

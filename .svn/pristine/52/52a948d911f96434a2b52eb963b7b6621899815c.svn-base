@@ -1,0 +1,64 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.builder.ToStringExclude;
+
+import lombok.Data;
+
+@Data
+public class TestVO  implements Serializable {
+	@Size(max = 10)
+	@NotBlank
+	private String testNo;
+	@Size(max = 10)
+	private String lectNo;
+	@Size(max = 2)
+	private String testSe;
+	@Size(max = 2)
+	private String testCd;
+	
+	@Size(max = 1)
+	private String testOnlineYn;
+	@Size(max = 8)
+	private String testSchdl;
+	@Size(max = 4)
+	private String testDt;
+	@Size(max = 4)
+	private String testEt;
+	
+//	시험 리스트 조회용 강의실
+	private ClassRoomVO classroomVO;
+	
+	//시험 리스트 조회용 강의실
+	@ToStringExclude
+	private ProfessorVO profeVO;
+	
+	//시험 리스트 조회용 강의실
+	@ToStringExclude
+	private PersonVO personVO;
+	
+	//시험 리스트 조회용 강의실
+	@ToStringExclude
+	private LectureVO lectVO;
+	
+	
+	
+	
+	
+	//has a 문제
+	private QuestionVO questionVO;
+	
+	
+	
+	
+	//has many 응시기록
+	private List<ExaminationRecordVO> examList;
+	
+	
+	
+}

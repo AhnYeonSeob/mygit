@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.or.ddit.yguniv.person.dao.PersonMapper">
+	
+<resultMap type="PersonVO" id="personMap" autoMapping="true">
+
+  <collection property="student" ofType="StudentVO"
+    column="STU_ID" />
+  <collection property="professor" ofType="ProfessorVO"
+    column="PROFE_ID" />
+  <collection property="employee" ofType="EmployeeVO"
+    column="EMP_ID" />
+ 
+</resultMap>
+	
+<insert id="insertPerson" parameterType="PersonVO">
+    <!-- Person 삽입 -->
+    INSERT INTO PERSON(
+        ID,
+        PSWD,
+        NM,
+        BRDT,
+        SEXDSTN_CD,
+        ZIP,
+        RDNMADR,
+        DADDR,
+        MBTLNUM,
+        EML,
+        EML_RCPTN_AGRE_YN,
+        SMS_RCPTN_AGRE_YN,
+        CRTFC_MN_CD,
+        LAST_CONECT_DE,
+        PSWD_FAILR_CO,
+        PROFL_PHOTO,
+        PERSON_YN
+    ) VALUES (
+        #{id, jdbcType=VARCHAR},
+        #{pswd, jdbcType=VARCHAR},
+        #{nm, jdbcType=VARCHAR},
+        #{brdt, jdbcType=CHAR},
+        #{sexdstnCd, jdbcType=CHAR},
+        #{zip, jdbcType=CHAR},
+        #{rdnmadr, jdbcType=VARCHAR},
+        #{daddr, jdbcType=VARCHAR},
+        #{mbtlnum, jdbcType=VARCHAR},
+        #{eml, jdbcType=VARCHAR},
+        #{emlRcptnAgreYn, jdbcType=CHAR},
+        #{smsRcptnAgreYn, jdbcType=CHAR},
+        #{crtfcMnCd, jdbcType=CHAR},
+        TO_CHAR(SYSDATE, 'YYYYMMDD'),
+        '0',
+        <!-- 프로필 사진이 null이면 NULL 값으로 처리 -->
+        <if test="proflPhoto != null">
+            #{proflPhoto, jdbcType=BLOB}
+        </if>
+        <if test="proflPhoto == null">
+            NULL
+        </if>,
+        'N'
+    )
+
+</insert>
+
+<insert id="insertEmployee" parameterType="EmployeeVO">
+	INSERT INTO EMPLOYEE(
+		EMP_ID
+		,EMP_DEPT
+		,EMP_JBGD
+	)
+	VALUES(
+		, #{empId, jdbcType=VARCHAR}
+		, #{empDept, jdbcType=VARCHAR}
+		, #{empJbgd, jdbcType=VARCHAR}
+	)
+</insert>
+	
+	
+<insert id="insertProfessor" parameterType="ProfessorVO">
+    INSERT INTO PROFESSOR (
+        PROFE_ID, 
+        DEPT_NO, 
+        PROFE_TYPE
+    )
+    VALUES (
+        #{profeId, jdbcType=VARCHAR},
+        #{deptNo, jdbcType=VARCHAR},
+        #{profeType, jdbcType=VARCHAR}
+    )
+</insert>
+
+	
+	
+<!-- 	<insert id="insertPerson" parameterType="PersonVO"> -->
+<!-- 	INSERT INTO PERSON( -->
+<!-- 		 ID -->
+<!-- 		 ,PSWD -->
+<!-- 		 ,NM -->
+<!-- 		 ,BRDT -->
+<!-- 		 ,SEXDSTN_CD -->
+<!-- 		 ,ZIP -->
+<!-- 		 ,RDNMADR -->
+<!-- 		 ,DADDR -->
+<!-- 		 ,MBTLNUM -->
+<!-- 		 ,EML -->
+<!-- 		 ,EML_RCPTN_AGRE_YN -->
+<!-- 		 ,SMS_RCPTN_AGRE_YN -->
+<!-- 		 ,CRTFC_MN_CD -->
+<!-- 		 ,LAST_CONECT_DE -->
+<!-- 		 ,PSWD_FAILR_CO -->
+<!-- 		 ,PROFL_PHOTO -->
+<!-- 		 ,PERSON_YN -->
+		
+<!-- 		) -->
+<!-- VALUES( -->
+<!-- 		 #{id, jdbcType=VARCHAR} -->
+<!-- 		, #{pswd, jdbcType=VARCHAR} -->
+<!-- 		, #{nm, jdbcType=VARCHAR} -->
+<!-- 		, #{brdt, jdbcType=CHAR} -->
+<!-- 		, #{sexdstnCd, jdbcType=CHAR} -->
+<!-- 		, #{zip, jdbcType=CHAR} -->
+<!-- 		, #{rdnmadr, jdbcType=VARCHAR} -->
+<!-- 		, #{daddr, jdbcType=VARCHAR} -->
+<!-- 		, #{mbtlnum, jdbcType=VARCHAR} -->
+<!-- 		, #{eml, jdbcType=VARCHAR} -->
+<!-- 		, #{emlRcptnAgreYn, jdbcType=CHAR} -->
+<!-- 		, #{smsRcptnAgreYn, jdbcType=CHAR} -->
+<!-- 		, #{crtfcMnCd, jdbcType=CHAR} -->
+<!-- 		, (SELECT TO_DATE(SYSDATE, 'YYYY-MM-DD') FROM DUAL) -->
+<!-- 		, '0' -->
+<!-- 		, #{proflPhoto, jdbcType=BLOB} -->
+<!-- 		,'N' -->
+<!-- 		) -->
+<!-- 	</insert> -->
+	
+	<select id="selectPerson" resultMap="personMap">
+		SELECT 
+			ID
+			,NM
+			,BRDT
+			,SEXDSTN_CD
+			,ZIP
+			,RDNMADR
+			,DADDR
+			,MBTLNUM
+			,EML
+			FROM PERSON
+	WHERE ID = #{id, jdbcType=VARCHAR}
+	</select>
+	
+<!-- 	사용자 리스트 조회 -->
+	<select id="selectPersonList" resultType="PersonVO">
+		SELECT 
+			ID
+			,NM
+			,BRDT
+			,SEXDSTN_CD
+			,ZIP
+			,RDNMADR
+			,DADDR
+			,MBTLNUM
+			,EML
+			,EML_RCPTN_AGRE_YN
+			,SMS_RCPTN_AGRE_YN
+			,CRTFC_MN_CD
+			,LAST_CONECT_DE
+			,PSWD_FAILR_CO
+			,PROFL_PHOTO
+			,PERSON_YN
+			FROM PERSON
+	</select>
+	
+	<update id="updatePerson">
+		UPDATE PERSON
+		SET
+		
+			NM= #{nm, jdbcType=VARCHAR}
+			,BRDT= #{brdt, jdbcType=CHAR}
+			,SEXDSTN_CD= #{sexdstnCd, jdbcType=CHAR}
+			,ZIP= #{zip, jdbcType=CHAR}
+			,RDNMADR=#{rdnmadr, jdbcType=VARCHAR}
+			,DADDR= #{daddr, jdbcType=VARCHAR}
+			,MBTLNUM= #{mbtlnum, jdbcType=VARCHAR}
+			,EML= #{eml, jdbcType=VARCHAR}
+			,EML_RCPTN_AGRE_YN= #{emlRcptnAgreYn, jdbcType=CHAR}
+			,SMS_RCPTN_AGRE_YN= #{smsRcptnAgreYn, jdbcType=CHAR}
+			,CRTFC_MN_CD= #{crtfcMnCd, jdbcType=CHAR}
+			,LAST_CONECT_DE= #{lastConectDe, jdbcType=VARCHAR}
+			,PSWD_FAILR_CO= #{pswdFailrCo, jdbcType=NUMERIC}
+			,PERSON_YN = #{personYn, jdbcType=VARCHAR}
+	WHERE ID = #{id, jdbcType=VARCHAR}
+		
+	</update>
+	
+	<delete id="deletePerson">
+		UPDATE PERSON
+		SET
+			PERSON_YN ='Y'
+		WHERE ID=#{id}
+	</delete>
+	
+
+</mapper>

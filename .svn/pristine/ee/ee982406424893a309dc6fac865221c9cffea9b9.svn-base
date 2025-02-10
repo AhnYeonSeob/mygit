@@ -1,0 +1,105 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+
+<h4>프로젝트일감</h4>
+
+<!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container-fluid">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectDuty/${projectMember.projectTeam.teamCd}">일감</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">채팅방</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">제출관리</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="${pageContext.request.contextPath }/lecture/${lectNo }/projectBoard/${projectMember.projectTeam.teamCd}">게시판</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+
+<div class="search-area text-end" data-pg-target="#searchForm" data-pg-fn-name="fnPaging">
+	<form:select path="condition.searchType">
+		<form:option value="" label="전체" />
+		<form:option value="title" label="제목" />
+		<form:option value="content" label="내용" />
+		<form:option value="writer" label="담당자" />
+	</form:select>
+	<form:input path="condition.searchWord"/>
+	<button class="search-btn">검색</button>
+</div>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>번호</th>
+			<th>제목</th>
+			<th>담당자</th>
+			<th>수정일시</th>
+			<th>상태</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:if test="${not empty projectDutyList }">
+			<c:forEach items="${projectDutyList }" var="duty">
+				<tr>
+					<td>${duty.rnum }</td>
+					
+					<td>
+						<a href="<c:url value='get/${duty.dutyNo }'/>">${duty.dutyTitle }</a>
+					</td>
+					
+					<td>${duty.projectMember.nm }</td>
+					
+					<td>${duty.dutyDate }</td>
+					<c:choose>
+					<c:when test="${duty.dutyPrgsRtprgs eq 100 }">
+					<td>완료</td>
+					</c:when>
+					<c:otherwise>
+					<td>진행중</td>
+					</c:otherwise>
+					</c:choose>
+				</tr>
+			</c:forEach>
+		</c:if>
+		<c:if test="${empty projectDutyList }">
+			<tr class="text-center">
+				<td colspan="5">등록된 일감 없음.</td>
+			</tr>
+		</c:if>
+	</tbody>
+	<tfoot>
+		<!-- 검색 페이징 area -->
+		<tr class="text-center">
+			<td colspan="5">
+				<div class="paging-area">
+					${pagingHTML }
+				</div>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+<!-- 권한에 따라 보일지말지 -->
+<div class="text-end">
+<a href="<c:url value='new/${projectMember.teamCd }' />" class="btn btn-primary">일감등록</a>
+</div>
+
+<form:form id="searchForm" method="get" modelAttribute="condition">
+	<form:input type="hidden" path="searchType"/>
+	<form:input type="hidden" path="searchWord"/>
+	<input type="hidden" name="page" />
+</form:form>
+
+
+
+<script src="${pageContext.request.contextPath }/resources/js/utils/paging.js"></script>

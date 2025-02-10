@@ -1,0 +1,51 @@
+/**
+ * 
+ */
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("personForm");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); 
+
+        const formData = new FormData(form); 
+
+   
+        const person = {};
+		person.professor = {};
+		person.employee ={};
+        formData.forEach((value, key) => {
+		    if (key.startsWith('professorVO.')) {
+		       	const nestedKey = key.replace('professorVO.', ''); // 
+		    	person.professor[nestedKey] = value; // 중첩된 객체에 값을 
+		    }else if(key.startsWith('employeeVO.')) {
+                const nestedKey = key.replace('employeeVO.', ''); 
+                person.employee[nestedKey] = value;  
+		}else {
+		        person[key] = value;
+		    }
+        });
+
+        console.log(person); 
+
+        // AJAX 요청 보내기
+        $.ajax({
+            url: '../../../yguniv/yguniv/person/create',
+            type: 'POST',
+            data: JSON.stringify(person), 
+            contentType: 'application/json',
+            success: function(response) {
+                console.log('성공:', response);
+            },
+            error: function(error) {
+                console.log('실패:', error);
+            }
+        });
+    });
+});
+
+	
+	
+	
+	
+	
+

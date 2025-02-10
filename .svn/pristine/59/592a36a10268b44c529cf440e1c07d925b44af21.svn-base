@@ -1,0 +1,45 @@
+package kr.or.ddit.yguniv.projectchatmessage.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.projectchatmessage.service.ProjectChatMessageService;
+import kr.or.ddit.yguniv.vo.ProjectChatMessageVO;
+import kr.or.ddit.yguniv.vo.ProjectChatRoomVO;
+
+@Controller
+@RequestMapping("/projectChatMessage")
+public class ProjectChatMessageController {
+	
+	@Autowired
+	ProjectChatMessageService service;
+	
+	//채팅방 입장 시 해당 채팅방 메시지내역 조회
+	@GetMapping("{taskNo}/{teamCd}")
+	public ResponseEntity<List<ProjectChatMessageVO>> getChat(
+			@PathVariable String taskNo
+			,@PathVariable String teamCd
+			) {
+		ProjectChatRoomVO room = new ProjectChatRoomVO();
+		room.setTaskNo(taskNo);
+		room.setTeamCd(teamCd);
+		
+		// 서비스 호출
+        List<ProjectChatMessageVO> chatList;
+        try {
+            chatList = service.getHistory(room);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+		
+		return ResponseEntity.ok(chatList);
+	}
+	
+}

@@ -1,0 +1,11 @@
+package kr.or.ddit.yguniv.notification.dao;
+
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface NotificationMapper {
+
+	//알람을 어케할지
+	public String selectNorification();
+
+}

@@ -1,0 +1,123 @@
+package kr.or.ddit.yguniv.assignmentSubmission.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import kr.or.ddit.yguniv.assignment.service.AssignmentService;
+import kr.or.ddit.yguniv.assignmentSubmission.service.AssignmentSubmissionService;
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.vo.AssignmentSubmissionVO;
+import kr.or.ddit.yguniv.vo.AssignmentVO;
+import kr.or.ddit.yguniv.vo.LectureVO;
+import kr.or.ddit.yguniv.vo.SerchMappingVO;
+
+/**
+ * @author AYS
+ * lvn에 ?는 디테일로 갈 수 있게 해당넘버를 붙여줘야함
+ */
+@Controller
+@RequestMapping("/lecture/{lectNo}/assignmentSubmission")
+public class AssignmentSubmissionController {
+	
+	@Autowired
+	private AssignmentSubmissionService service;
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureservice;
+	
+	@Autowired
+	private AssignmentService assignmentservice;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureservice.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+	}
+	@GetMapping
+	public String pageMove(@PathVariable String lectNo, Model model) {
+		
+		model.addAttribute("lectNo", lectNo);
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionList";
+	}
+	//과제상세조회
+	@GetMapping("assign/{assigNo}")
+	@ResponseBody
+	public AssignmentVO detailAssignment(@PathVariable String assigNo) {
+		AssignmentVO data = assignmentservice.readAssignment(assigNo);
+		return data;
+	}
+	//제출과제전체조회
+	//lectNo 강의번호 assigNo 과제번호 stuId 학번 여부에따라 조회를 다르게해야함(수정필요)
+	@GetMapping("get")
+	@ResponseBody
+	public List<AssignmentSubmissionVO> selectList(@PathVariable String lectNo) {
+		SerchMappingVO search = new SerchMappingVO();
+		search.setLectNo(lectNo);
+		 List<AssignmentSubmissionVO> data = service.readAssignmentSubmissionlist(search);
+		return data;
+	}
+	//제출과제전체조회(검색어 있는지 없는지)
+	@GetMapping("{id}")
+	public String selectMyList(@PathVariable()int courCd) {
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionList";
+	}
+	//과제 생성폼이동
+	@GetMapping("new")
+	public String createForm() {
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionForm";
+	}
+
+	
+	//제출과제 생성
+	@PostMapping()
+	public String create() {
+		return "lecture/materials/assignmentSubmission/?";
+	}
+	
+	//제출과제상세조회
+	@GetMapping("{assigCd}")
+	public String select(@PathVariable()int assigCd) {
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionDetail";
+	}
+	
+	//과제수정폼이동
+	@GetMapping("{assigCd}/edit")
+	public String updateForm() {
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionEditForm";
+	}
+	
+	
+	//제출과제수정
+	@PutMapping("{assigCd}")
+	public String update(@PathVariable()int assigCd) {
+		
+		return "lecture/materials/assignmentSubmission/?";
+	}
+	
+	//제출과제삭제
+	@DeleteMapping("{assigCd}")
+	public String delete(@PathVariable()int assigCd) {
+		
+		return "lecture/materials/assignmentSubmission/assignmentSubmissionList";
+	}
+
+}

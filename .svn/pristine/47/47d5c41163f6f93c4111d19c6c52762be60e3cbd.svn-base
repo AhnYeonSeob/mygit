@@ -1,0 +1,88 @@
+package kr.or.ddit.yguniv.projectteam.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.commons.exception.PKNotFoundException;
+import kr.or.ddit.yguniv.lecture.service.LectureMaterialsServiceImpl;
+import kr.or.ddit.yguniv.vo.LectureVO;
+
+@Controller
+@RequestMapping("/lecture/{lectNo}/projectTeam")
+public class ProjectTeamController {
+	
+	@Autowired
+	private LectureMaterialsServiceImpl lectureservice;
+	
+	@ModelAttribute
+	public void addLecture(@PathVariable String lectNo, Model model){
+		LectureVO lectureVO = lectureservice.selectLecture(lectNo);
+		if(lectureVO == null) {
+			throw new PKNotFoundException("해당 강의는 존재하지 않습니다", true);
+		}
+		model.addAttribute("lecture", lectureVO);
+		model.addAttribute("lectNo", lectNo);
+	}
+	
+	//프로젝트팀 목록조회
+	@GetMapping
+	public String selectList() {
+		
+		return "lecture/materials/projectTeam/projectTeamList";
+	}
+	
+	//프로젝트팀 상세조회
+	@GetMapping("{teamCd}")
+	public String select(@PathVariable()int teamCd) {
+		
+		return "projectTeam/projectTeamDetail";
+	}
+	//프로젝트팀 생성폼 이동
+	@GetMapping("{teamCd}/new")
+	public String createForm() {
+		
+		return "projectTeam/projectTeamForm";
+	}
+	
+	
+	//프로젝트팀 생성
+	@PostMapping("{teamCd}")
+	public String create(@PathVariable()int teamCd) {
+		
+		return "projectTeam/?";
+	}
+	
+	//프로젝트팀 수정폼이동
+	@GetMapping("{teamCd}/edit")
+	public String updateForm(@PathVariable()int teamCd) {
+		
+		
+		return "projectTeam/projectTeamEditForm";
+	}
+	
+	//프로젝트팀 수정
+	@PutMapping("{teamCd}")
+	public String update(@PathVariable()int teamCd) {
+		
+		
+		return "projectTeam/?";
+	}
+	
+	//프로젝트팀 삭제
+	@DeleteMapping("{teamCd}")
+	public String delete(@PathVariable()int teamCd) {
+		
+		
+		return "projectTeam/projectTeamList";
+	}
+
+	
+}

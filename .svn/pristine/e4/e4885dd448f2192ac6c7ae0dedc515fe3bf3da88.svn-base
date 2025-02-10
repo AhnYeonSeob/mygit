@@ -1,0 +1,96 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+
+<h2>학사일정리스트</h2>
+
+<div class="search-area text-end" data-pg-target="#searchForm" data-pg-fn-name="fnPaging">
+	<form:select path="condition.searchType">
+		<form:option value="" label="전체" />
+		<form:option value="title" label="제목" />
+		<form:option value="writer" label="작성자" />
+	</form:select>
+	<form:input path="condition.searchWord"/>
+	<button class="search-btn">검색</button>
+	<button id="calendarIcon" class="btn btn-outline-secondary ms-2" data-path="${pageContext.request.contextPath }">
+        <i class="bi bi-calendar-check"></i>
+    </button>
+</div>
+				
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>공지번호</th>
+			<th>제목</th>
+			<th>시작일자</th>
+			<th>종료일자</th>
+			<th>조회수</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:if test="${not empty boardList }">
+			<c:forEach items="${boardList }" var="board">
+				<tr>
+					<td>${board.rnum }</td>
+					<td>
+						<!-- a태그 안 url 수정해야함 -->
+						<a href="<c:url value='/noticeboard/${board.ntcCd }'/>">${board.ntcNm }</a>
+					</td>
+					<td>${board.ntcDt }</td>
+					<td>${board.ntcEt }</td>
+					<td>${board.ntcInqCnt }</td>
+				</tr>
+			</c:forEach>
+		</c:if>
+		<c:if test="${empty boardList }">
+			<tr>
+				<td colspan="5">글 없음.</td>
+			</tr>
+		</c:if>
+	</tbody>
+	<tfoot>
+		<!-- 검색 페이징 area -->
+		<tr align="center">
+			<td colspan="5">
+				<div class="paging-area">
+					${pagingHTML }
+				</div>
+			</td>
+		</tr>
+	</tfoot>
+</table>
+<!-- 권한에 따라 보일지말지 -->
+<div class="text-end">
+<a href="<c:url value='/noticeboard/new'/>" class="btn btn-primary">일정등록</a>
+</div>
+
+<form:form id="searchForm" method="get" modelAttribute="condition">
+	<form:input type="hidden" path="searchType"/>
+	<form:input type="hidden" path="searchWord"/>
+	<input type="hidden" name="page" />
+</form:form>
+
+
+
+<!-- 캘린더 모달 -->
+
+<div id="calendarModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">전체 일정</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="fullCalendar"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="${pageContext.request.contextPath }/resources/js/utils/paging.js"></script>
+<script src="${pageContext.request.contextPath }/resources/js/noticeBoard/noticeBoardCalendar.js"></script>

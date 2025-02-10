@@ -1,0 +1,27 @@
+package kr.or.ddit.yguniv.dissent.controller;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+import javax.inject.Inject;
+
+import org.junit.jupiter.api.Test;
+
+import kr.or.ddit.yguniv.annotation.RootContextWebConfig;
+import kr.or.ddit.yguniv.dissent.service.DissentService;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RootContextWebConfig
+class DissentControllerTest {
+
+	@Inject
+	DissentService service;
+	
+	@Test
+	void test() {
+		assertDoesNotThrow(()->{
+			service.readDissentList();
+		});
+	}
+
+}

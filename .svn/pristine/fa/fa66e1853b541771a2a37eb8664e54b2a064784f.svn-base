@@ -1,0 +1,112 @@
+
+
+// 모달이 열릴 때마다 해당 데이터를 채워넣는 함수
+var myModal = document.getElementById('staticBackdrop');
+myModal.addEventListener('show.bs.modal', function (event) {
+	// 버튼을 클릭했을 때 전달된 데이터를 가져오기
+	var button = event.relatedTarget; // 버튼을 클릭한 요소
+	var lectOrder = button.getAttribute('data-lectOrder');
+	var studentName = button.getAttribute('data-studentName');
+	var studentId = button.getAttribute('data-studentId');
+	var absenceReason = button.getAttribute('data-absenceReason');
+	var absenceStatus = button.getAttribute('data-absenceStatus');
+	
+	// 모달에 해당 데이터 채우기
+	document.getElementById('lectOrder').textContent = lectOrder;
+	document.getElementById('studentName').textContent = studentName;
+	document.getElementById('studentId').textContent = studentId;
+	document.getElementById('absenceReason').textContent = absenceReason;
+	document.getElementById('absenceStatus').textContent = absenceStatus;
+});
+
+
+
+
+
+// 모달에서 승인 및 반려 버튼 클릭 시 처리하는 로직
+document.getElementById('approveButton').addEventListener('click', function() {
+    handleAbsenceRequest(true); // 승인 처리 (공결인정서 + 출결 상태 업데이트)
+});
+
+document.getElementById('rejectButton').addEventListener('click', function() {
+    handleAbsenceRequest(false); // 반려 처리 (공결인정서 상태만 업데이트)
+});
+
+function handleAbsenceRequest(isApproved) {
+    // 모달에서 전달된 데이터 가져오기
+    const lectOrder = document.getElementById('lectOrder').innerText;
+    const studentId = document.getElementById('studentId').innerText;
+    const studentName = document.getElementById('studentName').innerText;
+    const absenceStatus = document.getElementById('absenceStatus').innerText;
+    const absenceReason = document.getElementById('absenceReason').innerText;
+
+    // 서버로 전송할 데이터 구조 준비
+    const data = {
+        lectOrder: lectOrder,
+        stuId: studentId,
+        absenceStatus: absenceStatus,
+        absenceReason: absenceReason,
+        isApproved: isApproved // 승인 여부 추가
+    };
+
+    // 승인/반려 처리 API 호출
+    fetch('/api/absence/update', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert(isApproved ? "공결 인증서 승인 처리 완료!" : "공결 인증서 반려 처리 완료!");
+            location.reload(); // 데이터 갱신 후 페이지 새로고침
+        } else {
+            alert("처리 실패! 다시 시도해 주세요.");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("서버와의 통신 오류가 발생했습니다.");
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// 셀렉트 박스
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('statusFilter').addEventListener('change', function() {
+    var selectedStatus = this.value; // 셀렉트박스에서 선택된 값
+    console.log("선택된 값: " + selectedStatus); // 디버깅용 로그
+
+    var rows = document.querySelectorAll('.absenceRow'); // 모든 행을 선택
+
+    rows.forEach(function(row) {
+      var status = row.getAttribute('data-absence-status'); // 각 행의 상태 값 (absence.PRST)
+      console.log("행의 상태 값: " + status); // 디버깅용 로그
+
+      // 선택된 상태와 행의 상태가 일치하면 표시, 아니면 숨김
+      if (selectedStatus === '선택해주세요.' || status === selectedStatus) {
+        row.style.display = ''; // 보이도록 설정
+      } else {
+        row.style.display = 'none'; // 숨기기
+      }
+    });
+  });
+});

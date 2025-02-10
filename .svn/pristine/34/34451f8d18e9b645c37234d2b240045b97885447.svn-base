@@ -1,0 +1,51 @@
+package kr.or.ddit.yguniv.coursecart.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+
+@Controller
+@RequestMapping("/yguniv/courseCart")
+public class CourseCartContoller {
+	
+	//테이블 ->VO
+	//수강신청 페이지로 이동
+	@GetMapping
+	public String selectList(PaginationInfo pageInfo) {
+		
+		return "coursecart/courseCartList";
+	}
+
+	//강의 계획서 출력
+	//강의 계획서를 팝업창 처럼 출력해야함. 
+	@GetMapping("{courNo}")
+	public String selectCoursePaper() {
+		
+		return "/coursecart/coursePaperDetail";
+	}
+
+	//신청한 강의를 저장하기
+	//[신청] 버튼을 누르면 해당 강의가 장바구니에 들어가고 페이지 유지
+	//싱글페이지로 강의 저장하는 작업만 할꺼니까 뷰네임은 필요없지 않ㄴ마?
+	@PutMapping("{courNo}")
+	public String updateCourseCart() {
+		
+		return "coursecart/courseCartList";
+	}
+
+	//신청한 강의를 취소하기
+	//[삭제] 버튼을 누르면 해당 강의가 장바구니에서 빠지고 페이지 유지
+	@DeleteMapping("{courNo}")
+	public String deleteCourseCart() {
+		
+		return "coursecart/courseCartList";
+	}
+	
+	
+	
+	
+}

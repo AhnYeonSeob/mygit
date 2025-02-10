@@ -1,0 +1,14 @@
+package kr.or.ddit.yguniv.login.service;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.vo.PersonVO;
+
+@Service
+public interface PersonFindLoginService {
+	 
+	
+	public PersonVO selectFindForm(PersonVO person);
+	
+	
+}

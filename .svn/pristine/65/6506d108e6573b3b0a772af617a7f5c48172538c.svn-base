@@ -1,0 +1,78 @@
+package kr.or.ddit.yguniv.introduce.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.introduce.dao.IntroduceMapper;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.IntroduceVO;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class IntroduceServiceImpl implements IntroduceService {
+	
+	private final IntroduceMapper mapper;
+
+	@Override
+	public void insertintroduce(IntroduceVO introduce) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public IntroduceVO updateintroduce(IntroduceVO introduce) {
+		 int rowsAffected = mapper.updateintroduce(introduce);
+		    if (rowsAffected > 0) {
+		        return mapper.selectintroduce(introduce.getStuId()); // 수정된 데이터 반환
+		    }
+		    return null; // 수정 실패 시 null 반환
+	}
+
+
+	@Override
+	public IntroduceVO selectintroduce(String stuId) {
+		IntroduceVO introduce =mapper.selectintroduce(stuId);
+		return introduce;
+	}
+	
+	@Override
+	public IntroduceVO selectEditedIntroduce(String stuId) {
+		return mapper.selectEditedIntroduce(stuId);
+	}
+
+
+	@Override
+	public List<IntroduceVO> selectintroduceListPaging(PaginationInfo<IntroduceVO> paging) {
+		paging.setTotalRecord(mapper.selectTotalRecord(paging));
+		List<IntroduceVO>introduceList = mapper.selectintroduceListPaging(paging);
+		return introduceList;
+	}
+
+
+
+	@Override
+	public void deleteintroduce(String stuId) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public int selectTotalRecord(PaginationInfo<IntroduceVO> paging) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+
+
+
+
+
+	}
+
+

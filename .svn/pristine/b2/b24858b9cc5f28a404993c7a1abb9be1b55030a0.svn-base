@@ -1,0 +1,67 @@
+function submitReply() {
+	
+	
+    const replyContent = document.getElementById("adminReply").value.trim();
+
+
+
+    if (replyContent === "") {
+        swal('답변을 작성해주세요!','작성된 글이 없습니다.','warning');
+
+        return;
+    }
+
+    const data = {
+        sibNo: sibNo.value,
+        sibAns: replyContent
+    };
+
+console.log("이거 들어왔니 ? ",data);
+
+    fetch(contextPath + "/answer/registerReply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+			response.text().then(rslt=> {
+				if(rslt == '"success"'){
+					
+					swal('답변 작성 완료!',"답변이 정상적으로 작성되었습니다.",'success');
+
+					
+					
+					  // 버튼 숨기기
+            const submitButton = document.getElementById("submitButton");
+            if (submitButton) {
+                submitButton.style.display = "none";
+            }
+
+            // 텍스트 영역 비활성화
+            const adminReply = document.getElementById("adminReply");
+            if (adminReply) {
+                adminReply.disabled = true; // 텍스트 영역 비활성화
+            }
+				
+                
+                // 페이지 새로 고침
+                location.href = location.href;
+
+			
+					
+					
+					
+				}else {
+					
+						swal('업로드 오류',"답변 등록이 실패 되었습니다. 다시 시도해주세요.",'warning');
+            					
+				}		
+			})	
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        swal('서버 에러',"해당 서버 오류로 인해 다시 시도해주세요.",'warning');
+
+
+    });
+}

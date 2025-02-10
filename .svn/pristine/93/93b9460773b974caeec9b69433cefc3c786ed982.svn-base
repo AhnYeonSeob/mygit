@@ -1,0 +1,57 @@
+package kr.or.ddit.yguniv.test.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/test")
+public class TestController {
+
+	// 교직원이 등록된 시험을 조회
+	// 교수는 자신이 등록한 리스트를 조회
+	@GetMapping()
+	public String selectList() {
+
+		return "test/testList";
+	}
+
+	// 단건조회
+	@GetMapping("{testId}")
+	public String selectTest() {
+
+		return "test/testDetail";
+	}
+	// 단건조회
+	@GetMapping("{testId}/{stuId}")
+	public String selectAttendTest() {
+		
+		return "test/testDetail";
+	}
+
+	// form으로 전송 
+	//교수가 시험을 만드는 폼으로
+	@GetMapping("new")
+	public String sendTestForm() {
+
+		return "test/testForm";
+	}
+
+	//시험 등록
+	@PostMapping
+	public String createTest() {
+		//진짜 등록하고 보내는
+		return "test/testDetail";
+	}
+
+	// edit으로 전송 
+	@GetMapping("{testId}/edit")
+	public String sendTestEdit() {
+
+		return "test/testEdit";
+	}
+
+	//등록과 반려를 어케해야하지
+	
+}

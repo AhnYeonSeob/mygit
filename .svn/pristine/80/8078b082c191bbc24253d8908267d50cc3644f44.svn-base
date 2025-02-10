@@ -1,0 +1,28 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 강의 주차(강의자료게시판)
+ */
+@Data
+@EqualsAndHashCode
+public class LectureWeekVO implements Serializable {
+	@NotBlank
+	@Size(min = 4, max = 4)
+	private String weekCd;  // 주차코드
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String lectNo;  // 강의번호
+	@NotBlank
+	@Size(max =300)
+	private String leweNm;  // 주차제목	
+	
+	private LectureVO lectureVO;
+}

@@ -1,0 +1,52 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of="stuId")
+public class IntroduceVO implements Serializable{
+	@NotNull
+    @Size(max = 10)
+	private String stuId; //학생번호 
+	
+	@NotNull
+    @Size(max = 10)
+	private String empfiCd; //취업분야코드
+	
+	@NotNull
+    @Size(max = 30)
+	private String intOtherNn; //기타취업분야
+	
+	@NotNull
+    @Size(max = 3000)
+	private String intQue1; //지원동기
+	
+	@NotNull
+    @Size(max = 3000)
+	private String intQue2; //입사후 포부
+	
+	@NotNull
+    @Size(max = 3000)
+	private String intQue3; //성격및 장단점
+	
+	@NotNull
+	@DateTimeFormat(iso=ISO.DATE)
+	private LocalDate intDate; //작성일시
+	
+	@NotNull
+	@DateTimeFormat(iso=ISO.DATE)
+	private LocalDate intUdate; //수정일시
+	
+	
+	//취업분야
+}

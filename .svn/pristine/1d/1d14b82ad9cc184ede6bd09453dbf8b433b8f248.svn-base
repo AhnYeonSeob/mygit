@@ -1,0 +1,173 @@
+package kr.or.ddit.yguniv.batch.controller;
+
+import java.util.Iterator;
+
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
+import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import kr.or.ddit.yguniv.batch.service.BatchServiceImpl;
+import kr.or.ddit.yguniv.vo.AttendeeVO;
+import kr.or.ddit.yguniv.vo.LectureCartVO;
+import kr.or.ddit.yguniv.vo.PersonVO;
+import lombok.extern.slf4j.Slf4j;
+
+//batchConfig
+@Slf4j
+@Configuration
+@EnableBatchProcessing
+public class BatchConfig {
+
+  @Autowired
+  private JobBuilderFactory jobBuilderFactory;
+
+  @Autowired
+  private StepBuilderFactory stepBuilderFactory;
+
+  @Autowired
+  private BatchServiceImpl service;
+
+  @Bean
+  public Job sampleJob() {
+      return jobBuilderFactory.get("sampleJob")
+              .start(sampleStep())
+              .build();
+  }
+
+  @Bean
+  public Step sampleStep() {
+      return stepBuilderFactory.get("sampleStep")
+              .<PersonVO, PersonVO>chunk(10)
+              .reader(customerItemReader())
+              .processor(customerItemProcessor())
+              .writer(customerItemWriter())
+              .build();
+  }
+ 
+//하나의 lectureCartVO를 받고 Processor에서 할게 있나?
+ /*
+  * 모든 리스트를 받아서 
+  * 
+  * 
+  * 
+  * */ 
+  
+  @Bean
+  public ItemReader<PersonVO> customerItemReader() {
+      return new ItemReader<PersonVO>() {
+          private Iterator<PersonVO> customerIterator;
+
+          @Override
+          public PersonVO read() throws Exception {
+              if (customerIterator == null) {
+                  customerIterator = service.selectCustomerList().iterator();
+              }
+              return customerIterator.hasNext() ? customerIterator.next() : null;
+          }
+      };
+  }
+
+  @Bean
+  public ItemProcessor<PersonVO, PersonVO> customerItemProcessor() {
+      return customer -> {
+//      	customer.setCusPw("batch");
+          log.info("Processing customer: {}", customer);
+          return service.customerChecker(customer);
+      };
+  }
+
+  @Bean
+  public ItemWriter<PersonVO> customerItemWriter() {
+      return items -> {
+          for (PersonVO customer : items) {
+              log.info("Writing customer: {}", customer);
+              service.updateCustomer(customer);
+          }
+      };
+  }
+  
+  
+  
+  @Bean
+  public Job testJob() {
+      return jobBuilderFactory.get("testJob")
+              .start(testStep())
+              .build();
+  }
+  
+  @Bean
+  public Step testStep() {
+	  return stepBuilderFactory.get("testStep")
+			  .<LectureCartVO, AttendeeVO>chunk(10)
+			  .reader(testItemReader())
+			  .processor(testItemProcessor())
+			  .writer(testItemWriter())
+			  .build();
+  }
+  
+  
+  @Bean
+  public ItemReader<LectureCartVO> testItemReader() {
+      return new ItemReader<LectureCartVO>() {
+          private Iterator<LectureCartVO> customerIterator;
+
+          @Override
+          public LectureCartVO read() throws Exception {
+              if (customerIterator == null) {
+                  customerIterator = service.selectCartList().iterator();
+              }
+              return customerIterator.hasNext() ? customerIterator.next() : null;
+          }
+      };
+  }
+
+  @Bean
+  public ItemProcessor<LectureCartVO, AttendeeVO> testItemProcessor() {
+      return cart -> {
+//      	customer.setCusPw("batch");
+          log.info("Processing customer: {}", cart);
+    	  
+    	  AttendeeVO aVo = new AttendeeVO();
+    	  aVo.setLectNo(cart.getLectNo());
+    	  aVo.setStuId(cart.getStuId());
+    	  
+          return aVo;
+      };
+  }
+
+  @Bean
+  public ItemWriter<AttendeeVO> testItemWriter() {
+      return items -> {
+          for (AttendeeVO attendee : items) {
+              int result = service.insertAttendee(attendee);
+              log.info("Writing customer: {} , result : {}", attendee,result);
+          }
+      };
+  }
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+}
+

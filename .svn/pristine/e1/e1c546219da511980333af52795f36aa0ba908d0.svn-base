@@ -1,0 +1,48 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+/**
+ * 강의 문의게시판
+ */
+@Data
+@EqualsAndHashCode(of = "cibCd")
+@ToString(exclude = {"cibTtl", "cibNotes", "cibAnsNotes"})
+public class LectureInquiryBoardVO implements Serializable {
+	@NotBlank
+	private String cibCd;  // 문의번호
+	@NotBlank
+	@Size(max = 10)
+	private String lectNo;  // 강의번호
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String stuId;  // 학생번호
+	@NotBlank
+	@Size(max = 500)
+	private String cibTtl;  // 문의제목
+	@NotBlank
+	private String cibNotes;  // 문의내용
+	@NotNull
+	@DateTimeFormat(iso = ISO.DATE_TIME)
+	private LocalDateTime cibDt;  // 문의등록일시
+	@Size(min = 10, max = 10)
+	private String profeId;  // 답변작성자
+	private String cibAnsNotes;  // 답변내용
+	@DateTimeFormat(iso = ISO.DATE_TIME)
+	private LocalDateTime cibAnsDt;  // 답변일시
+	
+	private AttendeeVO attendeeVO;
+	private ProfessorVO professorVO;
+}

@@ -1,0 +1,49 @@
+package kr.or.ddit.yguniv.assignmentSubmission.service;
+
+import java.util.List;
+
+import kr.or.ddit.yguniv.vo.AssignmentSubmissionVO;
+import kr.or.ddit.yguniv.vo.AtchFileDetailVO;
+import kr.or.ddit.yguniv.vo.SerchMappingVO;
+
+public interface AssignmentSubmissionService {                     
+	/**제출과제생성 Assignment 생성시 거기에서 호출
+	 * @param assignmentSubmission
+	 */
+	public void createAssignmentSubmission(AssignmentSubmissionVO assignmentSubmission);
+	/**단건조회
+	 * @param search
+	 * @return
+	 */
+	public AssignmentSubmissionVO readAssignmentSubmission(SerchMappingVO search);
+	/**다건조회
+	 * @param search
+	 * @return
+	 */
+	public List<AssignmentSubmissionVO>  readAssignmentSubmissionlist(SerchMappingVO search);
+	/**수정
+	 * @param assignmentSubmission
+	 */
+	public void modifyAssignmentSubmission(AssignmentSubmissionVO assignmentSubmission);
+	/**삭제
+	 * @param search
+	 */
+	public void removeAssignmentSubmission(SerchMappingVO search);
+	/**제출상태변경
+	 * @param search
+	 * @return
+	 */
+	public int updateSubmissionStatus(SerchMappingVO search);
+	/** 파일 다운로드
+	 * @param atchFileId
+	 * @param fileSn
+	 * @return
+	 */
+	public AtchFileDetailVO download(int atchFileId, int fileSn);
+	/** 파일 한건 삭제
+	 * @param atchFileId
+	 * @param fileSn
+	 */
+	public void removeFile(int atchFileId, int fileSn);
+	
+}

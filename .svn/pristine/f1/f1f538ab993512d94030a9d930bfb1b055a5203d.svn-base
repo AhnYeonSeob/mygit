@@ -1,0 +1,38 @@
+package kr.or.ddit.yguniv.lecture.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/lecture")
+public class LectureMaterialsController {
+	@GetMapping("{lectNo}/materials")
+	public String selectLectureMaterialsList(@PathVariable String lectNo) {
+		return "lecture/lectureMaterialsList";
+	}
+	
+	@GetMapping("{lectNo}/materials/{lectWeekNo}/{sectCd}")
+	public String selectOrderLectureData(@PathVariable String lectNo, @PathVariable String lectWeekNo, @PathVariable String sectCd) {
+		return "lecture/lectureMaterialsDetail";
+	}
+	
+	@PostMapping("{lectNo}/materials/{lectWeekNo}/new")
+	public void insertOrderLectureData(@PathVariable String lectNo, @PathVariable String lectWeekNo) {
+
+	}
+	
+	@PostMapping("{lectNo}/materials/{lectWeekNo}/{sectNo}/edit")
+	public void updateOrderLectureData(@PathVariable String lectNo, @PathVariable String lectWeekNo, @PathVariable String sectCd) {
+
+	}
+	
+	@DeleteMapping("{lectNo}/materials/{lectWeekNo}/{sectNo}")
+	public void deleteOrderLectureData(@PathVariable String lectNo, @PathVariable String lectWeekNo, @PathVariable String sectCd) {
+
+	}
+}

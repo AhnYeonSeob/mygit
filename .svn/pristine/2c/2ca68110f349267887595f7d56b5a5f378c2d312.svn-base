@@ -1,0 +1,14 @@
+package kr.or.ddit.yguniv.mypage.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@Controller
+@RequestMapping("/yguniv/mypage")
+public class MainUIController {
+	@PostMapping
+	public String processMainUI() {
+		return "mypage/mainUI";
+	}
+}

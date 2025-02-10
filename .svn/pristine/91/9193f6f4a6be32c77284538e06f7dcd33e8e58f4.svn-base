@@ -1,0 +1,41 @@
+package kr.or.ddit.yguniv.assignment.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
+
+import kr.or.ddit.yguniv.vo.AssignmentVO;
+
+@Mapper
+public interface AssignmentMapper {
+	
+	/** 과제생성
+	 * @param assignment
+	 * @return
+	 */
+	public int insertAssignment(AssignmentVO assignment);
+	
+	/** 전체조회
+	 * @return
+	 */
+	public List<AssignmentVO> selectAssignment();
+	
+	/** 단건조회
+	 * @param assigNo
+	 * @return
+	 */
+	public AssignmentVO selectAssignmentlist(int assigNo);
+	
+	/** 과제수정
+	 * @param assignment
+	 * @return
+	 */
+	public int updateAssignment(AssignmentVO assignment);
+	
+	/** 과제삭제
+	 * @param assigNo
+	 * @return
+	 */
+	public int deleteAssignment(int assigNo);
+	
+}

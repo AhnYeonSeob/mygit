@@ -1,0 +1,14 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<ul class="list-group">
+  <li class="list-group-item list-group-item-primary fw-bold text-center">담당교수</li>
+  <li class="list-group-item">최희연 교수님</li>
+  <li class="list-group-item list-group-item-primary fw-bold text-center">수강생(7명)</li>
+  <li class="list-group-item">박찬주(2024100001)</li>
+  <li class="list-group-item">안연섭(2024100002)</li>
+  <li class="list-group-item">양순주(2024100003)</li>
+  <li class="list-group-item">이석(2024100004)</li>
+  <li class="list-group-item">김한비(2024100005)</li>
+  <li class="list-group-item">신유정(2024100006)</li>
+  <li class="list-group-item">오연근(2024100007)</li>
+</ul>

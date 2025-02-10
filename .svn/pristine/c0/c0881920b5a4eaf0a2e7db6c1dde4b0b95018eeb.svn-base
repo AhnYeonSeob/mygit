@@ -1,0 +1,69 @@
+package kr.or.ddit.yguniv.lecture.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import kr.or.ddit.yguniv.lecture.dao.LectureMaterialsMapper;
+import kr.or.ddit.yguniv.vo.LectureWeekVO;
+import kr.or.ddit.yguniv.vo.OrderLectureDataVO;
+
+@Service
+public class LectureMaterialsService {
+	@Autowired
+	private LectureMaterialsMapper dao;
+	/**
+	 * R-강의자료 목록 조회
+	 */
+	public List<OrderLectureDataVO> selectOrderLectureDataList(String lectNo){
+		return dao.selectOrderLectureDataList(lectNo);
+	}
+	/**
+	 * R-강의자료 단건 조회
+	 */
+	public OrderLectureDataVO selectOrderLectureData(OrderLectureDataVO orderLectureDataVO) {
+		return dao.selectOrderLectureData(orderLectureDataVO);
+	}
+	/**
+	 * C-강의 주차 추가
+	 */
+	public boolean insertLectureWeek(LectureWeekVO lectureWeekVO) {
+		return dao.insertLectureWeek(lectureWeekVO)>0;
+	}
+	/**
+	 * U-강의 주차 수정
+	 */
+	public boolean updateLectureWeek(LectureWeekVO lectureWeekVO) {
+		return dao.updateLectureWeek(lectureWeekVO)>0;
+	}
+	/**
+	 * D-강의 주차 삭제
+	 */
+	public boolean deleteLectureWeek(LectureWeekVO lectureWeekVO) {
+		// 주차 삭제 전 주차에 해당하는 차시 삭제
+		OrderLectureDataVO orderLectureDataVO = new OrderLectureDataVO();
+		orderLectureDataVO.setLectNo(lectureWeekVO.getLectNo());
+		orderLectureDataVO.setWeekCd(lectureWeekVO.getWeekCd());
+		dao.deleteOrderLectureData(orderLectureDataVO);
+		return dao.deleteLectureWeek(lectureWeekVO)>0;
+	}
+	/**
+	 * C-강의 차시 추가
+	 */
+	public boolean insertOrderLectureData(OrderLectureDataVO orderLectureDataVO) {
+		return dao.insertOrderLectureData(orderLectureDataVO)>0;
+	}
+	/**
+	 * U-강의 차시 수정
+	 */
+	public boolean updateOrderLectureData(OrderLectureDataVO orderLectureDataVO) {
+		return dao.updateOrderLectureData(orderLectureDataVO)>0;
+	}
+	/**
+	 * D-강의 차시 삭제
+	 */
+	public boolean deleteOrderLectureData(OrderLectureDataVO orderLectureDataVO) {
+		return dao.deleteOrderLectureData(orderLectureDataVO)>0;
+	}
+}

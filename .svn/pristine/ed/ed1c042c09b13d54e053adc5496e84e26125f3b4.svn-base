@@ -1,0 +1,40 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+<h4>제출과제리스트</h4>
+<table class="table table-bordered">
+	<thead>
+		<tr><th>과제번호</th>
+			<th>강의번호</th>
+			<th>학번</th>
+			<th>과제명</th>
+			<th>제출일</th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:if test="${not empty assignmentSubmissionSubmissionList }">
+			<c:forEach items="${assignmentSubmissionList }" var="assignmentSubmission">
+				<tr>
+					<td>${assignmentSubmission.assigNo }</td>
+					<td>${assignmentSubmission.lectNo }</td>
+					<td>${assignmentSubmission.stuId }</td>
+					<td>
+						<!-- a태그 안 url 수정해야함 -->
+						<a href="<c:url value='/board/${board.boNo }'/>">${assignmentSubmission.assignment.assigNm }</a>
+					</td>
+					<td>${assignmentSubmission.assubDate }</td>
+				</tr>
+			</c:forEach>
+		</c:if>
+		<c:if test="${empty assignmentSubmissionList }">
+			<tr>
+				<td colspan="5">글 없음.</td>
+			</tr>
+		</c:if>
+	</tbody>
+	<tfoot>
+		<!-- 검색 페이징 area -->
+	</tfoot>
+</table>
+<!-- 권한에 따라 보일지말지 -->
+<button>제출과제등록</button>

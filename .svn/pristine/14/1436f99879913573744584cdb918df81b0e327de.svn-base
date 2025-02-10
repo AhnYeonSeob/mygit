@@ -1,0 +1,52 @@
+package kr.or.ddit.yguniv.login.controller;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
+
+import kr.or.ddit.yguniv.login.dao.PersonDAO;
+import kr.or.ddit.yguniv.login.service.PersonService;
+import lombok.RequiredArgsConstructor;
+
+
+@RequiredArgsConstructor
+@Component
+public class CustomAuthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler{
+	
+	private final PersonDAO person; // DAO 의존성 주입
+	private final PersonService service; // DAO 의존성 주입
+	
+
+    public void onAuthenticationSuccess(
+    		HttpServletRequest request, 
+    		HttpServletResponse response, 
+    		Authentication authentication
+    		) throws IOException, ServletException {
+        
+    	String id = authentication.getName(); // 인증된 사용자 ID 가져오기
+       
+//  	  LocalDate today = LocalDate.now();
+//	    String formattedDate = today.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+    	// 로그인 로그 
+//    	int res = service.mergeIntoPersonVisit(formattedDate);
+    
+    	// 로그인 성공 시 실패 횟수 초기화
+        try {
+        	
+        	person.resetFail(id); // 실패 횟수 초기화 메서드 호출        		
+        } catch (Exception e) {
+            e.printStackTrace(); // 예외 발생 시 로그 출력
+        }
+        
+        super.onAuthenticationSuccess(request, response, authentication);
+    }
+
+}

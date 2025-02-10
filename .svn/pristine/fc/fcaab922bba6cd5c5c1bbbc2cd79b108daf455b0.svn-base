@@ -1,0 +1,39 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+import java.time.LocalDate;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "projectchatmessageId")
+public class ProjectChatMessageVO implements Serializable{
+	
+	@NotBlank
+	@Size(max = 10)
+	private String projectchatmessageId;
+	@NotBlank
+	@Size(max = 10)
+	private String teamCd;
+	@NotBlank
+	@Size(max = 300)
+	private String projectchatmessageSender;
+	@NotBlank
+	@Size(max = 3000)
+	private String projectchatmessageContent;
+	
+	@DateTimeFormat(iso = ISO.DATE)
+	private LocalDate projectchatmessageDt;
+	
+	private String projectchatmessageYn;
+	
+	//has a
+	//private ProjectChatRoomVO room;
+}

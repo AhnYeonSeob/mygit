@@ -1,0 +1,58 @@
+package kr.or.ddit.yguniv.jobboard.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+@RequestMapping("/yguniv/jobBoard")
+@Controller
+public class JobBoardController {
+	
+	//form으로 보냄
+	@GetMapping("new")
+	public String createForm() {
+		return "jobBoard/jobboardForm";
+	}
+	
+	
+	//게시글전체조회(검색어 있는지 없는지 ntcNm 제목 / ntcDesc 내용)
+	@GetMapping()
+	public String selectlist() {
+			
+		return "jobBoard/jobboardList";
+	}
+	
+	//게시글 생성
+	@PostMapping()
+	public String create() {
+		return "jobBoard/jobboardDetail";
+	}
+	
+	
+	
+	//게시글상세조회
+	@GetMapping("{jobNo}")
+	public String select(@PathVariable()String jobNo) {
+		
+		return "jobBoard/jobboardDetail";
+	}
+	
+	//게시글수정
+	@PutMapping("{jobNo}")
+	public String update(@PathVariable()String jobNo) {
+		return "jobBoard/jobboardDetail";
+	}
+	
+	//게시글삭제
+	@DeleteMapping("{jobNo}")
+	public String delete(@PathVariable()String jobNo) {
+		return "jobBoard/jobboardList";
+	}
+		
+	
+}
+

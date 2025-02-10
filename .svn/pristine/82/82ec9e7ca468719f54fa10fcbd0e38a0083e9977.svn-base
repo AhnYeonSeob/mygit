@@ -1,0 +1,47 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.io.Serializable;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+/**
+ * 연구논문관리
+ */
+
+@Data
+@EqualsAndHashCode
+public class ResearchManagementVO implements Serializable { 
+
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String resmaCd; // 연구논문번호
+	
+	@NotBlank
+	@Size(min = 10, max = 10)
+	private String profeId; // 교수번호
+	
+	@NotBlank
+	@Size(min = 1, max = 200)
+	private String resmaNm; // 연구논문명
+	
+	@NotBlank
+	@Size(min = 1, max = 200)
+	private String resmaPurp; // 연구목적
+	
+	@NotBlank
+	@Size(min = 1, max = 3000)
+	private String resmaDesc; // 연구내용
+	
+	@Size(min = 8, max = 8)
+	private String resmaDt; // 연구작성일시
+	
+	private Long atchFileId; // 파일그룹번호
+	
+	// private ProfessorVO professorVO;
+	// private AtchFileVO atchFileVO;
+	
+}

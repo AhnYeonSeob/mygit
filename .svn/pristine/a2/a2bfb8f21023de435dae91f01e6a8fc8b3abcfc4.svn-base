@@ -1,0 +1,51 @@
+package kr.or.ddit.yguniv.vo;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.format.annotation.DateTimeFormat.ISO;
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@Data
+@EqualsAndHashCode(of = "ntcCd")
+public class NoticeBoardVO {
+	@NotBlank
+	@Size(max= 10)
+	private String ntcCd;
+	@NotBlank
+	@Size(max= 10)
+	private String prsId;
+	
+	@NotBlank
+	@Size(max= 2)
+	private String ntcYn;
+	
+	@Nullable
+	private Long atchFileId;
+	
+	@NotBlank
+	@Size(max= 20)
+	private String ntcNm;
+	
+	@NotBlank
+	@Size(max= 3000)
+	private String ntcDesc;
+	
+	@DateTimeFormat(iso = ISO.DATE)
+	@NonNull
+	private LocalDate ntcDt;
+	
+	@DateTimeFormat(iso = ISO.DATE)
+	private LocalDate ntcEt;
+	
+	private int ntcInqCnt;
+	
+}

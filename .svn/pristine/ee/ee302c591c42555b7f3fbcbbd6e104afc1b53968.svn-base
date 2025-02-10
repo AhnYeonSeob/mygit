@@ -1,0 +1,109 @@
+package kr.or.ddit.yguniv.board.systemBoard.service;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.PostConstruct;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import kr.or.ddit.yguniv.atch.service.AtchFileService;
+import kr.or.ddit.yguniv.board.systemBoard.dao.SystemBoardMapper;
+import kr.or.ddit.yguniv.paging.PaginationInfo;
+import kr.or.ddit.yguniv.vo.SystemNoticeBoardVO;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class SystemBoardServiceImpl implements SystemBoardService {
+
+	private final SystemBoardMapper mapper;
+	private final AtchFileService atchFileService;
+
+
+
+	@Value("#{dirInfo.saveDir}")
+	private Resource saveFolderRes;
+	private File saveFolder;
+
+	@PostConstruct
+	public void init() throws IOException {
+		this.saveFolder = saveFolderRes.getFile();
+	}
+
+	@Override
+	public void insertSystemBoard(final SystemNoticeBoardVO systemNoticeBoard) {
+
+		
+		Integer atchFileId = Optional.ofNullable(systemNoticeBoard.getAtchFile())
+				.filter(af->! CollectionUtils.isEmpty(af.getFileDetails()))
+				.map(af -> {
+					atchFileService.createAtchFile(af, saveFolder);
+					return af.getAtchFileId();
+				}).orElse(null);
+		
+		systemNoticeBoard.setAtchFileId(atchFileId);
+	    mapper.insertSystemBoard(systemNoticeBoard);
+				
+		
+		
+	}
+
+//	리스트 출력 
+	@Override
+	public List<SystemNoticeBoardVO> selectList(PaginationInfo<SystemNoticeBoardVO> paginationInfo) {
+
+		paginationInfo.setTotalRecord(mapper.selectTotalRecord(paginationInfo));
+		
+		List<SystemNoticeBoardVO> boardList= mapper.selectList(paginationInfo);
+		return boardList;
+		
+	}
+
+//	@Override
+//	public int selectTotalRecord(PaginationInfo<SystemNoticeBoardVO> paginationInfo) {
+//		// TODO Auto-generated method stub
+//		return 0;
+//	}
+
+	@Override
+	public SystemNoticeBoardVO selectSystemBoard(String snbNo) {
+		SystemNoticeBoardVO system = mapper.selectSystemBoard(snbNo);
+		if (system == null) {
+			String.format("%s 번 게시글 없음", snbNo);
+			mapper.snbCount(snbNo);
+		}
+		return system;
+	}
+
+	@Override
+	public void updateSystemBoard(final SystemNoticeBoardVO systemNoticeBoard) {
+		
+				mapper.updateSystemBoard(systemNoticeBoard);
+	}
+
+	@Override
+	public void deleteSystemBoard(String snbNo) {
+
+		mapper.deleteSystemBoard(snbNo);
+	}
+
+	@Override
+	public List<SystemNoticeBoardVO> selectSystemNoticeBoardList(PaginationInfo paginationInfo) {
+
+		if(paginationInfo != null) {
+			
+			int totalRecord = mapper.selectTotalRecord(paginationInfo);
+			paginationInfo.setTotalRecord(totalRecord);
+		}
+		
+		return mapper.selectList(paginationInfo); //실제 데이터 조회
+	}
+
+
+}

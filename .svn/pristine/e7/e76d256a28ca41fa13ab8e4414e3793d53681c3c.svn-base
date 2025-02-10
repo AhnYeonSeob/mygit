@@ -1,0 +1,174 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
+<style>
+
+table {
+	width: 100%;
+	border: 1px solid #ddd;
+	border-collapse: collapse;
+	font-family: Arial, sans-serif;
+}
+
+tr {
+	border-bottom: 1px solid #ddd;
+}
+
+td {
+	padding: 10px;
+	color: #333;
+}
+
+.badge {
+	background-color: #e0ebff;
+	padding: 3px 6px;
+	border-radius: 4px;
+	font-size: 12px;
+}
+
+.title {
+	font-size: 18px;
+	width: 10px;
+	
+}
+
+.info {
+	color: #777;
+	font-size: 18px;
+}
+
+.content {
+	padding: 15px;
+	font-size: 18px;
+	color: #333;
+	height: 200px;
+	width: 200px; 
+}
+
+.right-align {
+	text-align: right;
+	padding-right: 10px;
+}
+
+#cjName {
+	width: 300px;
+	height: 100px;
+}
+</style>
+
+<input type="hidden" value="${board.sibNo }" id="sibNo" />
+
+<h4>문의 게시글</h4>
+<table class="table table-bordered">
+	<script>
+    const contextPath = "${pageContext.request.contextPath}";
+</script>
+
+	<!-- 상태, 요청 -->
+<tr>
+    <td colspan="1" style="width: 100px;"><span class="title">상태</span></td>
+    <td colspan="3" style="width: 150px;"><span class="info">${board.sibSttsYn}</span></td>
+
+</tr>
+
+<!-- 제목 -->
+<tr>
+    <td style="width: 10%; height: 60px;"><span class="title">제목</span></td>
+    <td colspan="3" style="width: 90%; height: 60px;"><span class="info">${board.sibTtl}</span></td>
+</tr>
+
+<!-- 작성일시와 작성자 -->
+<tr>
+    <td style="width: 30; height: 30px;"><span class="title">작성일시</span></td>
+    <td style="width: 50%;"><span class="info">
+        ${fn:split(board.sibDt, 'T')[0]} ${fn:split(board.sibDt, 'T')[1]}</span></td>
+    <td style="width: 10%;"><span class="title">작성자</span></td>
+    <td style="width: 10%;"><span class="info">${board.userId}</span></td>
+</tr>
+
+	<!-- 본문 내용 -->
+	<tr>
+		<td colspan="5" class="content">${board.sibCn}</td>
+
+	</tr>
+
+
+	<br>
+	
+	<tr>
+
+		<br><br> 
+
+<td colspan="4" align="center">
+			<!-- 관리자가 입력할 수 있는 textarea --> 
+			<c:if
+				test="${not empty board.sibAns}">
+				
+				<label for="adminReply"  style="display: inline-block; vertical-align: top; padding-top: 5px;">관리자: </label>
+				<textarea id="adminReply" name="adminReply" disabled
+					style="width: 1200px; height: 100px; padding: 0px 80px 0px 0px; line-height: 1.2; text-align: left; resize: none; box-sizing: border-box; overflow-y: auto;">${board.sibAns}</textarea>
+			</c:if> 
+			
+			<c:if test="${empty board.sibAns}">
+    <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px;">
+        <!-- 라벨 -->
+        <label for="adminReply" style="padding-top: 5px; font-size: 18px;">관리자:</label>
+        
+        <!-- 텍스트 영역 -->
+        <textarea id="adminReply" 
+                  placeholder="답변을 입력하세요" 
+                  style="width: 1100px; height: 100px; 
+                         padding: 20px; 
+                         line-height: 1.2; 
+                         text-align: left; 
+                         resize: none; 
+                         box-sizing: border-box; 
+                         overflow-y: auto;"></textarea>
+
+        <!-- 답변 등록 버튼 -->
+        <button id="submitButton" onclick="submitReply()"
+                style="height: 100px; 
+                       padding: 10px 20px; 
+                       background-color: #007bff; 
+                       color: white; 
+                       border: none; 
+                       border-radius: 10px; 
+                       cursor: pointer; 
+                       font-size: 16px;">답변 등록</button>
+    </div>
+</c:if>
+		
+			</td>
+	</tr>
+
+
+
+	<tr>
+		<td colspan="4" align="right">
+		<a href="<c:url value='/answer'/>" class="btn btn-primary">목록</a> 
+			<!-- 삭제 버튼 -->
+			
+			<form action="<c:url value='/answer/delete/${sibNo}' />" method="post" style="display:inline;">
+ 
+            <button type="submit" class="btn btn-danger">삭제</button>
+			</td>
+			
+</form>
+
+			
+		
+
+
+
+	</tr>
+
+</table>
+<script
+	src="${pageContext.request.contextPath }/resources/js/board/reply.js"></script>
+
+
+<script src="${pageContext.request.contextPath }/resources/js/board/answerDelete.js"></script>
+

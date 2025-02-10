@@ -1,0 +1,56 @@
+package kr.or.ddit.yguniv.person.controller;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+
+@RequestMapping("/yguniv/person")
+@Controller
+public class personController {
+	
+	//form으로 보냄
+	@GetMapping("new")
+	public String createForm() {
+		return "person/personForm";
+	}
+	
+	
+	//전체조회(검색어 있는지 없는지)
+	@GetMapping()
+	public String selectlist() {
+			
+		return "person/personList";
+	}
+	
+	//생성
+	@PostMapping()
+	public String create() {
+		return "person/personDetail";
+	}
+	
+	
+	
+	//상세조회
+	@GetMapping("{personId}")
+	public String select(@PathVariable()int personId) {
+		
+		return "person/personDetail";
+	}
+	
+	//수정
+	@PutMapping("{personId}")
+	public String update(@PathVariable()int personId) {
+		return "person/personDetail";
+	}
+	
+	//삭제
+	@DeleteMapping("{personId}")
+	public String delete(@PathVariable()int personId) {
+		return "person/personList";
+	}
+}

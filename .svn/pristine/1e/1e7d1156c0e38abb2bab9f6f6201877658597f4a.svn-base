@@ -1,0 +1,165 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<title>사용자 입력 폼</title>
+
+<form:form modelAttribute="person" id="personForm">
+    <table class="table">
+        <!-- 공통 정보 입력 필드 -->
+        <tr>
+            <th>ID</th>
+            <td><input type="text" name="id" class="form-control" required value="${person.id}" /><span class="text-danger">${errors.id}</span></td>
+        </tr>
+        <tr>
+            <th>PSWD</th>
+            <td><input type="text" name="pswd" class="form-control" required value="${person.pswd}" /><span class="text-danger">${errors.pswd}</span></td>
+        </tr>
+        <tr>
+            <th>이름</th>
+            <td><input type="text" name="nm" class="form-control" required value="${person.nm}" /><span class="text-danger">${errors.nm}</span></td>
+        </tr>
+        <tr>
+            <th>생년월일</th>
+            <td><input type="text" name="brdt" class="form-control" required value="${person.brdt}" /><span class="text-danger">${errors.brdt}</span></td>
+        </tr>
+        <tr>
+            <th>성별코드</th>
+            <td><input type="text" name="sexdstnCd" class="form-control" required value="${person.sexdstnCd}" /><span class="text-danger">${errors.sexdstnCd}</span></td>
+        </tr>
+        <tr>
+            <th>우편번호</th>
+            <td><input type="text" name="zip" class="form-control" required value="${person.zip}" /><span class="text-danger">${errors.zip}</span></td>
+        </tr>
+        <tr>
+            <th>도로명주소</th>
+            <td><input type="text" name="rdnmadr" class="form-control" required value="${person.rdnmadr}" /><span class="text-danger">${errors.rdnmadr}</span></td>
+        </tr>
+        <tr>
+            <th>상세주소</th>
+            <td><input type="text" name="daddr" class="form-control" value="${person.daddr}" /><span class="text-danger">${errors.daddr}</span></td>
+        </tr>
+        <tr>
+            <th>휴대폰번호</th>
+            <td><input type="text" name="mbtlnum" class="form-control" required value="${person.mbtlnum}" /><span class="text-danger">${errors.mbtlnum}</span></td>
+        </tr>
+        <tr>
+            <th>이메일</th>
+            <td><input type="text" name="eml" class="form-control" required value="${person.eml}" /><span class="text-danger">${errors.eml}</span></td>
+        </tr>
+        <tr>
+            <th>이메일 수신동의 여부</th>
+            <td><input type="text" name="emlRcptnAgreYn" class="form-control" required value="${person.emlRcptnAgreYn}" /><span class="text-danger">${errors.emlRcptnAgreYn}</span></td>
+        </tr>
+        <tr>
+            <th>SNS 수신동의 여부</th>
+            <td><input type="text" name="smsRcptnAgreYn" class="form-control" required value="${person.smsRcptnAgreYn}" /><span class="text-danger">${errors.smsRcptnAgreYn}</span></td>
+        </tr>
+        <tr>
+            <th>인증수단코드</th>
+            <td><input type="text" name="crtfcMnCd" class="form-control" required value="${person.crtfcMnCd}" /><span class="text-danger">${errors.crtfcMnCd}</span></td>
+        </tr>
+<!--         <tr> -->
+<!--             <th>프로필 사진</th> -->
+<%--             <td><input type="file" name="proflPhoto" class="form-control" /><span class="text-danger">${errors.proflPhoto}</span></td> --%>
+<!--         </tr> -->
+    </table>
+
+    <!-- 사용자 유형 선택 -->
+    <select id="user-type" onchange="usertype(event)">
+        <option value="">select user type</option>
+        <option value="professor">교수</option>
+        <option value="student">학생</option>
+        <option value="employee">교직원</option>
+    </select>
+
+
+    <!-- 교수 정보 입력 필드 -->
+    <div id="professor-table" style="display:none;">
+        <table class="table">
+         <tr>
+                <th> </th>
+                <td>
+                    <!-- ID는 이미 person.id로 설정되어 있으므로, 교수 정보에도 해당 값을 넣어주기 -->
+                    <input type="hidden" name="professorVO.profeId" value="${person.id}" />
+                </td>
+            </tr>
+            <tr>
+                <th> 학과
+                    <select id="department-type" name="professorVO.deptNo">
+                        <option value="">학과를 선택하세요</option>
+                        <option value="c001">컴퓨터공학과</option>
+                        <option value="c002">기계공학과</option>
+                        <option value="c003">전자공학과</option>
+                    </select>
+                </th>
+            </tr>
+            <tr>
+                <th> 구분코드
+                    <select id="professor-type" name="professorVO.profeType">
+                        <option value="">구분을 선택하세요</option>
+                        <option value="정교수">정교수</option>
+                        <option value="부교수">부교수</option>
+                        <option value="기간제">기간제</option>
+                    </select>
+                </th>
+            </tr>
+        </table>
+    </div>
+
+ <!-- 교직원 입력 폼 -->
+    <div id="employee-table" style="display:none;">
+        <table class="e-table">
+		  <tr>
+                <th> </th>
+                <td>
+                    <!-- ID는 이미 person.id로 설정되어 있으므로, 교수 정보에도 해당 값을 넣어주기 -->
+                    <input type="hidden" name="employeeVO.empId" value="${person.id}" />
+                </td>
+            </tr>
+            <tr>
+                <th> 부서
+                <select id="emp-dept" name="employeeVO.empDept">
+                	<option value="">부서를 선택하세요</option>
+                	<option value="인사팀">인사팀</option>
+                	<option value="총무팀">총무팀</option>
+                	<option value="교무팀">교무팀</option>
+                </select>
+                </th>
+            </tr>
+            
+              <tr>
+                <th> 직급
+                <select id="emp-jbgd" name="employeeVO.empJbgd"> 
+                	<option value="">직급을 선택하세요</option>
+                	<option value="정교수">행정직</option>
+                	<option value="부교수">주임</option>
+                	<option value="기간제">조교</option>
+                </select>
+                </th>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <!-- 저장 버튼 -->
+    <button type="submit">Save</button>
+</form:form>
+
+<script>
+function usertype(e) {
+    const selectedUserType = e.target.value;  
+
+    //교수 교직원꺼 일단 숨겨
+    document.getElementById("professor-table").style.display = "none";
+    document.getElementById("employee-table").style.display = "none";
+
+    
+    if (selectedUserType === "professor") {
+        document.getElementById("professor-table").style.display = "block";
+    } else if (selectedUserType === "employee") {
+        document.getElementById("employee-table").style.display = "block";
+    }
+}
+</script>
+<script src="${pageContext.request.contextPath}/resources/js/person/personForm.js"></script>

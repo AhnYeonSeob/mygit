@@ -1,0 +1,28 @@
+/**
+ * 
+ */
+
+document.addEventListener("DOMContentLoaded", () => {
+    const searchToggle = document.getElementById("search-toggle");
+    const searchBox = document.getElementById("search-box");
+
+    // 돋보기 아이콘 클릭 시 검색창 표시/숨기기
+    searchToggle.addEventListener("click", (e) => {
+        e.stopPropagation(); // 클릭 이벤트 전파 방지
+        if (searchBox.style.display === "none" || searchBox.style.display === "") {
+            searchBox.style.display = "block";
+        } else {
+            searchBox.style.display = "none";
+        }
+    });
+
+    // 검색창 외부 클릭 시 검색창 숨기기
+    document.addEventListener("click", () => {
+        searchBox.style.display = "none";
+    });
+
+    // 검색창 클릭 시 닫히지 않도록 이벤트 전파 방지
+    searchBox.addEventListener("click", (e) => {
+        e.stopPropagation();
+    });
+});
