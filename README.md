@@ -42,26 +42,22 @@
 
 ## 🖥 Service UI
 
-🎬 1차 인증(로그인페이지)
-![authenticate](https://github.com/user-attachments/assets/fd754eeb-c14d-4087-aa43-3ef72d00967b)
+<h3>🎬 1차 인증(로그인페이지)</h3>
+<img src="https://github.com/user-attachments/assets/fd754eeb-c14d-4087-aa43-3ef72d00967b" width="600px"/>
+<p>🟡 사용자는 입학 시 주어진 학번과 일정규칙으로 조합된 비밀번호(최초 로그인 이후 변경)를 입력하고 로그인 할 수 있는 페이지입니다.</p>
 
-🟡사용자는 입학 시 주어진 학번과 일정규칙으로 조합된 비밀번호(최초 로그인 이후 변경)를 입력하고 로그인 할 수 있는 페이지입니다.
+<h3>🎬 2차 인증요청페이지(로그인성공시)</h3>
+<img src="https://github.com/user-attachments/assets/4b3cbcf0-66d3-46a4-a10d-9930d36b91fd" width="600px"/>
+<p>🟡 이메일 또는 휴대폰으로 인증 수단을 선택해 인증번호를 요청할 수 있습니다.</p>
 
-🎬 2차 인증요청페이지(로그인성공시)
-![2authrequest](https://github.com/user-attachments/assets/4b3cbcf0-66d3-46a4-a10d-9930d36b91fd)
+<h3>🎬 2차 인증응답페이지(2차인증요청시)</h3>
+<img src="https://github.com/user-attachments/assets/7fcf380d-1870-4597-995d-e7ab3f2e9352" width="600px"/>
+<p>🟡 전송된 인증번호를 입력하고 인증을 완료하면 메인 페이지로 이동할 수 있습니다.</p>
 
-🟡
+<h3>🎬 메인화면(1,2차 인증 완료)</h3>
+<img src="https://github.com/user-attachments/assets/283384d3-7683-41c9-985d-730968985a0f" width="600px"/>
+<p>🟡 로그인 완료 후 사용자별 대시보드가 제공되며, 학사일정과 게시판, 과제정보 등을 통합 관리할 수 있습니다.</p>
 
-
-🎬 2차 인증응답페이지(2차인증요청시)
-![2auth_response](https://github.com/user-attachments/assets/7fcf380d-1870-4597-995d-e7ab3f2e9352)
-
-🟡
-
-🎬 메인화면(1,2차인증 완료)
-![afterloginMain](https://github.com/user-attachments/assets/283384d3-7683-41c9-985d-730968985a0f)
-
-🟡
 
 
 
