@@ -93,4 +93,9 @@
 
 ---
 
-## 📂 프로젝트 구조 (간단 예시)
+## 📂 ERD
+<img src="https://github.com/user-attachments/assets/90462a81-2941-48b3-a40d-5ccc77fab4b4" width="600px"/>
+<p>🟡테이블 갯수 : 총 74개 </p>
+
+
+
