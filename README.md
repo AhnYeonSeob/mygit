@@ -39,7 +39,28 @@
 - ✅ 데이터 시각화 (Chart.js)
 
 ---
+## 📁 폴더구조
+Team01Project/
 
+├── pom.xml                          ← Maven 의존성 설정
+
+├── src/
+
+│   ├── main/
+
+│   │   ├── java/                   ← 자바 소스 (Controller, Service, DAO 등)
+
+│   │   ├── resources/             ← 설정 파일 (log4j.xml, mybatis-config.xml 등)
+
+│   │   └── webapp/                ← 웹 리소스 (JSP, JS, CSS)
+
+│   │       └── WEB-INF/          ← 서블릿 설정(web.xml), JSP 저장 위치
+
+│   └── test/                      ← 단위 테스트 소스
+
+└── target/                        ← 컴파일 결과물 (자동 생성)
+
+---
 ## 🖥 Service UI
 
 <h3>🎬 1차 인증(로그인페이지)</h3>
